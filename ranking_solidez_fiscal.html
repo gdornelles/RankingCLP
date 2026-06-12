@@ -1,0 +1,1266 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ranking CLP · Pilar Solidez Fiscal · 2019–2029</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=PT+Sans:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+/* ── TOKENS ── */
+:root{
+  --paper:#f1ecdf; --paper-2:#ebe4d1; --paper-3:#e4dcc4;
+  --ink:#1c1814;   --ink-2:#4a4239;   --muted:#857a68;
+  --rule:#c4b8a1;  --rule-soft:#d6cdb8;
+  --green:#3a6b3e; --gold:#a37714; --red:#92302a; --steel:#2f4e74;
+  --sidebar-bg:#1c1814; --sidebar-w:320px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--paper);color:var(--ink);
+  font-family:"PT Sans",sans-serif;font-size:15px;line-height:1.5;
+  -webkit-font-smoothing:antialiased}
+.serif{font-family:"Spectral",serif}
+.mono{font-family:"JetBrains Mono",monospace;font-variant-numeric:tabular-nums}
+
+/* ── APP SHELL (sidebar + main) ── */
+.app-shell{display:flex;min-height:100vh}
+
+/* ── SIDEBAR ── */
+.sidebar{
+  width:var(--sidebar-w);flex-shrink:0;
+  background:var(--sidebar-bg);color:#d6cdb8;
+  display:flex;flex-direction:column;
+  border-right:1px solid #333;
+  position:sticky;top:0;height:100vh;overflow-y:auto;
+}
+.sidebar::-webkit-scrollbar{width:4px}
+.sidebar::-webkit-scrollbar-thumb{background:#444}
+.sidebar-head{padding:22px 20px 14px;border-bottom:1px solid #333}
+.sidebar-kicker{font-size:9px;letter-spacing:.2em;text-transform:uppercase;
+  color:#857a68;font-weight:700;margin-bottom:8px}
+.sidebar-title{font-family:"Spectral",serif;font-size:18px;font-weight:600;
+  color:#f1ecdf;line-height:1.2}
+.sidebar-deck{font-family:"Spectral",serif;font-style:italic;font-size:12px;
+  color:#857a68;margin-top:4px;line-height:1.4}
+
+.sidebar-section{padding:14px 20px;border-bottom:1px solid #2a2520}
+.sidebar-section-label{font-size:9px;letter-spacing:.18em;text-transform:uppercase;
+  color:#857a68;font-weight:700;margin-bottom:10px;display:flex;
+  justify-content:space-between;align-items:center}
+.sidebar-section-label span{font-variant-numeric:tabular-nums;
+  font-family:"JetBrains Mono",monospace;color:#c4b8a1}
+
+/* Input conta */
+.conta-block{margin-bottom:10px}
+.conta-label{font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+  color:#c4b8a1;font-weight:700;margin-bottom:6px;line-height:1.3}
+.conta-years{display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
+.conta-year-wrap{display:flex;flex-direction:column;gap:2px}
+.conta-year-wrap label{font-size:9px;font-family:"JetBrains Mono",monospace;
+  color:#555;text-align:center;letter-spacing:.04em}
+.conta-year-wrap input{
+  width:100%;background:#2a2520;border:1px solid #383230;
+  color:#f1ecdf;font-family:"JetBrains Mono",monospace;
+  font-size:11px;padding:5px 6px;text-align:right;
+  font-variant-numeric:tabular-nums;-moz-appearance:textfield;
+  transition:border-color .12s,background .12s}
+.conta-year-wrap input::-webkit-outer-spin-button,
+.conta-year-wrap input::-webkit-inner-spin-button{-webkit-appearance:none}
+.conta-year-wrap input:focus{outline:none;border-color:#c4b8a1;background:#161310;color:#f1ecdf}
+.conta-year-wrap input.has-value:not(:focus){color:#a37714;font-size:11px}
+
+.sidebar-note{padding:12px 20px 16px;font-size:10px;font-family:"JetBrains Mono",monospace;
+  color:#555;line-height:1.6;border-top:1px solid #2a2520;margin-top:auto}
+.sidebar-note strong{color:#c4b8a1;font-weight:600}
+
+/* ── MAIN CONTENT ── */
+.main{flex:1;min-width:0;display:flex;flex-direction:column}
+
+/* MASTHEAD */
+.masthead{padding:20px 36px 14px;border-bottom:3px double var(--ink)}
+.kicker{font-size:10px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--ink-2);font-weight:700}
+.kicker .sep{margin:0 .5em;color:var(--rule)}
+.masthead-row{display:flex;align-items:flex-end;justify-content:space-between;
+  gap:24px;margin-top:10px;flex-wrap:wrap}
+.title{font-family:"Spectral",serif;font-weight:600;
+  font-size:clamp(28px,3.5vw,48px);line-height:.95;letter-spacing:-.012em}
+.edition{text-align:right;font-family:"Spectral",serif;font-size:12px;
+  font-style:italic;color:var(--ink-2);line-height:1.55}
+.edition .ed-em{font-style:normal;font-weight:600;color:var(--ink)}
+
+/* AVISO METODOLOGIA */
+.aviso{background:var(--paper-2);border-left:3px solid var(--gold);
+  padding:9px 16px;margin:0 36px;font-family:"Spectral",serif;font-style:italic;
+  font-size:13px;color:var(--ink-2);line-height:1.5}
+.aviso strong{color:var(--ink);font-style:normal}
+
+/* NAV TABS */
+nav.tabs{display:flex;gap:0;border-bottom:1px solid var(--ink);
+  padding:0 36px;overflow-x:auto}
+.tab-btn{background:none;border:none;cursor:pointer;
+  padding:14px 18px 12px;font-family:"Spectral",serif;font-size:14px;
+  color:var(--ink-2);white-space:nowrap;position:relative;transition:color .12s}
+.tab-btn:hover{color:var(--ink)}
+.tab-btn.active{color:var(--ink);font-weight:600}
+.tab-btn.active::after{content:"";position:absolute;left:18px;right:18px;
+  bottom:-1px;height:3px;background:var(--ink)}
+.tab-btn .tab-num{font-family:"JetBrains Mono",monospace;font-size:9px;
+  color:var(--muted);margin-right:7px;font-weight:400;letter-spacing:.05em;top:-1px;position:relative}
+.tab-btn.active .tab-num{color:var(--ink)}
+
+/* TAB CONTENT */
+.tab-content{padding:28px 36px 60px;flex:1}
+.tab-pane{display:none}.tab-pane.active{display:block}
+
+/* SECTION HEADS */
+.section-head{margin:0 0 16px}
+.section-eyebrow{font-size:10px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--muted);font-weight:700;margin-bottom:5px}
+.section-title{font-family:"Spectral",serif;font-size:22px;font-weight:600;
+  line-height:1.15;letter-spacing:-.005em}
+.section-deck{font-family:"Spectral",serif;font-style:italic;color:var(--ink-2);
+  font-size:13.5px;margin-top:4px;line-height:1.5;max-width:72ch}
+
+/* METRIC CARDS (4 posições projetadas) */
+.metric-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0;
+  border-top:2px solid var(--ink);border-bottom:1px solid var(--ink);margin:18px 0 24px}
+.metric-card{padding:14px 16px 16px;border-right:1px solid var(--rule-soft)}
+.metric-card:last-child{border-right:none}
+.metric-year{font-size:10px;font-family:"JetBrains Mono",monospace;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--muted);margin-bottom:4px;
+  display:flex;justify-content:space-between;align-items:center}
+.proj-tag{font-size:8px;letter-spacing:.1em;background:var(--gold);
+  color:var(--paper);padding:2px 5px;font-weight:700;font-family:"PT Sans",sans-serif}
+.metric-value{font-family:"JetBrains Mono",monospace;font-size:32px;font-weight:600;
+  line-height:1;font-variant-numeric:tabular-nums;color:var(--red)}
+.metric-value.melhor{color:var(--green)}
+.metric-score{font-size:12px;color:var(--muted);font-family:"Spectral",serif;
+  font-style:italic;margin-top:3px}
+.metric-delta{font-size:11px;font-family:"JetBrains Mono",monospace;
+  margin-top:5px;font-weight:600}
+.metric-delta.pos{color:var(--green)}.metric-delta.neg{color:var(--red)}
+.metric-delta.neu{color:var(--muted)}
+
+/* LAYOUT 2 COLUNAS */
+.col-layout{display:grid;grid-template-columns:3fr 1fr;gap:18px;align-items:start}
+@media(max-width:1100px){.col-layout{grid-template-columns:1fr}}
+
+/* CHART BLOCK */
+.chart-block{background:var(--paper);padding:18px 22px 22px;
+  border:1px solid var(--rule);margin:0}
+.chart-eyebrow{font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--muted);font-weight:700;margin-bottom:3px}
+.chart-title{font-family:"Spectral",serif;font-size:17px;font-weight:600;line-height:1.2}
+.chart-deck{font-family:"Spectral",serif;font-style:italic;font-size:12.5px;
+  color:var(--ink-2);margin-top:3px;line-height:1.4}
+.chart-source{font-size:10px;color:var(--muted);margin-top:8px;letter-spacing:.04em;
+  padding-top:7px;border-top:1px dotted var(--rule)}
+.chart-canvas{position:relative}
+.legend-row{display:flex;gap:14px;flex-wrap:wrap;margin:8px 0 10px;font-size:11px}
+.legend-item{display:inline-flex;align-items:center;gap:5px;color:var(--ink-2)}
+.legend-item .sq{display:inline-block;width:10px;height:10px;flex-shrink:0}
+
+/* SCORE LIST (coluna direita tab1) */
+.score-list{background:var(--paper);border:1px solid var(--rule);padding:14px 16px}
+.score-list-title{font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--muted);font-weight:700;margin-bottom:10px}
+.score-item{display:flex;align-items:center;gap:8px;padding:5px 0;
+  border-bottom:1px solid var(--rule-soft);font-size:13px}
+.score-item:last-child{border-bottom:none}
+.score-item .s-year{font-family:"JetBrains Mono",monospace;font-weight:600;
+  font-size:12px;min-width:36px;color:var(--ink-2)}
+.score-item .s-bar{flex:1;height:6px;background:var(--paper-3);
+  border:1px solid var(--rule);position:relative}
+.score-item .s-fill{position:absolute;top:0;left:0;bottom:0;transition:width .3s}
+.score-item .s-val{font-family:"JetBrains Mono",monospace;font-size:11px;
+  min-width:70px;text-align:right;color:var(--ink)}
+.score-item .s-rank{font-family:"JetBrains Mono",monospace;font-size:11px;
+  min-width:28px;text-align:right}
+
+/* EDITORIAL NOTE */
+.editorial-note{background:var(--paper-2);border-left:3px solid var(--ink);
+  padding:12px 16px;margin:18px 0;font-family:"Spectral",serif;font-size:13.5px;
+  line-height:1.6;color:var(--ink-2)}
+.editorial-note .note-tag{display:block;font-family:"PT Sans",sans-serif;font-size:9px;
+  letter-spacing:.18em;text-transform:uppercase;color:var(--muted);font-weight:700;
+  margin-bottom:5px;font-style:normal}
+.editorial-note strong{color:var(--ink);font-weight:700}
+
+/* GRID 2 */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:18px}
+@media(max-width:1000px){.grid-2{grid-template-columns:1fr}}
+
+/* SEPARADOR */
+.rule-sep{border:none;border-top:1px solid var(--rule);margin:24px 0}
+
+/* SELECT / RADIO */
+.control-row{display:flex;gap:20px;flex-wrap:wrap;align-items:flex-end;
+  padding:10px 0;border-bottom:1px solid var(--rule-soft);margin-bottom:18px}
+.ctrl-group{display:flex;flex-direction:column;gap:4px}
+.ctrl-label{font-size:9px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--muted);font-weight:700}
+select.ctrl-sel{background:var(--paper);border:1px solid var(--rule);color:var(--ink);
+  padding:6px 10px;font-family:"PT Sans",sans-serif;font-size:13px;cursor:pointer;
+  -webkit-appearance:none;appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23857a68'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 10px center;padding-right:28px}
+.radio-group{display:flex;gap:2px}
+.radio-btn{background:none;border:1px solid var(--rule);cursor:pointer;
+  padding:6px 14px;font-family:"JetBrains Mono",monospace;font-size:12px;
+  color:var(--ink-2);transition:all .12s;letter-spacing:.01em}
+.radio-btn:hover{border-color:var(--ink);color:var(--ink)}
+.radio-btn.active{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.radio-btn+.radio-btn{border-left:none}
+
+/* TABELAS */
+.table-wrap{overflow-x:auto;border:1px solid var(--ink);margin-top:14px}
+table.data-table{width:100%;border-collapse:collapse;font-size:12.5px;background:var(--paper)}
+table.data-table thead th{background:var(--ink);color:var(--paper);font-weight:600;
+  padding:9px 11px;text-align:center;font-family:"PT Sans",sans-serif;font-size:10px;
+  letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
+table.data-table thead th:first-child{text-align:left}
+table.data-table tbody td{padding:8px 11px;text-align:center;
+  border-bottom:1px solid var(--rule-soft);font-family:"JetBrains Mono",monospace;
+  font-variant-numeric:tabular-nums;color:var(--ink);font-size:12px}
+table.data-table tbody td:first-child{text-align:left;font-family:"PT Sans",sans-serif;
+  font-size:13px;font-weight:600}
+table.data-table tbody tr:hover td{background:var(--paper-2)}
+table.data-table tbody tr.rs-row td{background:#fff7f5 !important;color:var(--red);font-weight:700}
+.proj-col{border-left:2px dashed var(--rule) !important}
+.cell-pos{color:var(--green)}.cell-neg{color:var(--red)}
+.cell-gold{color:var(--gold)}.cell-nd{color:var(--rule)}
+
+/* LIMITES / ALERTAS */
+.limits-block{border:1px solid var(--ink);background:var(--paper-2);padding:18px 22px;margin-top:18px}
+.limits-block-title{font-family:"Spectral",serif;font-size:15px;font-weight:600;margin-bottom:14px}
+.limit-row{display:grid;grid-template-columns:220px 1fr 90px 80px;gap:16px;
+  align-items:center;padding:11px 0;border-bottom:1px solid var(--rule-soft)}
+.limit-row:last-child{border-bottom:none}
+.limit-name{font-family:"Spectral",serif;font-size:14px;color:var(--ink)}
+.limit-name .lim-cap{font-size:10px;color:var(--muted);font-family:"PT Sans",sans-serif;
+  letter-spacing:.04em;display:block;margin-top:1px;text-transform:uppercase}
+.limit-bar{position:relative;height:10px;background:var(--paper-3);border:1px solid var(--rule)}
+.limit-fill{position:absolute;top:0;left:0;bottom:0;transition:width .4s}
+.limit-val{text-align:right;font-family:"JetBrains Mono",monospace;
+  font-size:14px;font-weight:600;font-variant-numeric:tabular-nums}
+.limit-status{text-align:center;font-size:16px}
+.year-tabs-inline{display:flex;gap:0;margin-bottom:14px}
+.ytab{background:none;border:1px solid var(--rule);cursor:pointer;padding:5px 12px;
+  font-family:"JetBrains Mono",monospace;font-size:12px;color:var(--ink-2);
+  transition:all .12s}
+.ytab.active{background:var(--ink);color:var(--paper)}
+.ytab+.ytab{border-left:none}
+
+/* CONTEXTO RS */
+.context-block{margin-top:20px;border-top:1px solid var(--rule);padding-top:16px}
+.context-item{display:flex;gap:12px;padding:8px 0;border-bottom:1px solid var(--rule-soft);
+  font-size:13.5px;font-family:"Spectral",serif;line-height:1.5}
+.context-item:last-child{border-bottom:none}
+.context-item .ctx-year{font-family:"JetBrains Mono",monospace;font-size:12px;
+  font-weight:600;color:var(--ink-2);min-width:36px}
+.context-item .ctx-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:6px}
+.context-item .ctx-text{color:var(--ink-2)}
+.context-item .ctx-text strong{color:var(--ink)}
+
+/* FOOTER */
+footer.colophon{margin:60px 36px 0;padding:22px 0 40px;
+  border-top:3px double var(--ink);font-size:12px;color:var(--ink-2);
+  line-height:1.65;font-family:"Spectral",serif}
+.colophon-grid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:36px}
+@media(max-width:760px){.colophon-grid{grid-template-columns:1fr;gap:18px}}
+.colophon h4{font-family:"PT Sans",sans-serif;font-size:10px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--ink);font-weight:700;margin-bottom:8px}
+.colophon-aside{font-style:italic;color:var(--muted);font-size:11px;
+  margin-top:12px;padding-top:12px;border-top:1px solid var(--rule)}
+
+/* Responsive */
+@media(max-width:900px){
+  .sidebar{display:none}
+  .metric-grid{grid-template-columns:repeat(2,1fr)}
+  .limit-row{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+<div class="app-shell">
+
+<!-- ═══════════════════════════════════════════
+     SIDEBAR
+═══════════════════════════════════════════ -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-head">
+    <div class="sidebar-kicker">Contas SICONFI</div>
+    <div class="sidebar-title">RS · 2026–2029</div>
+  </div>
+
+  <div class="sidebar-section" style="padding-top:10px">
+    <div id="sidebar-inputs"></div>
+  </div>
+
+  <div class="sidebar-note">
+    <div id="ultima-alteracao" style="color:#555;margin-bottom:8px"></div>
+    <button onclick="resetarInputs()" style="background:none;border:1px solid #333;color:#555;padding:5px 10px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;width:100%;transition:all .15s" onmouseover="this.style.borderColor='#c4b8a1';this.style.color='#c4b8a1'" onmouseout="this.style.borderColor='#333';this.style.color='#555'">↺ restaurar padrão 2025</button>
+  </div>
+</aside>
+
+<!-- ═══════════════════════════════════════════
+     MAIN
+═══════════════════════════════════════════ -->
+<div class="main">
+
+  <header class="masthead">
+    <div class="kicker">
+      Centro de Liderança Pública <span class="sep">·</span> Ranking de Competitividade dos Estados <span class="sep">·</span> Pilar Solidez Fiscal
+    </div>
+    <div class="masthead-row">
+      <h1 class="title serif">Pilar Solidez Fiscal<br><span style="font-size:.55em;font-weight:400;color:var(--ink-2)">Ranking CLP · 27 Estados · 2019–2025 + Projeções 2026–2029</span></h1>
+      <div class="edition">
+        <span style="display:block"><em class="ed-em">Ranking CLP</em> · Solidez Fiscal</span>
+        <span style="display:block;margin-top:2px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted)">2019–2025 histórico · 2026–2029 projeção</span>
+      </div>
+    </div>
+  </header>
+
+  <div style="padding:7px 36px;background:var(--paper-2);border-bottom:1px solid var(--rule-soft);font-size:11px;color:var(--muted);font-family:'JetBrains Mono',monospace;letter-spacing:.02em">
+    ⚠ Ranking parcial · 6/9 indicadores (sem RGF) · pesos iguais como proxy CLP
+  </div>
+
+  <nav class="tabs">
+    <button class="tab-btn active" data-tab="t1"><span class="tab-num">I</span>Ranking RS — Histórico &amp; Projeção</button>
+    <button class="tab-btn" data-tab="t3"><span class="tab-num">II</span>Mapa de Calor — Todos os Estados</button>
+    <button class="tab-btn" data-tab="t4"><span class="tab-num">III</span>Alertas &amp; Referências</button>
+  </nav>
+
+  <div class="tab-content">
+    <div id="t1" class="tab-pane active"></div>
+    <div id="t2" class="tab-pane"></div>
+    <div id="t3" class="tab-pane"></div>
+    <div id="t4" class="tab-pane"></div>
+  </div>
+
+  <footer class="colophon">
+    <div class="colophon-grid">
+      <div>
+        <h4>Sobre este painel</h4>
+        Acompanhamento do Pilar Solidez Fiscal do Ranking de Competitividade dos Estados (CLP/Tendências).
+        Dados históricos via API SICONFI/Tesouro Nacional — RREO 6º bimestre e RGF 3º quadrimestre.
+        Projeções ARIMA(1,1,0) para 26 estados; inputs manuais para o Rio Grande do Sul.
+        <div class="colophon-aside">Ranking parcial: 6 de 9 indicadores. Pesos iguais como proxy — CLP não divulga pesos reais.</div>
+      </div>
+      <div>
+        <h4>Indicadores disponíveis</h4>
+        <ul style="list-style:none;font-size:11.5px">
+          <li>✓ Taxa de Investimentos</li><li>✓ Regra de Ouro</li>
+          <li>✓ Sucesso no Planejamento</li><li>✓ Dependência Fiscal</li>
+          <li>✓ Resultado Primário</li><li>✓ Poupança Corrente</li>
+          <li style="color:var(--muted)">⏳ Solvência Fiscal</li>
+          <li style="color:var(--muted)">⏳ Gasto com Pessoal</li>
+          <li style="color:var(--muted)">⏳ Índice de Liquidez</li>
+        </ul>
+      </div>
+      <div>
+        <h4>Fontes</h4>
+        <ul style="list-style:none;font-size:11.5px">
+          <li>SICONFI — Tesouro Nacional</li>
+          <li>Ranking CLP — clp.org.br</li>
+          <li>LC 101/2000 — Lei de Responsabilidade Fiscal</li>
+        </ul>
+      </div>
+    </div>
+  </footer>
+
+</div><!-- /main -->
+</div><!-- /app-shell -->
+
+<script>
+/* ══════════════════════════════════════════════════════════
+   DADOS EMBUTIDOS
+══════════════════════════════════════════════════════════ */
+const DADOS = {"anos": [2019, 2020, 2021, 2022, 2023, 2024, 2025], "ufs": ["AC", "AL", "AM", "AP", "BA", "CE", "DF", "ES", "GO", "MA", "MG", "MS", "MT", "PA", "PB", "PE", "PI", "PR", "RJ", "RN", "RO", "RR", "RS", "SC", "SE", "SP", "TO"], "rs_contas": {"2019": {"RCL": 39779435776.0, "RECEITAS_CORRENTES": 54210265538.0, "DESPESAS_CORRENTES": 54938047222.0, "TRANSFERENCIAS_CORRENTES": 8348480373.0, "RECEITA_OP_CREDITO": 191868025.0, "DESPESA_CAPITAL_EMPENHADA": 2540534717.0, "INVESTIMENTO_LIQUIDADO": 572804996.0, "DESPESA_LIQUIDADA_TOTAL": 72809039543.0, "DOTACAO_ATUALIZADA": 76787831191.0, "RECEITA_PRIMARIA": 57068703011.0, "DESPESA_PRIMARIA_EMPENHADA": 53680705931.0}, "2020": {"RCL": 42073517609.0, "RECEITAS_CORRENTES": 46020565971.0, "DESPESAS_CORRENTES": 44052724346.0, "TRANSFERENCIAS_CORRENTES": 11169989874.0, "RECEITA_OP_CREDITO": 24870038.0, "DESPESA_CAPITAL_EMPENHADA": 2736034777.0, "INVESTIMENTO_LIQUIDADO": 430184489.0, "DESPESA_LIQUIDADA_TOTAL": 63026689275.0, "DOTACAO_ATUALIZADA": 68788057422.0, "RECEITA_PRIMARIA": 44088677494.0, "DESPESA_PRIMARIA_EMPENHADA": 57407674034.0}, "2021": {"RCL": 53878109956.0, "RECEITAS_CORRENTES": 53915064960.0, "DESPESAS_CORRENTES": 45533054451.0, "TRANSFERENCIAS_CORRENTES": 10348575789.0, "RECEITA_OP_CREDITO": 41848000.0, "DESPESA_CAPITAL_EMPENHADA": 7474162761.0, "INVESTIMENTO_LIQUIDADO": 1149184566.0, "DESPESA_LIQUIDADA_TOTAL": 68169156577.0, "DOTACAO_ATUALIZADA": 75713365768.0, "RECEITA_PRIMARIA": 42222818569.0, "DESPESA_PRIMARIA_EMPENHADA": 47855259427.0}, "2022": {"RCL": 50634029850.0, "RECEITAS_CORRENTES": 54098338264.0, "DESPESAS_CORRENTES": 48190814762.0, "TRANSFERENCIAS_CORRENTES": 10862024898.0, "RECEITA_OP_CREDITO": 95595667.0, "DESPESA_CAPITAL_EMPENHADA": 4134908164.0, "INVESTIMENTO_LIQUIDADO": 2358730729.0, "DESPESA_LIQUIDADA_TOTAL": 67778236096.0, "DOTACAO_ATUALIZADA": 75202383013.0, "RECEITA_PRIMARIA": 48445230539.0, "DESPESA_PRIMARIA_EMPENHADA": 51260133324.0}, "2023": {"RCL": 56639116676.0, "RECEITAS_CORRENTES": 60574550434.0, "DESPESAS_CORRENTES": 53320893566.0, "TRANSFERENCIAS_CORRENTES": 12850986509.0, "RECEITA_OP_CREDITO": 78658880.0, "DESPESA_CAPITAL_EMPENHADA": 5933658130.0, "INVESTIMENTO_LIQUIDADO": 1326243759.0, "DESPESA_LIQUIDADA_TOTAL": 74772085534.0, "DOTACAO_ATUALIZADA": 83149468008.0, "RECEITA_PRIMARIA": 19579410986.0, "DESPESA_PRIMARIA_EMPENHADA": 19178439587.0}, "2024": {"RCL": 60043883382.0, "RECEITAS_CORRENTES": 64089313279.0, "DESPESAS_CORRENTES": 55988211721.0, "TRANSFERENCIAS_CORRENTES": 13578144404.0, "RECEITA_OP_CREDITO": 1221374207.0, "DESPESA_CAPITAL_EMPENHADA": 6812798917.0, "INVESTIMENTO_LIQUIDADO": 1597344877.0, "DESPESA_LIQUIDADA_TOTAL": 76670306783.0, "DOTACAO_ATUALIZADA": 96564111774.0, "RECEITA_PRIMARIA": 19685805406.0, "DESPESA_PRIMARIA_EMPENHADA": 19290541854.0}, "2025": {"RCL": 65232845641.0, "RECEITAS_CORRENTES": 69588668830.0, "DESPESAS_CORRENTES": 61766322325.0, "TRANSFERENCIAS_CORRENTES": 12980922761.0, "RECEITA_OP_CREDITO": 2406757254.0, "DESPESA_CAPITAL_EMPENHADA": 5839976952.0, "INVESTIMENTO_LIQUIDADO": 2341594679.0, "DESPESA_LIQUIDADA_TOTAL": 82218287668.0, "DOTACAO_ATUALIZADA": 98005924512.0, "RECEITA_PRIMARIA": 10249753452.0, "DESPESA_PRIMARIA_EMPENHADA": 9991823091.0}}, "hist_scores": {"AC": {"2019": {"score": 45.87, "rank": 17, "sc_ind1": 15.06, "sc_ind2": 65.23, "sc_ind4": 67.49, "sc_ind5": 0.0, "sc_ind6": 83.16, "sc_ind9": 44.26, "ind1": 0.025349, "ind2": 0.079939, "ind4": 0.892241, "ind5": 0.649042, "ind6": 0.131771, "ind9": 0.10664}, "2020": {"score": 46.15, "rank": 18, "sc_ind1": 29.13, "sc_ind2": 62.62, "sc_ind4": 60.23, "sc_ind5": 4.49, "sc_ind6": 88.93, "sc_ind9": 31.48, "ind1": 0.034183, "ind2": 0.092696, "ind4": 0.841501, "ind5": 0.676081, "ind6": 0.14876, "ind9": 0.126804}, "2021": {"score": 38.7, "rank": 18, "sc_ind1": 25.64, "sc_ind2": 32.12, "sc_ind4": 78.64, "sc_ind5": 3.83, "sc_ind6": 67.16, "sc_ind9": 24.79, "ind1": 0.051644, "ind2": 0.111985, "ind4": 0.884331, "ind5": 0.656362, "ind6": 0.141214, "ind9": 0.154484}, "2022": {"score": 48.42, "rank": 11, "sc_ind1": 36.03, "sc_ind2": 49.43, "sc_ind4": 85.44, "sc_ind5": 2.55, "sc_ind6": 90.25, "sc_ind9": 26.83, "ind1": 0.090949, "ind2": 0.160643, "ind4": 0.92638, "ind5": 0.675987, "ind6": 0.108766, "ind9": 0.140249}, "2023": {"score": 39.06, "rank": 24, "sc_ind1": 18.56, "sc_ind2": 27.9, "sc_ind4": 78.23, "sc_ind5": 3.46, "sc_ind6": 90.29, "sc_ind9": 15.93, "ind1": 0.046025, "ind2": 0.101819, "ind4": 0.885049, "ind5": 0.667471, "ind6": -0.005596, "ind9": 0.097071}, "2024": {"score": 37.71, "rank": 23, "sc_ind1": 11.18, "sc_ind2": 25.92, "sc_ind4": 73.32, "sc_ind5": 0.0, "sc_ind6": 91.53, "sc_ind9": 24.28, "ind1": 0.042756, "ind2": 0.092019, "ind4": 0.893262, "ind5": 0.681497, "ind6": -0.001976, "ind9": 0.105452}, "2025": {"score": 37.53, "rank": 22, "sc_ind1": 17.26, "sc_ind2": 38.62, "sc_ind4": 63.39, "sc_ind5": 0.0, "sc_ind6": 76.22, "sc_ind9": 29.72, "ind1": 0.055066, "ind2": 0.092073, "ind4": 0.895164, "ind5": 0.679742, "ind6": 0.007722, "ind9": 0.106709}}, "AL": {"2019": {"score": 68.16, "rank": 3, "sc_ind1": 95.85, "sc_ind2": 100.0, "sc_ind4": 44.35, "sc_ind5": 22.68, "sc_ind6": 85.27, "sc_ind9": 60.78, "ind1": 0.084632, "ind2": 0.108348, "ind4": 0.839973, "ind5": 0.514846, "ind6": 0.142789, "ind9": 0.157588}, "2020": {"score": 65.43, "rank": 6, "sc_ind1": 85.71, "sc_ind2": 65.64, "sc_ind4": 65.36, "sc_ind5": 34.31, "sc_ind6": 71.56, "sc_ind9": 70.02, "ind1": 0.080707, "ind2": 0.095962, "ind4": 0.858548, "ind5": 0.496427, "ind6": 0.05785, "ind9": 0.224783}, "2021": {"score": 71.94, "rank": 1, "sc_ind1": 100.0, "sc_ind2": 100.0, "sc_ind4": 37.11, "sc_ind5": 37.07, "sc_ind6": 87.7, "sc_ind9": 69.77, "ind1": 0.140226, "ind2": 0.309353, "ind4": 0.769739, "ind5": 0.449783, "ind6": 0.233458, "ind9": 0.257174}, "2022": {"score": 58.13, "rank": 8, "sc_ind1": 100.0, "sc_ind2": 46.72, "sc_ind4": 71.38, "sc_ind5": 26.16, "sc_ind6": 86.82, "sc_ind9": 17.7, "ind1": 0.184954, "ind2": 0.154359, "ind4": 0.896432, "ind5": 0.531648, "ind6": 0.095584, "ind9": 0.116421}, "2023": {"score": 57.56, "rank": 8, "sc_ind1": 88.2, "sc_ind2": 51.04, "sc_ind4": 66.67, "sc_ind5": 30.25, "sc_ind6": 89.41, "sc_ind9": 19.76, "ind1": 0.137529, "ind2": 0.148253, "ind4": 0.865478, "ind5": 0.516224, "ind6": -0.008811, "ind9": 0.104292}, "2024": {"score": 63.75, "rank": 5, "sc_ind1": 84.91, "sc_ind2": 75.53, "sc_ind4": 34.71, "sc_ind5": 26.72, "sc_ind6": 92.27, "sc_ind9": 68.34, "ind1": 0.149326, "ind2": 0.172144, "ind4": 0.840982, "ind5": 0.526595, "ind6": 0.000213, "ind9": 0.203102}, "2025": {"score": 42.82, "rank": 16, "sc_ind1": 45.4, "sc_ind2": 86.97, "sc_ind4": 0.0, "sc_ind5": 25.57, "sc_ind6": 34.15, "sc_ind9": 64.8, "ind1": 0.0943, "ind2": 0.195705, "ind4": 0.793256, "ind5": 0.531607, "ind6": -0.012062, "ind9": 0.171601}}, "AM": {"2019": {"score": 57.03, "rank": 9, "sc_ind1": 41.45, "sc_ind2": 41.6, "sc_ind4": 70.18, "sc_ind5": 60.47, "sc_ind6": 73.14, "sc_ind9": 55.33, "ind1": 0.044712, "ind2": 0.060642, "ind4": 0.898301, "ind5": 0.291242, "ind6": 0.079452, "ind9": 0.140779}, "2020": {"score": 54.08, "rank": 11, "sc_ind1": 41.0, "sc_ind2": 37.33, "sc_ind4": 71.3, "sc_ind5": 64.63, "sc_ind6": 59.19, "sc_ind9": 51.04, "ind1": 0.043944, "ind2": 0.065422, "ind4": 0.878315, "ind5": 0.313752, "ind6": -0.006876, "ind9": 0.17653}, "2021": {"score": 40.72, "rank": 14, "sc_ind1": 32.35, "sc_ind2": 13.31, "sc_ind4": 79.3, "sc_ind5": 62.68, "sc_ind6": 39.74, "sc_ind9": 16.94, "ind1": 0.059646, "ind2": 0.057278, "ind4": 0.886152, "ind5": 0.290602, "ind6": 0.018096, "ind9": 0.136562}, "2022": {"score": 46.7, "rank": 14, "sc_ind1": 30.95, "sc_ind2": 16.2, "sc_ind4": 84.05, "sc_ind5": 62.1, "sc_ind6": 68.58, "sc_ind9": 18.34, "ind1": 0.08349, "ind2": 0.083506, "ind4": 0.923411, "ind5": 0.312005, "ind6": 0.025435, "ind9": 0.118085}, "2023": {"score": 50.34, "rank": 14, "sc_ind1": 25.65, "sc_ind2": 0.0, "sc_ind4": 100.0, "sc_ind5": 66.58, "sc_ind6": 99.24, "sc_ind9": 10.59, "ind1": 0.055347, "ind2": 0.045858, "ind4": 0.921902, "ind5": 0.311105, "ind6": 0.027188, "ind9": 0.086968}, "2024": {"score": 46.75, "rank": 17, "sc_ind1": 22.14, "sc_ind2": 0.0, "sc_ind4": 81.64, "sc_ind5": 63.34, "sc_ind6": 97.81, "sc_ind9": 15.6, "ind1": 0.058598, "ind2": 0.050147, "ind4": 0.904521, "ind5": 0.314362, "ind6": 0.016693, "ind9": 0.086208}, "2025": {"score": 52.07, "rank": 12, "sc_ind1": 8.92, "sc_ind2": 23.84, "sc_ind4": 100.0, "sc_ind5": 64.68, "sc_ind6": 96.53, "sc_ind9": 18.41, "ind1": 0.043451, "ind2": 0.060406, "ind4": 0.954029, "ind5": 0.305055, "ind6": 0.017273, "ind9": 0.085786}}, "AP": {"2019": {"score": 42.91, "rank": 21, "sc_ind1": 13.38, "sc_ind2": 30.99, "sc_ind4": 7.14, "sc_ind5": 5.93, "sc_ind6": 100.0, "sc_ind9": 100.0, "ind1": 0.024115, "ind2": 0.051969, "ind4": 0.755904, "ind5": 0.613971, "ind6": 0.219686, "ind9": 0.278532}, "2020": {"score": 39.43, "rank": 23, "sc_ind1": 10.21, "sc_ind2": 2.72, "sc_ind4": 18.57, "sc_ind5": 5.06, "sc_ind6": 100.0, "sc_ind9": 100.0, "ind1": 0.018618, "ind2": 0.0281, "ind4": 0.702993, "ind5": 0.672668, "ind6": 0.206679, "ind9": 0.301007}, "2021": {"score": 36.74, "rank": 21, "sc_ind1": 5.74, "sc_ind2": 5.32, "sc_ind4": 46.59, "sc_ind5": 0.0, "sc_ind6": 84.28, "sc_ind9": 78.52, "ind1": 0.027943, "ind2": 0.034055, "ind4": 0.795891, "ind5": 0.680172, "ind6": 0.218061, "ind9": 0.27715}, "2022": {"score": 47.84, "rank": 12, "sc_ind1": 26.39, "sc_ind2": 27.57, "sc_ind4": 38.53, "sc_ind5": 0.74, "sc_ind6": 94.57, "sc_ind9": 99.24, "ind1": 0.076794, "ind2": 0.109908, "ind4": 0.826442, "ind5": 0.687018, "ind6": 0.12541, "ind9": 0.32927}, "2023": {"score": 48.32, "rank": 17, "sc_ind1": 10.46, "sc_ind2": 28.59, "sc_ind4": 65.42, "sc_ind5": 1.78, "sc_ind6": 83.64, "sc_ind9": 100.0, "ind1": 0.035391, "ind2": 0.103219, "ind4": 0.863368, "ind5": 0.67694, "ind6": -0.029951, "ind9": 0.255867}, "2024": {"score": 48.06, "rank": 15, "sc_ind1": 13.38, "sc_ind2": 35.41, "sc_ind4": 76.19, "sc_ind5": 0.11, "sc_ind6": 96.82, "sc_ind9": 66.45, "ind1": 0.045946, "ind2": 0.107339, "ind4": 0.89714, "ind5": 0.680836, "ind6": 0.013759, "ind9": 0.198915}, "2025": {"score": 39.86, "rank": 20, "sc_ind1": 31.26, "sc_ind2": 42.55, "sc_ind4": 61.87, "sc_ind5": 5.6, "sc_ind6": 21.01, "sc_ind9": 76.84, "ind1": 0.074593, "ind2": 0.100498, "ind4": 0.892729, "ind5": 0.647299, "ind6": -0.018237, "ind9": 0.193873}}, "BA": {"2019": {"score": 65.8, "rank": 6, "sc_ind1": 68.62, "sc_ind2": 77.38, "sc_ind4": 80.69, "sc_ind5": 58.58, "sc_ind6": 70.44, "sc_ind9": 39.12, "ind1": 0.06465, "ind2": 0.089864, "ind4": 0.922043, "ind5": 0.302431, "ind6": 0.065355, "ind9": 0.090798}, "2020": {"score": 59.01, "rank": 8, "sc_ind1": 58.91, "sc_ind2": 59.29, "sc_ind4": 70.23, "sc_ind5": 60.47, "sc_ind6": 70.85, "sc_ind9": 34.3, "ind1": 0.058671, "ind2": 0.089105, "ind4": 0.874747, "ind5": 0.338813, "ind6": 0.054176, "ind9": 0.133977}, "2021": {"score": 54.57, "rank": 6, "sc_ind1": 41.71, "sc_ind2": 36.96, "sc_ind4": 84.76, "sc_ind5": 60.98, "sc_ind6": 50.64, "sc_ind9": 52.39, "ind1": 0.070787, "ind2": 0.126046, "ind4": 0.901209, "ind5": 0.30117, "ind6": 0.067053, "ind9": 0.217499}, "2022": {"score": 72.12, "rank": 2, "sc_ind1": 91.12, "sc_ind2": 74.48, "sc_ind4": 65.11, "sc_ind5": 54.68, "sc_ind6": 86.99, "sc_ind9": 60.33, "ind1": 0.171902, "ind2": 0.218809, "ind4": 0.883066, "ind5": 0.357388, "ind6": 0.096247, "ind9": 0.227694}, "2023": {"score": 71.14, "rank": 4, "sc_ind1": 88.92, "sc_ind2": 66.17, "sc_ind4": 82.12, "sc_ind5": 59.71, "sc_ind6": 91.56, "sc_ind9": 38.37, "ind1": 0.138477, "ind2": 0.178599, "ind4": 0.891626, "ind5": 0.349851, "ind6": -0.000943, "ind9": 0.139445}, "2024": {"score": 59.16, "rank": 6, "sc_ind1": 58.2, "sc_ind2": 48.08, "sc_ind4": 74.58, "sc_ind5": 48.97, "sc_ind6": 89.36, "sc_ind9": 35.76, "ind1": 0.110718, "ind2": 0.127817, "ind4": 0.894965, "ind5": 0.397638, "ind6": -0.008426, "ind9": 0.130885}, "2025": {"score": 42.52, "rank": 17, "sc_ind1": 54.37, "sc_ind2": 43.85, "sc_ind4": 36.15, "sc_ind5": 50.81, "sc_ind6": 39.87, "sc_ind9": 30.08, "ind1": 0.106804, "ind2": 0.103293, "ind4": 0.851381, "ind5": 0.385427, "ind6": -0.00937, "ind9": 0.107366}}, "CE": {"2019": {"score": 72.34, "rank": 2, "sc_ind1": 100.0, "sc_ind2": 81.81, "sc_ind4": 55.12, "sc_ind5": 51.76, "sc_ind6": 87.34, "sc_ind9": 58.04, "ind1": 0.087679, "ind2": 0.093486, "ind4": 0.864286, "ind5": 0.342826, "ind6": 0.153589, "ind9": 0.149152}, "2020": {"score": 66.79, "rank": 3, "sc_ind1": 87.44, "sc_ind2": 72.54, "sc_ind4": 53.13, "sc_ind5": 52.72, "sc_ind6": 80.49, "sc_ind9": 54.45, "ind1": 0.082129, "ind2": 0.103398, "ind4": 0.81789, "ind5": 0.385514, "ind6": 0.104595, "ind9": 0.185192}, "2021": {"score": 52.79, "rank": 9, "sc_ind1": 58.41, "sc_ind2": 42.7, "sc_ind4": 65.63, "sc_ind5": 51.2, "sc_ind6": 49.94, "sc_ind9": 48.84, "ind1": 0.090684, "ind2": 0.142756, "ind4": 0.848431, "ind5": 0.361964, "ind6": 0.063887, "ind9": 0.20939}, "2022": {"score": 56.0, "rank": 9, "sc_ind1": 52.55, "sc_ind2": 48.82, "sc_ind4": 73.92, "sc_ind5": 39.97, "sc_ind6": 73.71, "sc_ind9": 47.03, "ind1": 0.115231, "ind2": 0.159233, "ind4": 0.901833, "ind5": 0.447279, "ind6": 0.045163, "ind9": 0.192975}, "2023": {"score": 42.53, "rank": 22, "sc_ind1": 40.4, "sc_ind2": 24.39, "sc_ind4": 34.61, "sc_ind5": 43.58, "sc_ind6": 87.49, "sc_ind9": 24.69, "ind1": 0.074718, "ind2": 0.094796, "ind4": 0.811204, "ind5": 0.440943, "ind6": -0.015845, "ind9": 0.113614}, "2024": {"score": 51.15, "rank": 13, "sc_ind1": 46.38, "sc_ind2": 52.25, "sc_ind4": 37.14, "sc_ind5": 41.12, "sc_ind6": 94.04, "sc_ind9": 35.98, "ind1": 0.093633, "ind2": 0.134542, "ind4": 0.844273, "ind5": 0.443125, "ind6": 0.005495, "ind9": 0.131383}, "2025": {"score": 49.22, "rank": 13, "sc_ind1": 52.99, "sc_ind2": 29.45, "sc_ind4": 59.49, "sc_ind5": 42.26, "sc_ind6": 75.15, "sc_ind9": 35.94, "ind1": 0.104881, "ind2": 0.072437, "ind4": 0.888903, "ind5": 0.434944, "ind6": 0.007218, "ind9": 0.11822}}, "DF": {"2019": {"score": 45.36, "rank": 19, "sc_ind1": 20.77, "sc_ind2": 20.06, "sc_ind4": 42.97, "sc_ind5": 91.99, "sc_ind6": 59.46, "sc_ind9": 36.94, "ind1": 0.029539, "ind2": 0.043043, "ind4": 0.836837, "ind5": 0.104784, "ind6": 0.008033, "ind9": 0.084081}, "2020": {"score": 43.97, "rank": 21, "sc_ind1": 16.49, "sc_ind2": 10.58, "sc_ind4": 55.27, "sc_ind5": 90.33, "sc_ind6": 60.63, "sc_ind9": 30.52, "ind1": 0.023783, "ind2": 0.03658, "ind4": 0.825012, "ind5": 0.158891, "ind6": 0.00069, "ind9": 0.124361}, "2021": {"score": 30.31, "rank": 25, "sc_ind1": 3.19, "sc_ind2": 11.02, "sc_ind4": 50.36, "sc_ind5": 78.16, "sc_ind6": 19.49, "sc_ind9": 19.63, "ind1": 0.024908, "ind2": 0.050618, "ind4": 0.806305, "ind5": 0.194394, "ind6": -0.072856, "ind9": 0.142717}, "2022": {"score": 31.73, "rank": 25, "sc_ind1": 0.0, "sc_ind2": 0.0, "sc_ind4": 53.33, "sc_ind5": 79.32, "sc_ind6": 57.72, "sc_ind9": 0.0, "ind1": 0.038013, "ind2": 0.045893, "ind4": 0.857978, "ind5": 0.206758, "ind6": -0.016305, "ind9": 0.07021}, "2023": {"score": 46.51, "rank": 18, "sc_ind1": 13.66, "sc_ind2": 2.91, "sc_ind4": 37.22, "sc_ind5": 85.28, "sc_ind6": 93.37, "sc_ind9": 46.64, "ind1": 0.039597, "ind2": 0.051696, "ind4": 0.815626, "ind5": 0.205537, "ind6": 0.005696, "ind9": 0.155068}, "2024": {"score": 36.42, "rank": 25, "sc_ind1": 11.06, "sc_ind2": 12.81, "sc_ind4": 20.97, "sc_ind5": 84.74, "sc_ind6": 83.47, "sc_ind9": 5.48, "ind1": 0.042583, "ind2": 0.070838, "ind4": 0.822371, "ind5": 0.190305, "ind6": -0.025954, "ind9": 0.063781}, "2025": {"score": 29.55, "rank": 25, "sc_ind1": 11.3, "sc_ind2": 27.76, "sc_ind4": 46.28, "sc_ind5": 87.27, "sc_ind6": 0.0, "sc_ind9": 4.67, "ind1": 0.046771, "ind2": 0.068799, "ind4": 0.867661, "ind5": 0.174245, "ind6": -0.028118, "ind9": 0.060366}}, "ES": {"2019": {"score": 67.91, "rank": 4, "sc_ind1": 53.61, "sc_ind2": 76.03, "sc_ind4": 56.74, "sc_ind5": 46.94, "sc_ind6": 77.47, "sc_ind9": 96.68, "ind1": 0.053635, "ind2": 0.088767, "ind4": 0.867957, "ind5": 0.371345, "ind6": 0.102059, "ind9": 0.268309}, "2020": {"score": 69.27, "rank": 2, "sc_ind1": 75.51, "sc_ind2": 100.0, "sc_ind4": 39.31, "sc_ind5": 55.18, "sc_ind6": 74.73, "sc_ind9": 70.89, "ind1": 0.072318, "ind2": 0.133012, "ind4": 0.771943, "ind5": 0.370686, "ind6": 0.074461, "ind9": 0.226992}, "2021": {"score": 48.54, "rank": 11, "sc_ind1": 54.08, "sc_ind2": 52.09, "sc_ind4": 32.19, "sc_ind5": 53.8, "sc_ind6": 29.79, "sc_ind9": 69.29, "ind1": 0.085524, "ind2": 0.170048, "ind4": 0.756163, "ind5": 0.345772, "ind6": -0.026604, "ind9": 0.256076}, "2022": {"score": 71.34, "rank": 4, "sc_ind1": 75.92, "sc_ind2": 79.85, "sc_ind4": 35.36, "sc_ind5": 62.3, "sc_ind6": 85.44, "sc_ind9": 89.17, "ind1": 0.149578, "ind2": 0.231274, "ind4": 0.819691, "ind5": 0.31077, "ind6": 0.090271, "ind9": 0.302964}, "2023": {"score": 84.73, "rank": 2, "sc_ind1": 98.93, "sc_ind2": 91.83, "sc_ind4": 65.02, "sc_ind5": 69.41, "sc_ind6": 93.24, "sc_ind9": 89.95, "ind1": 0.151629, "ind2": 0.230076, "ind4": 0.862686, "ind5": 0.295088, "ind6": 0.0052, "ind9": 0.236877}, "2024": {"score": 82.16, "rank": 1, "sc_ind1": 73.84, "sc_ind2": 100.0, "sc_ind4": 53.8, "sc_ind5": 69.97, "sc_ind6": 95.35, "sc_ind9": 100.0, "ind1": 0.133317, "ind2": 0.211674, "ind4": 0.866825, "ind5": 0.275877, "ind6": 0.009375, "ind9": 0.273266}, "2025": {"score": 76.93, "rank": 1, "sc_ind1": 84.18, "sc_ind2": 100.0, "sc_ind4": 31.0, "sc_ind5": 70.05, "sc_ind6": 76.38, "sc_ind9": 100.0, "ind1": 0.148351, "ind2": 0.223639, "ind4": 0.843098, "ind5": 0.273978, "ind6": 0.007796, "ind9": 0.236703}}, "GO": {"2019": {"score": 45.52, "rank": 18, "sc_ind1": 0.49, "sc_ind2": 50.91, "sc_ind4": 56.18, "sc_ind5": 74.64, "sc_ind6": 74.33, "sc_ind9": 16.56, "ind1": 0.014657, "ind2": 0.068243, "ind4": 0.866691, "ind5": 0.207416, "ind6": 0.085652, "ind9": 0.021242}, "2020": {"score": 47.36, "rank": 16, "sc_ind1": 18.09, "sc_ind2": 49.79, "sc_ind4": 61.94, "sc_ind5": 75.55, "sc_ind6": 56.1, "sc_ind9": 22.68, "ind1": 0.025104, "ind2": 0.078867, "ind4": 0.84718, "ind5": 0.247922, "ind6": -0.023015, "ind9": 0.10444}, "2021": {"score": 53.78, "rank": 8, "sc_ind1": 44.15, "sc_ind2": 44.62, "sc_ind4": 58.15, "sc_ind5": 74.66, "sc_ind6": 55.77, "sc_ind9": 45.32, "ind1": 0.073694, "ind2": 0.148337, "ind4": 0.827795, "ind5": 0.216139, "ind6": 0.090077, "ind9": 0.201354}, "2022": {"score": 43.84, "rank": 19, "sc_ind1": 4.78, "sc_ind2": 11.92, "sc_ind4": 53.29, "sc_ind5": 76.66, "sc_ind6": 67.23, "sc_ind9": 49.16, "ind1": 0.04504, "ind2": 0.073577, "ind4": 0.857886, "ind5": 0.223042, "ind6": 0.020276, "ind9": 0.198532}, "2023": {"score": 52.73, "rank": 13, "sc_ind1": 33.72, "sc_ind2": 24.17, "sc_ind4": 29.58, "sc_ind5": 78.94, "sc_ind6": 93.51, "sc_ind9": 56.45, "ind1": 0.065954, "ind2": 0.094348, "ind4": 0.802686, "ind5": 0.241327, "ind6": 0.006198, "ind9": 0.173595}, "2024": {"score": 56.18, "rank": 8, "sc_ind1": 30.22, "sc_ind2": 32.39, "sc_ind4": 46.08, "sc_ind5": 79.21, "sc_ind6": 93.29, "sc_ind9": 55.87, "ind1": 0.070278, "ind2": 0.102469, "ind4": 0.856376, "ind5": 0.222326, "ind6": 0.003249, "ind9": 0.175448}, "2025": {"score": 60.12, "rank": 4, "sc_ind1": 67.81, "sc_ind2": 79.58, "sc_ind4": 66.94, "sc_ind5": 78.99, "sc_ind6": 51.2, "sc_ind9": 16.19, "ind1": 0.125536, "ind2": 0.179876, "ind4": 0.900878, "ind5": 0.222206, "ind6": -0.004042, "ind9": 0.081676}}, "MA": {"2019": {"score": 44.7, "rank": 20, "sc_ind1": 65.57, "sc_ind2": 95.04, "sc_ind4": 0.0, "sc_ind5": 20.34, "sc_ind6": 46.0, "sc_ind9": 41.22, "ind1": 0.062412, "ind2": 0.104299, "ind4": 0.739788, "ind5": 0.52868, "ind6": -0.062219, "ind9": 0.097275}, "2020": {"score": 50.88, "rank": 14, "sc_ind1": 62.79, "sc_ind2": 65.84, "sc_ind4": 47.1, "sc_ind5": 25.44, "sc_ind6": 65.02, "sc_ind9": 39.11, "ind1": 0.061859, "ind2": 0.096172, "ind4": 0.797831, "ind5": 0.549889, "ind6": 0.023669, "ind9": 0.146202}, "2021": {"score": 54.21, "rank": 7, "sc_ind1": 76.32, "sc_ind2": 59.9, "sc_ind4": 63.57, "sc_ind5": 24.11, "sc_ind6": 75.93, "sc_ind9": 25.41, "ind1": 0.112021, "ind2": 0.192763, "ind4": 0.842746, "ind5": 0.530307, "ind6": 0.180589, "ind9": 0.155902}, "2022": {"score": 45.84, "rank": 16, "sc_ind1": 49.96, "sc_ind2": 39.41, "sc_ind4": 55.17, "sc_ind5": 27.1, "sc_ind6": 68.92, "sc_ind9": 34.5, "ind1": 0.111432, "ind2": 0.137396, "ind4": 0.861889, "ind5": 0.525926, "ind6": 0.026759, "ind9": 0.160257}, "2023": {"score": 45.89, "rank": 19, "sc_ind1": 39.23, "sc_ind2": 27.76, "sc_ind4": 56.54, "sc_ind5": 25.04, "sc_ind6": 87.98, "sc_ind9": 38.81, "ind1": 0.073186, "ind2": 0.101552, "ind4": 0.848325, "ind5": 0.545628, "ind6": -0.014075, "ind9": 0.140284}, "2024": {"score": 54.95, "rank": 9, "sc_ind1": 49.02, "sc_ind2": 50.04, "sc_ind4": 44.6, "sc_ind5": 17.55, "sc_ind6": 92.85, "sc_ind9": 75.61, "ind1": 0.097448, "ind2": 0.130982, "ind4": 0.854369, "ind5": 0.579756, "ind6": 0.001962, "ind9": 0.219206}, "2025": {"score": 58.97, "rank": 5, "sc_ind1": 78.22, "sc_ind2": 70.04, "sc_ind4": 54.49, "sc_ind5": 22.6, "sc_ind6": 49.13, "sc_ind9": 79.35, "ind1": 0.140049, "ind2": 0.159425, "ind4": 0.880868, "ind5": 0.548812, "ind6": -0.005018, "ind9": 0.198514}}, "MG": {"2019": {"score": 46.13, "rank": 16, "sc_ind1": 11.39, "sc_ind2": 90.91, "sc_ind4": 62.77, "sc_ind5": 79.34, "sc_ind6": 17.89, "sc_ind9": 14.46, "ind1": 0.022651, "ind2": 0.100925, "ind4": 0.881574, "ind5": 0.179613, "ind6": -0.208973, "ind9": 0.014764}, "2020": {"score": 48.06, "rank": 15, "sc_ind1": 10.14, "sc_ind2": 61.76, "sc_ind4": 69.34, "sc_ind5": 80.94, "sc_ind6": 59.22, "sc_ind9": 6.95, "ind1": 0.018563, "ind2": 0.091776, "ind4": 0.871772, "ind5": 0.215431, "ind6": -0.006717, "ind9": 0.064441}, "2021": {"score": 39.73, "rank": 17, "sc_ind1": 23.86, "sc_ind2": 45.25, "sc_ind4": 61.53, "sc_ind5": 79.91, "sc_ind6": 13.61, "sc_ind9": 14.22, "ind1": 0.049526, "ind2": 0.150155, "ind4": 0.837101, "ind5": 0.183496, "ind6": -0.099245, "ind9": 0.130359}, "2022": {"score": 32.58, "rank": 24, "sc_ind1": 29.08, "sc_ind2": 43.91, "sc_ind4": 0.0, "sc_ind5": 72.29, "sc_ind6": 14.02, "sc_ind9": 36.2, "ind1": 0.08074, "ind2": 0.14783, "ind4": 0.744361, "ind5": 0.24976, "ind6": -0.18434, "ind9": 0.164716}, "2023": {"score": 55.32, "rank": 10, "sc_ind1": 24.64, "sc_ind2": 38.52, "sc_ind4": 70.95, "sc_ind5": 83.22, "sc_ind6": 91.32, "sc_ind9": 23.27, "ind1": 0.054022, "ind2": 0.123134, "ind4": 0.87272, "ind5": 0.217131, "ind6": -0.001835, "ind9": 0.110924}, "2024": {"score": 51.35, "rank": 12, "sc_ind1": 17.28, "sc_ind2": 23.24, "sc_ind4": 62.95, "sc_ind5": 80.03, "sc_ind6": 90.57, "sc_ind9": 34.04, "ind1": 0.051575, "ind2": 0.087689, "ind4": 0.879213, "ind5": 0.217579, "ind6": -0.004817, "ind9": 0.127068}, "2025": {"score": 47.55, "rank": 15, "sc_ind1": 19.89, "sc_ind2": 45.98, "sc_ind4": 47.13, "sc_ind5": 81.42, "sc_ind6": 52.22, "sc_ind9": 38.66, "ind1": 0.058736, "ind2": 0.107854, "ind4": 0.869024, "ind5": 0.208091, "ind6": -0.003562, "ind9": 0.123243}}, "MS": {"2019": {"score": 66.54, "rank": 5, "sc_ind1": 83.95, "sc_ind2": 98.78, "sc_ind4": 57.73, "sc_ind5": 55.74, "sc_ind6": 52.46, "sc_ind9": 50.61, "ind1": 0.075898, "ind2": 0.107348, "ind4": 0.870194, "ind5": 0.319237, "ind6": -0.028505, "ind9": 0.126242}, "2020": {"score": 60.76, "rank": 7, "sc_ind1": 65.47, "sc_ind2": 49.99, "sc_ind4": 61.45, "sc_ind5": 60.49, "sc_ind6": 57.15, "sc_ind9": 70.03, "ind1": 0.064067, "ind2": 0.079082, "ind4": 0.845536, "ind5": 0.338676, "ind6": -0.017535, "ind9": 0.224802}, "2021": {"score": 55.23, "rank": 5, "sc_ind1": 58.42, "sc_ind2": 45.32, "sc_ind4": 48.99, "sc_ind5": 60.1, "sc_ind6": 59.19, "sc_ind9": 59.34, "ind1": 0.090702, "ind2": 0.150371, "ind4": 0.802516, "ind5": 0.306616, "ind6": 0.105441, "ind9": 0.233367}, "2022": {"score": 71.85, "rank": 3, "sc_ind1": 97.75, "sc_ind2": 77.5, "sc_ind4": 54.42, "sc_ind5": 62.63, "sc_ind6": 88.77, "sc_ind9": 50.05, "ind1": 0.181643, "ind2": 0.225832, "ind4": 0.860289, "ind5": 0.308767, "ind6": 0.103088, "ind9": 0.200849}, "2023": {"score": 71.28, "rank": 3, "sc_ind1": 100.0, "sc_ind2": 67.27, "sc_ind4": 48.75, "sc_ind5": 67.39, "sc_ind6": 89.59, "sc_ind9": 54.68, "ind1": 0.153029, "ind2": 0.180813, "ind4": 0.835135, "ind5": 0.306523, "ind6": -0.00817, "ind9": 0.170253}, "2024": {"score": 59.1, "rank": 7, "sc_ind1": 67.56, "sc_ind2": 61.25, "sc_ind4": 34.5, "sc_ind5": 73.11, "sc_ind6": 88.72, "sc_ind9": 29.43, "ind1": 0.124248, "ind2": 0.149086, "ind4": 0.840699, "ind5": 0.257714, "ind6": -0.010319, "ind9": 0.116863}, "2025": {"score": 53.08, "rank": 10, "sc_ind1": 57.94, "sc_ind2": 56.02, "sc_ind4": 43.21, "sc_ind5": 70.98, "sc_ind6": 44.16, "sc_ind9": 46.18, "ind1": 0.111781, "ind2": 0.129381, "ind4": 0.862732, "ind5": 0.268572, "ind6": -0.007354, "ind9": 0.137145}}, "MT": {"2019": {"score": 52.78, "rank": 11, "sc_ind1": 32.12, "sc_ind2": 66.13, "sc_ind4": 38.93, "sc_ind5": 67.78, "sc_ind6": 54.98, "sc_ind9": 56.72, "ind1": 0.037863, "ind2": 0.080681, "ind4": 0.827722, "ind5": 0.248016, "ind6": -0.015332, "ind9": 0.14508}, "2020": {"score": 66.07, "rank": 4, "sc_ind1": 42.56, "sc_ind2": 51.68, "sc_ind4": 56.9, "sc_ind5": 67.66, "sc_ind6": 83.57, "sc_ind9": 94.06, "ind1": 0.045221, "ind2": 0.080905, "ind4": 0.830407, "ind5": 0.29548, "ind6": 0.120696, "ind9": 0.285898}, "2021": {"score": 63.21, "rank": 3, "sc_ind1": 41.28, "sc_ind2": 57.7, "sc_ind4": 46.12, "sc_ind5": 71.97, "sc_ind6": 62.2, "sc_ind9": 100.0, "ind1": 0.070283, "ind2": 0.186359, "ind4": 0.794588, "ind5": 0.232832, "ind6": 0.118936, "ind9": 0.326174}, "2022": {"score": 78.54, "rank": 1, "sc_ind1": 64.99, "sc_ind2": 100.0, "sc_ind4": 34.82, "sc_ind5": 72.7, "sc_ind6": 98.75, "sc_ind9": 100.0, "ind1": 0.133512, "ind2": 0.278062, "ind4": 0.818536, "ind5": 0.247236, "ind6": 0.141475, "ind9": 0.331241}, "2023": {"score": 87.59, "rank": 1, "sc_ind1": 95.36, "sc_ind2": 100.0, "sc_ind4": 67.9, "sc_ind5": 79.99, "sc_ind6": 91.38, "sc_ind9": 90.93, "ind1": 0.146938, "ind2": 0.246466, "ind4": 0.867556, "ind5": 0.235358, "ind6": -0.001607, "ind9": 0.238726}, "2024": {"score": 69.01, "rank": 2, "sc_ind1": 69.58, "sc_ind2": 75.81, "sc_ind4": 34.1, "sc_ind5": 79.27, "sc_ind6": 83.95, "sc_ind9": 71.37, "ind1": 0.12716, "ind2": 0.172607, "ind4": 0.840152, "ind5": 0.221986, "ind6": -0.024503, "ind9": 0.209814}, "2025": {"score": 66.06, "rank": 2, "sc_ind1": 64.22, "sc_ind2": 82.36, "sc_ind4": 39.98, "sc_ind5": 79.5, "sc_ind6": 36.25, "sc_ind9": 94.02, "ind1": 0.120523, "ind2": 0.185835, "ind4": 0.857533, "ind5": 0.219214, "ind6": -0.011072, "ind9": 0.225638}}, "PA": {"2019": {"score": 64.34, "rank": 7, "sc_ind1": 62.67, "sc_ind2": 50.7, "sc_ind4": 86.55, "sc_ind5": 51.1, "sc_ind6": 78.25, "sc_ind9": 56.75, "ind1": 0.060287, "ind2": 0.068072, "ind4": 0.935279, "ind5": 0.346735, "ind6": 0.106164, "ind9": 0.14517}, "2020": {"score": 70.36, "rank": 1, "sc_ind1": 100.0, "sc_ind2": 63.33, "sc_ind4": 79.5, "sc_ind5": 53.27, "sc_ind6": 86.98, "sc_ind9": 39.07, "ind1": 0.092461, "ind2": 0.093463, "ind4": 0.905574, "ind5": 0.382165, "ind6": 0.138568, "ind9": 0.146099}, "2021": {"score": 58.86, "rank": 4, "sc_ind1": 80.47, "sc_ind2": 39.1, "sc_ind4": 88.36, "sc_ind5": 51.72, "sc_ind6": 73.5, "sc_ind9": 20.0, "ind1": 0.116959, "ind2": 0.132281, "ind4": 0.911153, "ind5": 0.358741, "ind6": 0.169672, "ind9": 0.14355}, "2022": {"score": 66.52, "rank": 6, "sc_ind1": 82.46, "sc_ind2": 49.4, "sc_ind4": 81.37, "sc_ind5": 49.12, "sc_ind6": 90.57, "sc_ind9": 46.17, "ind1": 0.159183, "ind2": 0.16058, "ind4": 0.917707, "ind5": 0.391345, "ind6": 0.110027, "ind9": 0.190728}, "2023": {"score": 65.17, "rank": 5, "sc_ind1": 94.75, "sc_ind2": 30.83, "sc_ind4": 92.28, "sc_ind5": 55.52, "sc_ind6": 88.2, "sc_ind9": 29.41, "ind1": 0.14613, "ind2": 0.107716, "ind4": 0.908825, "ind5": 0.373552, "ind6": -0.013246, "ind9": 0.122532}, "2024": {"score": 54.86, "rank": 10, "sc_ind1": 70.2, "sc_ind2": 36.88, "sc_ind4": 56.29, "sc_ind5": 50.49, "sc_ind6": 85.1, "sc_ind9": 30.18, "ind1": 0.128062, "ind2": 0.109713, "ind4": 0.870203, "ind5": 0.388808, "ind6": -0.021091, "ind9": 0.118511}, "2025": {"score": 53.33, "rank": 9, "sc_ind1": 73.11, "sc_ind2": 43.31, "sc_ind4": 89.99, "sc_ind5": 47.47, "sc_ind6": 28.12, "sc_ind9": 38.01, "ind1": 0.132924, "ind2": 0.10214, "ind4": 0.937929, "ind5": 0.404759, "ind6": -0.014897, "ind9": 0.122036}}, "PB": {"2019": {"score": 50.67, "rank": 13, "sc_ind1": 41.03, "sc_ind2": 53.4, "sc_ind4": 57.13, "sc_ind5": 26.35, "sc_ind6": 75.63, "sc_ind9": 50.45, "ind1": 0.044404, "ind2": 0.070281, "ind4": 0.868825, "ind5": 0.493136, "ind6": 0.092489, "ind9": 0.125741}, "2020": {"score": 44.12, "rank": 20, "sc_ind1": 26.37, "sc_ind2": 16.8, "sc_ind4": 49.79, "sc_ind5": 28.76, "sc_ind6": 92.48, "sc_ind9": 50.51, "ind1": 0.031908, "ind2": 0.04329, "ind4": 0.806792, "ind5": 0.529855, "ind6": 0.167307, "ind9": 0.175187}, "2021": {"score": 40.18, "rank": 16, "sc_ind1": 18.9, "sc_ind2": 28.26, "sc_ind4": 39.55, "sc_ind5": 29.97, "sc_ind6": 74.51, "sc_ind9": 49.87, "ind1": 0.043625, "ind2": 0.100768, "ind4": 0.776468, "ind5": 0.493869, "ind6": 0.174195, "ind9": 0.211738}, "2022": {"score": 42.4, "rank": 21, "sc_ind1": 28.7, "sc_ind2": 34.16, "sc_ind4": 38.35, "sc_ind5": 31.87, "sc_ind6": 66.69, "sc_ind9": 54.62, "ind1": 0.080182, "ind2": 0.125207, "ind4": 0.826057, "ind5": 0.496749, "ind6": 0.018199, "ind9": 0.212776}, "2023": {"score": 54.25, "rank": 12, "sc_ind1": 51.49, "sc_ind2": 38.85, "sc_ind4": 46.37, "sc_ind5": 33.28, "sc_ind6": 94.84, "sc_ind9": 60.64, "ind1": 0.089295, "ind2": 0.123804, "ind4": 0.831119, "ind5": 0.499113, "ind6": 0.011079, "ind9": 0.181522}, "2024": {"score": 51.49, "rank": 11, "sc_ind1": 46.52, "sc_ind2": 36.76, "sc_ind4": 48.5, "sc_ind5": 33.27, "sc_ind6": 95.07, "sc_ind9": 48.8, "ind1": 0.09384, "ind2": 0.10953, "ind4": 0.859658, "ind5": 0.488635, "ind6": 0.008545, "ind9": 0.159783}, "2025": {"score": 54.2, "rank": 7, "sc_ind1": 64.29, "sc_ind2": 53.01, "sc_ind4": 54.2, "sc_ind5": 34.41, "sc_ind6": 81.05, "sc_ind9": 38.25, "ind1": 0.12063, "ind2": 0.12293, "ind4": 0.8804, "ind5": 0.480415, "ind6": 0.009991, "ind9": 0.122477}}, "PE": {"2019": {"score": 50.97, "rank": 12, "sc_ind1": 15.3, "sc_ind2": 47.24, "sc_ind4": 95.33, "sc_ind5": 56.69, "sc_ind6": 57.42, "sc_ind9": 33.84, "ind1": 0.025521, "ind2": 0.065245, "ind4": 0.955121, "ind5": 0.313661, "ind6": -0.002607, "ind9": 0.074518}, "2020": {"score": 46.14, "rank": 19, "sc_ind1": 18.39, "sc_ind2": 34.24, "sc_ind4": 81.67, "sc_ind5": 57.66, "sc_ind6": 67.03, "sc_ind9": 17.83, "ind1": 0.025344, "ind2": 0.062096, "ind4": 0.912773, "ind5": 0.355708, "ind6": 0.034186, "ind9": 0.09209}, "2021": {"score": 37.78, "rank": 20, "sc_ind1": 12.11, "sc_ind2": 22.31, "sc_ind4": 83.92, "sc_ind5": 57.41, "sc_ind6": 38.46, "sc_ind9": 12.46, "ind1": 0.035534, "ind2": 0.083445, "ind4": 0.898899, "ind5": 0.323376, "ind6": 0.012319, "ind9": 0.126339}, "2022": {"score": 46.35, "rank": 15, "sc_ind1": 30.52, "sc_ind2": 22.17, "sc_ind4": 100.0, "sc_ind5": 51.52, "sc_ind6": 66.39, "sc_ind9": 7.53, "ind1": 0.082863, "ind2": 0.097361, "ind4": 0.957399, "ind5": 0.376705, "ind6": 0.017031, "ind9": 0.089871}, "2023": {"score": 40.5, "rank": 23, "sc_ind1": 12.57, "sc_ind2": 0.45, "sc_ind4": 86.55, "sc_ind5": 54.98, "sc_ind6": 88.46, "sc_ind9": 0.0, "ind1": 0.038165, "ind2": 0.04676, "ind4": 0.899137, "ind5": 0.376571, "ind6": -0.012314, "ind9": 0.066972}, "2024": {"score": 47.06, "rank": 16, "sc_ind1": 28.13, "sc_ind2": 14.79, "sc_ind4": 84.42, "sc_ind5": 43.77, "sc_ind6": 92.89, "sc_ind9": 18.36, "ind1": 0.067255, "ind2": 0.074031, "ind4": 0.908293, "ind5": 0.427791, "ind6": 0.002076, "ind9": 0.092331}, "2025": {"score": 47.92, "rank": 14, "sc_ind1": 43.53, "sc_ind2": 30.7, "sc_ind4": 81.42, "sc_ind5": 46.55, "sc_ind6": 74.39, "sc_ind9": 10.91, "ind1": 0.09169, "ind2": 0.075114, "ind4": 0.924156, "ind5": 0.410119, "ind6": 0.00686, "ind9": 0.071922}}, "PI": {"2019": {"score": 34.71, "rank": 26, "sc_ind1": 60.96, "sc_ind2": 66.6, "sc_ind4": 58.6, "sc_ind5": 22.08, "sc_ind6": 0.0, "sc_ind9": 0.0, "ind1": 0.059028, "ind2": 0.081062, "ind4": 0.872154, "ind5": 0.518398, "ind6": -0.302357, "ind9": -0.029831}, "2020": {"score": 53.18, "rank": 12, "sc_ind1": 64.01, "sc_ind2": 55.93, "sc_ind4": 52.79, "sc_ind5": 16.64, "sc_ind6": 57.4, "sc_ind9": 72.3, "ind1": 0.06286, "ind2": 0.08548, "ind4": 0.816744, "ind5": 0.602857, "ind6": -0.016204, "ind9": 0.230572}, "2021": {"score": 35.08, "rank": 22, "sc_ind1": 69.45, "sc_ind2": 19.89, "sc_ind4": 48.49, "sc_ind5": 25.72, "sc_ind6": 19.53, "sc_ind9": 27.39, "ind1": 0.103836, "ind2": 0.076424, "ind4": 0.801133, "ind5": 0.520325, "ind6": -0.072657, "ind9": 0.160418}, "2022": {"score": 52.83, "rank": 10, "sc_ind1": 89.82, "sc_ind2": 76.29, "sc_ind4": 67.8, "sc_ind5": 24.42, "sc_ind6": 33.77, "sc_ind9": 24.85, "ind1": 0.17, "ind2": 0.223017, "ind4": 0.888802, "ind5": 0.542318, "ind6": -0.108395, "ind9": 0.135069}, "2023": {"score": 58.3, "rank": 7, "sc_ind1": 83.43, "sc_ind2": 38.13, "sc_ind4": 71.54, "sc_ind5": 26.71, "sc_ind6": 89.52, "sc_ind9": 40.44, "ind1": 0.131261, "ind2": 0.122344, "ind4": 0.873721, "ind5": 0.536186, "ind6": -0.008404, "ind9": 0.143356}, "2024": {"score": 66.39, "rank": 3, "sc_ind1": 100.0, "sc_ind2": 47.95, "sc_ind4": 100.0, "sc_ind5": 24.83, "sc_ind6": 94.12, "sc_ind9": 31.41, "ind1": 0.171128, "ind2": 0.127607, "ind4": 0.929384, "ind5": 0.537554, "ind6": 0.005711, "ind9": 0.121252}, "2025": {"score": 56.16, "rank": 6, "sc_ind1": 100.0, "sc_ind2": 56.81, "sc_ind4": 81.02, "sc_ind5": 26.77, "sc_ind6": 49.95, "sc_ind9": 22.41, "ind1": 0.170402, "ind2": 0.131063, "ind4": 0.923517, "ind5": 0.524685, "ind6": -0.00463, "ind9": 0.093194}}, "PR": {"2019": {"score": 61.11, "rank": 8, "sc_ind1": 25.26, "sc_ind2": 95.84, "sc_ind4": 43.09, "sc_ind5": 77.45, "sc_ind6": 68.56, "sc_ind9": 56.48, "ind1": 0.032834, "ind2": 0.10495, "ind4": 0.837107, "ind5": 0.190796, "ind6": 0.055562, "ind9": 0.144319}, "2020": {"score": 54.17, "rank": 10, "sc_ind1": 44.26, "sc_ind2": 79.01, "sc_ind4": 44.28, "sc_ind5": 69.74, "sc_ind6": 40.77, "sc_ind9": 46.96, "ind1": 0.046625, "ind2": 0.110373, "ind4": 0.78846, "ind5": 0.282964, "ind6": -0.103227, "ind9": 0.166173}, "2021": {"score": 51.72, "rank": 10, "sc_ind1": 24.46, "sc_ind2": 48.55, "sc_ind4": 34.19, "sc_ind5": 70.62, "sc_ind6": 57.17, "sc_ind9": 75.31, "ind1": 0.050237, "ind2": 0.159751, "ind4": 0.761682, "ind5": 0.241229, "ind6": 0.096332, "ind9": 0.269811}, "2022": {"score": 44.02, "rank": 18, "sc_ind1": 9.39, "sc_ind2": 27.86, "sc_ind4": 15.88, "sc_ind5": 75.27, "sc_ind6": 56.94, "sc_ind9": 78.77, "ind1": 0.051814, "ind2": 0.110575, "ind4": 0.778181, "ind5": 0.231541, "ind6": -0.019306, "ind9": 0.275825}, "2023": {"score": 45.41, "rank": 20, "sc_ind1": 13.82, "sc_ind2": 29.37, "sc_ind4": 25.56, "sc_ind5": 77.15, "sc_ind6": 59.39, "sc_ind9": 67.19, "ind1": 0.0398, "ind2": 0.104775, "ind4": 0.795874, "ind5": 0.251397, "ind6": -0.118804, "ind9": 0.193883}, "2024": {"score": 44.23, "rank": 19, "sc_ind1": 16.75, "sc_ind2": 38.89, "sc_ind4": 27.3, "sc_ind5": 77.25, "sc_ind6": 55.79, "sc_ind9": 49.43, "ind1": 0.050811, "ind2": 0.112958, "ind4": 0.830944, "ind5": 0.233723, "ind6": -0.108235, "ind9": 0.161176}, "2025": {"score": 60.47, "rank": 3, "sc_ind1": 37.77, "sc_ind2": 51.32, "sc_ind4": 86.04, "sc_ind5": 74.77, "sc_ind6": 67.15, "sc_ind9": 45.77, "ind1": 0.083654, "ind2": 0.119293, "ind4": 0.931592, "ind5": 0.246653, "ind6": 0.003458, "ind9": 0.136401}}, "RJ": {"2019": {"score": 30.86, "rank": 27, "sc_ind1": 3.1, "sc_ind2": 0.0, "sc_ind4": 12.33, "sc_ind5": 90.39, "sc_ind6": 46.52, "sc_ind9": 32.84, "ind1": 0.016569, "ind2": 0.026653, "ind4": 0.767636, "ind5": 0.114272, "ind6": -0.059495, "ind9": 0.071443}, "2020": {"score": 29.48, "rank": 27, "sc_ind1": 5.1, "sc_ind2": 0.0, "sc_ind4": 21.64, "sc_ind5": 91.95, "sc_ind6": 47.82, "sc_ind9": 10.39, "ind1": 0.014418, "ind2": 0.025168, "ind4": 0.713186, "ind5": 0.149142, "ind6": -0.066343, "ind9": 0.073191}, "2021": {"score": 42.58, "rank": 13, "sc_ind1": 0.0, "sc_ind2": 0.0, "sc_ind4": 23.43, "sc_ind5": 93.84, "sc_ind6": 89.63, "sc_ind9": 48.58, "ind1": 0.021105, "ind2": 0.018587, "ind4": 0.73199, "ind5": 0.096899, "ind6": 0.242111, "ind9": 0.208798}, "2022": {"score": 42.46, "rank": 20, "sc_ind1": 14.45, "sc_ind2": 9.3, "sc_ind4": 37.54, "sc_ind5": 97.62, "sc_ind6": 62.46, "sc_ind9": 33.4, "ind1": 0.059249, "ind2": 0.067487, "ind4": 0.824332, "ind5": 0.094897, "ind6": 0.001902, "ind9": 0.157383}, "2023": {"score": 34.07, "rank": 26, "sc_ind1": 27.62, "sc_ind2": 8.83, "sc_ind4": 60.37, "sc_ind5": 100.0, "sc_ind6": 0.0, "sc_ind9": 7.6, "ind1": 0.057936, "ind2": 0.063571, "ind4": 0.854819, "ind5": 0.12241, "ind6": -0.336394, "ind9": 0.081322}, "2024": {"score": 25.89, "rank": 26, "sc_ind1": 17.62, "sc_ind2": 6.28, "sc_ind4": 26.84, "sc_ind5": 100.0, "sc_ind6": 0.0, "sc_ind9": 4.61, "ind1": 0.052072, "ind2": 0.060299, "ind4": 0.830325, "ind5": 0.101827, "ind6": -0.274104, "ind9": 0.061836}, "2025": {"score": 38.5, "rank": 21, "sc_ind1": 16.34, "sc_ind2": 24.86, "sc_ind4": 27.69, "sc_ind5": 100.0, "sc_ind6": 49.81, "sc_ind9": 12.28, "ind1": 0.053795, "ind2": 0.062583, "ind4": 0.837781, "ind5": 0.100487, "ind6": -0.004697, "ind9": 0.074455}}, "RN": {"2019": {"score": 39.15, "rank": 23, "sc_ind1": 45.24, "sc_ind2": 65.23, "sc_ind4": 28.02, "sc_ind5": 32.58, "sc_ind6": 29.98, "sc_ind9": 33.86, "ind1": 0.047497, "ind2": 0.079944, "ind4": 0.80308, "ind5": 0.456254, "ind6": -0.145841, "ind9": 0.074589}, "2020": {"score": 34.31, "rank": 24, "sc_ind1": 30.17, "sc_ind2": 32.5, "sc_ind4": 61.83, "sc_ind5": 34.9, "sc_ind6": 40.83, "sc_ind9": 5.64, "ind1": 0.035034, "ind2": 0.060223, "ind4": 0.846806, "ind5": 0.492885, "ind6": -0.102902, "ind9": 0.061116}, "2021": {"score": 20.74, "rank": 27, "sc_ind1": 4.0, "sc_ind2": 11.23, "sc_ind4": 74.55, "sc_ind5": 34.64, "sc_ind6": 0.0, "sc_ind9": 0.0, "ind1": 0.025876, "ind2": 0.051229, "ind4": 0.873044, "ind5": 0.464855, "ind6": -0.160351, "ind9": 0.0979}, "2022": {"score": 29.83, "rank": 26, "sc_ind1": 7.82, "sc_ind2": 9.24, "sc_ind4": 69.31, "sc_ind5": 31.7, "sc_ind6": 49.57, "sc_ind9": 11.33, "ind1": 0.049497, "ind2": 0.067349, "ind4": 0.892017, "ind5": 0.497829, "ind6": -0.047641, "ind9": 0.099774}, "2023": {"score": 35.55, "rank": 25, "sc_ind1": 0.0, "sc_ind2": 1.56, "sc_ind4": 74.34, "sc_ind5": 41.87, "sc_ind6": 90.29, "sc_ind9": 5.26, "ind1": 0.021645, "ind2": 0.048995, "ind4": 0.878454, "ind5": 0.450609, "ind6": -0.005609, "ind9": 0.076904}, "2024": {"score": 37.0, "rank": 24, "sc_ind1": 17.05, "sc_ind2": 2.99, "sc_ind4": 80.68, "sc_ind5": 33.15, "sc_ind6": 88.12, "sc_ind9": 0.0, "ind1": 0.051242, "ind2": 0.054974, "ind4": 0.90322, "ind5": 0.489335, "ind6": -0.012119, "ind9": 0.05163}, "2025": {"score": 28.59, "rank": 26, "sc_ind1": 0.0, "sc_ind2": 23.12, "sc_ind4": 72.41, "sc_ind5": 33.12, "sc_ind6": 42.86, "sc_ind9": 0.0, "ind1": 0.031013, "ind2": 0.058864, "ind4": 0.909675, "ind5": 0.48792, "ind6": -0.007964, "ind9": 0.051733}}, "RO": {"2019": {"score": 50.35, "rank": 14, "sc_ind1": 24.38, "sc_ind2": 45.51, "sc_ind4": 37.11, "sc_ind5": 33.14, "sc_ind6": 82.27, "sc_ind9": 79.68, "ind1": 0.032183, "ind2": 0.063835, "ind4": 0.823607, "ind5": 0.452979, "ind6": 0.12714, "ind9": 0.215864}, "2020": {"score": 58.8, "rank": 9, "sc_ind1": 33.71, "sc_ind2": 72.14, "sc_ind4": 20.86, "sc_ind5": 36.7, "sc_ind6": 96.42, "sc_ind9": 93.0, "ind1": 0.037944, "ind2": 0.102962, "ind4": 0.710602, "ind5": 0.481996, "ind6": 0.18794, "ind9": 0.283206}, "2021": {"score": 37.99, "rank": 19, "sc_ind1": 12.24, "sc_ind2": 37.3, "sc_ind4": 28.08, "sc_ind5": 37.66, "sc_ind6": 28.27, "sc_ind9": 84.41, "ind1": 0.035684, "ind2": 0.127057, "ind4": 0.744805, "ind5": 0.446071, "ind6": -0.033401, "ind9": 0.290585}, "2022": {"score": 44.8, "rank": 17, "sc_ind1": 29.69, "sc_ind2": 34.03, "sc_ind4": 38.44, "sc_ind5": 40.32, "sc_ind6": 56.16, "sc_ind9": 70.19, "ind1": 0.081637, "ind2": 0.124895, "ind4": 0.826255, "ind5": 0.445162, "ind6": -0.022309, "ind9": 0.253425}, "2023": {"score": 42.91, "rank": 21, "sc_ind1": 24.95, "sc_ind2": 28.18, "sc_ind4": 0.0, "sc_ind5": 39.43, "sc_ind6": 81.83, "sc_ind9": 83.05, "ind1": 0.054428, "ind2": 0.102391, "ind4": 0.752611, "ind5": 0.464385, "ind6": -0.036591, "ind9": 0.223851}, "2024": {"score": 40.18, "rank": 21, "sc_ind1": 13.41, "sc_ind2": 29.57, "sc_ind4": 3.8, "sc_ind5": 40.97, "sc_ind6": 87.79, "sc_ind9": 65.54, "ind1": 0.045978, "ind2": 0.097903, "ind4": 0.79913, "ind5": 0.443979, "ind6": -0.013097, "ind9": 0.196901}, "2025": {"score": 36.77, "rank": 23, "sc_ind1": 3.42, "sc_ind2": 34.84, "sc_ind4": 18.36, "sc_ind5": 42.18, "sc_ind6": 63.24, "sc_ind9": 58.59, "ind1": 0.035783, "ind2": 0.083989, "ind4": 0.822779, "ind5": 0.435414, "ind6": 0.001617, "ind9": 0.160105}}, "RR": {"2019": {"score": 41.33, "rank": 22, "sc_ind1": 0.0, "sc_ind2": 38.38, "sc_ind4": 15.21, "sc_ind5": 3.04, "sc_ind6": 93.04, "sc_ind9": 98.28, "ind1": 0.014296, "ind2": 0.058011, "ind4": 0.774135, "ind5": 0.631028, "ind6": 0.183341, "ind9": 0.273227}, "2020": {"score": 34.13, "rank": 25, "sc_ind1": 11.32, "sc_ind2": 34.82, "sc_ind4": 0.0, "sc_ind5": 0.0, "sc_ind6": 65.3, "sc_ind9": 93.36, "ind1": 0.019537, "ind2": 0.062721, "ind4": 0.641248, "ind5": 0.703143, "ind6": 0.025139, "ind9": 0.284121}, "2021": {"score": 25.24, "rank": 26, "sc_ind1": 6.33, "sc_ind2": 24.09, "sc_ind4": 0.0, "sc_ind5": 4.13, "sc_ind6": 52.4, "sc_ind9": 64.46, "ind1": 0.02865, "ind2": 0.088636, "ind4": 0.667337, "ind5": 0.654491, "ind6": 0.07492, "ind9": 0.245045}, "2022": {"score": 12.68, "rank": 27, "sc_ind1": 8.1, "sc_ind2": 24.84, "sc_ind4": 29.66, "sc_ind5": 0.0, "sc_ind6": 0.0, "sc_ind9": 13.49, "ind1": 0.049916, "ind2": 0.103573, "ind4": 0.807538, "ind5": 0.691566, "ind6": -0.23826, "ind9": 0.105413}, "2023": {"score": 29.54, "rank": 27, "sc_ind1": 18.59, "sc_ind2": 23.72, "sc_ind4": 14.62, "sc_ind5": 0.0, "sc_ind6": 100.0, "sc_ind9": 20.33, "ind1": 0.046063, "ind2": 0.093443, "ind4": 0.777357, "ind5": 0.686987, "ind6": 0.029974, "ind9": 0.105377}, "2024": {"score": 25.28, "rank": 27, "sc_ind1": 7.05, "sc_ind2": 4.82, "sc_ind4": 14.41, "sc_ind5": 0.51, "sc_ind6": 100.0, "sc_ind9": 24.86, "ind1": 0.036797, "ind2": 0.057936, "ind4": 0.81349, "ind5": 0.678515, "ind6": 0.023205, "ind9": 0.106736}, "2025": {"score": 32.01, "rank": 24, "sc_ind1": 2.47, "sc_ind2": 0.0, "sc_ind4": 34.26, "sc_ind5": 1.24, "sc_ind6": 100.0, "sc_ind9": 54.06, "ind1": 0.034451, "ind2": 0.009306, "ind4": 0.848342, "ind5": 0.672545, "ind6": 0.018903, "ind9": 0.151726}}, "RS": {"2019": {"score": 48.95, "rank": 15, "sc_ind1": 0.14, "sc_ind2": 39.65, "sc_ind4": 92.26, "sc_ind5": 83.67, "sc_ind6": 74.23, "sc_ind9": 3.74, "ind1": 0.0144, "ind2": 0.059042, "ind4": 0.948185, "ind5": 0.154002, "ind6": 0.08517, "ind9": -0.018295}, "2020": {"score": 32.59, "rank": 26, "sc_ind1": 0.0, "sc_ind2": 36.41, "sc_ind4": 82.71, "sc_ind5": 76.42, "sc_ind6": 0.0, "sc_ind9": 0.0, "ind1": 0.010225, "ind2": 0.064439, "ind4": 0.916245, "ind5": 0.242717, "ind6": -0.316565, "ind9": 0.046772}, "2021": {"score": 40.32, "rank": 15, "sc_ind1": 0.19, "sc_ind2": 41.05, "sc_ind4": 84.45, "sc_ind5": 78.55, "sc_ind6": 12.43, "sc_ind9": 25.26, "ind1": 0.021329, "ind2": 0.137947, "ind4": 0.900358, "ind5": 0.191942, "ind6": -0.10454, "ind9": 0.155574}, "2022": {"score": 39.95, "rank": 22, "sc_ind1": 5.83, "sc_ind2": 14.59, "sc_ind4": 73.66, "sc_ind5": 80.3, "sc_ind6": 47.5, "sc_ind9": 17.8, "ind1": 0.046584, "ind2": 0.079775, "ind4": 0.901278, "ind5": 0.200783, "ind6": -0.055593, "ind9": 0.116671}, "2023": {"score": 54.47, "rank": 11, "sc_ind1": 1.35, "sc_ind2": 28.67, "sc_ind4": 86.62, "sc_ind5": 84.1, "sc_ind6": 93.75, "sc_ind9": 32.34, "ind1": 0.023416, "ind2": 0.103374, "ind4": 0.899249, "ind5": 0.212152, "ind6": 0.007079, "ind9": 0.128068}, "2024": {"score": 39.94, "rank": 22, "sc_ind1": 0.0, "sc_ind2": 26.61, "sc_ind4": 0.0, "sc_ind5": 81.02, "sc_ind6": 94.41, "sc_ind9": 37.58, "ind1": 0.026603, "ind2": 0.093122, "ind4": 0.793983, "ind5": 0.211863, "ind6": 0.006583, "ind9": 0.13492}, "2025": {"score": 40.39, "rank": 19, "sc_ind1": 3.5, "sc_ind2": 20.21, "sc_ind4": 28.4, "sc_ind5": 85.14, "sc_ind6": 68.21, "sc_ind9": 36.86, "ind1": 0.035896, "ind2": 0.05263, "ind4": 0.838911, "ind5": 0.186538, "ind6": 0.003954, "ind9": 0.119914}}, "SC": {"2019": {"score": 56.5, "rank": 10, "sc_ind1": 30.27, "sc_ind2": 68.19, "sc_ind4": 49.3, "sc_ind5": 76.59, "sc_ind6": 69.28, "sc_ind9": 45.36, "ind1": 0.036508, "ind2": 0.082362, "ind4": 0.851156, "ind5": 0.195912, "ind6": 0.05929, "ind9": 0.110038}, "2020": {"score": 53.06, "rank": 13, "sc_ind1": 43.39, "sc_ind2": 51.25, "sc_ind4": 50.23, "sc_ind5": 75.24, "sc_ind6": 52.69, "sc_ind9": 45.59, "ind1": 0.045903, "ind2": 0.080441, "ind4": 0.808231, "ind5": 0.249808, "ind6": -0.040879, "ind9": 0.162673}, "2021": {"score": 42.91, "rank": 12, "sc_ind1": 30.04, "sc_ind2": 36.65, "sc_ind4": 55.89, "sc_ind5": 74.16, "sc_ind6": 29.6, "sc_ind9": 31.12, "ind1": 0.056893, "ind2": 0.12514, "ind4": 0.821538, "ind5": 0.219253, "ind6": -0.027439, "ind9": 0.16895}, "2022": {"score": 62.51, "rank": 7, "sc_ind1": 60.9, "sc_ind2": 63.0, "sc_ind4": 69.01, "sc_ind5": 78.66, "sc_ind6": 58.45, "sc_ind9": 45.02, "ind1": 0.127506, "ind2": 0.19216, "ind4": 0.891384, "ind5": 0.210798, "ind6": -0.013485, "ind9": 0.18773}, "2023": {"score": 56.56, "rank": 9, "sc_ind1": 27.98, "sc_ind2": 26.83, "sc_ind4": 58.41, "sc_ind5": 82.73, "sc_ind6": 89.2, "sc_ind9": 54.23, "ind1": 0.058407, "ind2": 0.099684, "ind4": 0.851496, "ind5": 0.219939, "ind6": -0.009579, "ind9": 0.169408}, "2024": {"score": 48.26, "rank": 14, "sc_ind1": 40.17, "sc_ind2": 40.43, "sc_ind4": 8.23, "sc_ind5": 81.26, "sc_ind6": 64.51, "sc_ind9": 54.99, "ind1": 0.084653, "ind2": 0.115455, "ind4": 0.805129, "ind5": 0.210486, "ind6": -0.082321, "ind9": 0.173507}, "2025": {"score": 52.84, "rank": 11, "sc_ind1": 48.92, "sc_ind2": 56.36, "sc_ind4": 48.46, "sc_ind5": 79.35, "sc_ind6": 30.88, "sc_ind9": 53.07, "ind1": 0.099199, "ind2": 0.130106, "ind4": 0.871163, "ind5": 0.2201, "ind6": -0.0136, "ind9": 0.149906}}, "SE": {"2019": {"score": 38.78, "rank": 24, "sc_ind1": 15.31, "sc_ind2": 28.13, "sc_ind4": 100.0, "sc_ind5": 17.83, "sc_ind6": 52.77, "sc_ind9": 18.64, "ind1": 0.025533, "ind2": 0.049633, "ind4": 0.965664, "ind5": 0.543576, "ind6": -0.026878, "ind9": 0.027644}, "2020": {"score": 43.58, "rank": 22, "sc_ind1": 26.91, "sc_ind2": 39.83, "sc_ind4": 100.0, "sc_ind5": 23.93, "sc_ind6": 49.11, "sc_ind9": 21.67, "ind1": 0.032355, "ind2": 0.068121, "ind4": 0.973717, "ind5": 0.558937, "ind6": -0.059577, "ind9": 0.101862}, "2021": {"score": 34.44, "rank": 23, "sc_ind1": 18.49, "sc_ind2": 17.56, "sc_ind4": 100.0, "sc_ind5": 22.87, "sc_ind6": 37.35, "sc_ind9": 10.36, "ind1": 0.043126, "ind2": 0.069643, "ind4": 0.94326, "ind5": 0.538031, "ind6": 0.007353, "ind9": 0.121545}, "2022": {"score": 38.34, "rank": 23, "sc_ind1": 33.67, "sc_ind2": 20.63, "sc_ind4": 96.11, "sc_ind5": 22.18, "sc_ind6": 48.45, "sc_ind9": 9.0, "ind1": 0.087495, "ind2": 0.093801, "ind4": 0.949119, "ind5": 0.556029, "ind6": -0.051969, "ind9": 0.09369}, "2023": {"score": 48.66, "rank": 16, "sc_ind1": 30.47, "sc_ind2": 13.34, "sc_ind4": 93.85, "sc_ind5": 24.11, "sc_ind6": 91.74, "sc_ind9": 38.49, "ind1": 0.061674, "ind2": 0.072613, "ind4": 0.911493, "ind5": 0.550883, "ind6": -0.000298, "ind9": 0.139676}, "2024": {"score": 45.39, "rank": 18, "sc_ind1": 11.65, "sc_ind2": 13.23, "sc_ind4": 81.95, "sc_ind5": 27.46, "sc_ind6": 90.94, "sc_ind9": 47.07, "ind1": 0.043444, "ind2": 0.071519, "ind4": 0.904949, "ind5": 0.522326, "ind6": -0.00372, "ind9": 0.155953}, "2025": {"score": 40.92, "rank": 18, "sc_ind1": 24.56, "sc_ind2": 33.09, "sc_ind4": 76.38, "sc_ind5": 23.18, "sc_ind6": 61.86, "sc_ind9": 26.47, "ind1": 0.065248, "ind2": 0.080218, "ind4": 0.916056, "ind5": 0.545446, "ind6": 0.000971, "ind9": 0.100692}}, "SP": {"2019": {"score": 74.33, "rank": 1, "sc_ind1": 41.24, "sc_ind2": 87.42, "sc_ind4": 87.87, "sc_ind5": 100.0, "sc_ind6": 92.95, "sc_ind9": 36.53, "ind1": 0.044557, "ind2": 0.098072, "ind4": 0.938267, "ind5": 0.057391, "ind6": 0.182879, "ind9": 0.082807}, "2020": {"score": 65.65, "rank": 5, "sc_ind1": 35.64, "sc_ind2": 53.61, "sc_ind4": 72.88, "sc_ind5": 100.0, "sc_ind6": 95.59, "sc_ind9": 36.2, "ind1": 0.039533, "ind2": 0.082988, "ind4": 0.883557, "ind5": 0.100618, "ind6": 0.183599, "ind9": 0.138807}, "2021": {"score": 67.65, "rank": 2, "sc_ind1": 23.06, "sc_ind2": 51.61, "sc_ind4": 86.51, "sc_ind5": 100.0, "sc_ind6": 100.0, "sc_ind9": 44.71, "ind1": 0.048572, "ind2": 0.168651, "ind4": 0.906038, "ind5": 0.058631, "ind6": 0.288665, "ind9": 0.19997}, "2022": {"score": 68.04, "rank": 5, "sc_ind1": 29.65, "sc_ind2": 44.42, "sc_ind4": 84.22, "sc_ind5": 100.0, "sc_ind6": 100.0, "sc_ind9": 49.97, "ind1": 0.081581, "ind2": 0.149019, "ind4": 0.923786, "ind5": 0.080372, "ind6": 0.146271, "ind9": 0.200641}, "2023": {"score": 63.68, "rank": 6, "sc_ind1": 31.16, "sc_ind2": 37.4, "sc_ind4": 97.72, "sc_ind5": 95.15, "sc_ind6": 91.43, "sc_ind9": 29.24, "ind1": 0.062583, "ind2": 0.120879, "ind4": 0.918042, "ind5": 0.149779, "ind6": -0.001436, "ind9": 0.122208}, "2024": {"score": 64.23, "rank": 4, "sc_ind1": 24.36, "sc_ind2": 48.89, "sc_ind4": 98.5, "sc_ind5": 94.64, "sc_ind6": 91.94, "sc_ind9": 27.05, "ind1": 0.061805, "ind2": 0.12911, "ind4": 0.927357, "ind5": 0.132891, "ind6": -0.000763, "ind9": 0.11159}, "2025": {"score": 53.79, "rank": 8, "sc_ind1": 9.63, "sc_ind2": 60.33, "sc_ind4": 68.24, "sc_ind5": 95.5, "sc_ind6": 57.07, "sc_ind9": 31.98, "ind1": 0.044436, "ind2": 0.138607, "ind4": 0.902965, "ind5": 0.126554, "ind6": -0.001282, "ind9": 0.110878}}, "TO": {"2019": {"score": 38.12, "rank": 25, "sc_ind1": 20.67, "sc_ind2": 44.6, "sc_ind4": 46.45, "sc_ind5": 16.59, "sc_ind6": 63.94, "sc_ind9": 36.45, "ind1": 0.029464, "ind2": 0.063088, "ind4": 0.844709, "ind5": 0.550868, "ind6": 0.03144, "ind9": 0.082579}, "2020": {"score": 46.87, "rank": 17, "sc_ind1": 37.0, "sc_ind2": 57.1, "sc_ind4": 61.34, "sc_ind5": 21.85, "sc_ind6": 68.02, "sc_ind9": 35.9, "ind1": 0.040655, "ind2": 0.086744, "ind4": 0.845177, "ind5": 0.571488, "ind6": 0.03932, "ind9": 0.138031}, "2021": {"score": 33.16, "rank": 24, "sc_ind1": 28.6, "sc_ind2": 23.89, "sc_ind4": 63.58, "sc_ind5": 22.56, "sc_ind6": 36.63, "sc_ind9": 23.66, "ind1": 0.055179, "ind2": 0.088063, "ind4": 0.84278, "ind5": 0.539939, "ind6": 0.004141, "ind9": 0.151919}, "2022": {"score": 47.76, "rank": 13, "sc_ind1": 42.41, "sc_ind2": 39.65, "sc_ind4": 55.99, "sc_ind5": 26.12, "sc_ind6": 78.63, "sc_ind9": 43.76, "ind1": 0.100329, "ind2": 0.137938, "ind4": 0.86364, "ind5": 0.531905, "ind6": 0.064086, "ind9": 0.184425}, "2023": {"score": 49.92, "rank": 15, "sc_ind1": 36.88, "sc_ind2": 19.03, "sc_ind4": 87.72, "sc_ind5": 30.75, "sc_ind6": 92.89, "sc_ind9": 32.22, "ind1": 0.070093, "ind2": 0.084029, "ind4": 0.901122, "ind5": 0.513364, "ind6": 0.003934, "ind9": 0.127832}, "2024": {"score": 43.97, "rank": 20, "sc_ind1": 28.43, "sc_ind2": 13.22, "sc_ind4": 82.25, "sc_ind5": 27.92, "sc_ind6": 95.4, "sc_ind9": 16.57, "ind1": 0.067694, "ind2": 0.071499, "ind4": 0.905351, "ind5": 0.519648, "ind6": 0.009535, "ind9": 0.088356}, "2025": {"score": 20.84, "rank": 27, "sc_ind1": 10.54, "sc_ind2": 23.48, "sc_ind4": 17.0, "sc_ind5": 28.18, "sc_ind6": 31.83, "sc_ind9": 14.03, "ind1": 0.045701, "ind2": 0.05962, "ind4": 0.820586, "ind5": 0.516498, "ind6": -0.013149, "ind9": 0.077677}}}, "proj26": {"AC": {"IND1_TAXA_INVEST": {"2026": 0.05251936607071316, "2027": 0.053046224365601816, "2028": 0.05293722681065233, "2029": 0.05295977645464622}, "IND2_REGRA_OURO": {"2026": 0.09206406469607989, "2027": 0.0920656621588896, "2028": 0.09206538968492294, "2029": 0.09206543615990943}, "IND4_EXEC_ORCAMENTARIA": {"2026": 0.8945815908692512, "2027": 0.8947597394616367, "2028": 0.8947052166261219, "2029": 0.8947219034803527}, "IND5_DEPENDENCIA": {"2026": 0.6809599150272553, "2027": 0.6801148788514758, "2028": 0.6807013096178316, "2029": 0.6802943435569865}, "IND6_RESULTADO_PRIMARIO": {"2026": 0.01003015985572539, "2027": 0.010579499897139098, "2028": 0.01071024239154995, "2029": 0.010741359001584024}, "IND9_POUPANCA": {"2026": 0.1068713930628374, "2027": 0.10689236616408256, "2028": 0.10689507475552051, "2029": 0.10689542455918055}}, "AL": {"IND1_TAXA_INVEST": {"2026": 0.10054030824118317, "2027": 0.09983264202395681, "2028": 0.09991289496790441, "2029": 0.09990379387637922}, "IND2_REGRA_OURO": {"2026": 0.18419467878297743, "2027": 0.18981806553120606, "2028": 0.18707083328871268, "2029": 0.18841295776495873}, "IND4_EXEC_ORCAMENTARIA": {"2026": 0.8207660923519986, "2027": 0.8049090746975338, "2028": 0.8140493009770664, "2029": 0.8087807354585349}, "IND5_DEPENDENCIA": {"2026": 0.5293371232961156, "2027": 0.5303648592969081, "2028": 0.5298994792499974, "2029": 0.5301102129285838}, "IND6_RESULTADO_PRIMARIO": {"2026": -0.00740982753408525, "2027": -0.00917278867712044, "2028": -0.00850464585032443, "2029": -0.008757864611703593}, "IND9_POUPANCA": {"2026": 0.17605255906740008, "2027": 0.17542347584983803, "2028": 0.17551237539611236, "2029": 0.17549981246467952}}, "AM": {"IND1_TAXA_INVEST": {"2026": 0.04765749367051727, "2027": 0.04648913815548057, "2028": 0.04681362063950955, "2029": 0.046723503478177615}, "IND2_REGRA_OURO": {"2026": 0.054112858129299675, "2027": 0.05797334629857967, "2028": 0.05560519293878366, "2029": 0.057057897904994985}, "IND4_EXEC_ORCAMENTARIA": {"2026": 0.9366688435406092, "2027": 0.9427563104823257, "2028": 0.9406217048728809, "2029": 0.941370216717216}, "IND5_DEPENDENCIA": {"2026": 0.311634911321741, "2027": 0.3069827361813343, "2028": 0.31027189128750554, "2029": 0.3079464110581635}, "IND6_RESULTADO_PRIMARIO": {"2026": 0.017133507527331397, "2027": 0.01716711690087898, "2028": 0.017159026931825735, "2029": 0.01716097423379463}, "IND9_POUPANCA": {"2026": 0.08579569668117404, "2027": 0.08579549515932676, "2028": 0.08579549956423438, "2029": 0.08579549946795097}}, "AP": {"IND1_TAXA_INVEST": {"2026": 0.06299375403277926, "2027": 0.06769036487722893, "2028": 0.06578870430206517, "2029": 0.06655868782058594}, "IND2_REGRA_OURO": {"2026": 0.10076825120403689, "2027": 0.1007575750110656, "2028": 0.10075799675625423, "2029": 0.10075798009591429}, "IND4_EXEC_ORCAMENTARIA": {"2026": 0.892684479074815, "2027": 0.8926840358426846, "2028": 0.8926840313999106, "2029": 0.8926840313553781}, "IND5_DEPENDENCIA": {"2026": 0.6449849273704102, "2027": 0.6448252192673889, "2028": 0.6448141980826527, "2029": 0.6448134375294267}, "IND6_RESULTADO_PRIMARIO": {"2026": -0.0228194188651153, "2027": -0.023475637576470327, "2028": -0.02356961484863479, "2029": -0.023583073361064643}, "IND9_POUPANCA": {"2026": 0.19433449107092732, "2027": 0.1942921919809633, "2028": 0.1942960663201629, "2029": 0.19429571145427227}}, "BA": {"IND1_TAXA_INVEST": {"2026": 0.10718342203574922, "2027": 0.10714672418229117, "2028": 0.10715027766496482, "2029": 0.10714993357837876}, "IND2_REGRA_OURO": {"2026": 0.09817536465656386, "2027": 0.09710747321759407, "2028": 0.09688463121684955, "2029": 0.09683812971352845}, "IND4_EXEC_ORCAMENTARIA": {"2026": 0.8774459775519808, "2027": 0.8618580587206719, "2028": 0.8711802415934043, "2029": 0.8656052129796988}, "IND5_DEPENDENCIA": {"2026": 0.39261744479797717, "2027": 0.3883829101038424, "2028": 0.390876512053952, "2029": 0.38940809789874314}, "IND6_RESULTADO_PRIMARIO": {"2026": -0.009204255537928162, "2027": -0.00923343232663203, "2028": -0.009228303926027779, "2029": -0.009229205344378669}, "IND9_POUPANCA": {"2026": 0.10104707679471871, "2027": 0.09934952072028544, "2028": 0.09889345422608464, "2029": 0.0987709271118024}}, "CE": {"IND1_TAXA_INVEST": {"2026": 0.09912091340193256, "2027": 0.1020703310642226, "2028": 0.10055997319460634, "2029": 0.10133340753165461}, "IND2_REGRA_OURO": {"2026": 0.11345301768387918, "2027": 0.08636516485414708, "2028": 0.10425470157398221, "2029": 0.09243997686833655}, "IND4_EXEC_ORCAMENTARIA": {"2026": 0.8709065940203559, "2027": 0.8781630879764735, "2028": 0.875237069707786, "2029": 0.8764169208811581}, "IND5_DEPENDENCIA": {"2026": 0.4379691446324261, "2027": 0.43685075962723763, "2028": 0.43726428885416935, "2029": 0.4371113840667004}, "IND6_RESULTADO_PRIMARIO": {"2026": 0.00774651938343305, "2027": 0.007908662414681897, "2028": 0.007958403155880266, "2029": 0.007973662160944542}, "IND9_POUPANCA": {"2026": 0.11801941150115243, "2027": 0.11801636099963762, "2028": 0.1180163145621659, "2029": 0.11801631385525302}}, "DF": {"IND1_TAXA_INVEST": {"2026": 0.047661357775988324, "2027": 0.04785060347758986, "2028": 0.047890832796904155, "2029": 0.047899384632527346}, "IND2_REGRA_OURO": {"2026": 0.06914592546732562, "2027": 0.06908701307846735, "2028": 0.06909702724418726, "2029": 0.06909532499586549}, "IND4_EXEC_ORCAMENTARIA": {"2026": 0.841260365533367, "2027": 0.856649853490449, "2028": 0.8476789374195713, "2029": 0.8529083079727154}, "IND5_DEPENDENCIA": {"2026": 0.16508901590153124, "2027": 0.15986879988585917, "2028": 0.15689256984952507, "2029": 0.1551957156958686}, "IND6_RESULTADO_PRIMARIO": {"2026": -0.027477553942144097, "2027": -0.027667074614010325, "2028": -0.027610991654590234, "2029": -0.027627587724593276}, "IND9_POUPANCA": {"2026": 0.06249428331595069, "2027": 0.06116766283001862, "2028": 0.06199445059424009, "2029": 0.06147917285330723}}, "ES": {"IND1_TAXA_INVEST": {"2026": 0.1511087770938852, "2027": 0.15161482253533773, "2028": 0.1517076650664677, "2029": 0.1517246985873347}, "IND2_REGRA_OURO": {"2026": 0.22950100679758992, "2027": 0.23237359217170034, "2028": 0.23378115541268027, "2029": 0.23447085964052117}, "IND4_EXEC_ORCAMENTARIA": {"2026": 0.8379662466187088, "2027": 0.8368565386459819, "2028": 0.8366165521238814, "2029": 0.8365646524059328}, "IND5_DEPENDENCIA": {"2026": 0.27260908457322625, "2027": 0.27162162464756356, "2028": 0.27090944732879324, "2029": 0.2703958097419003}, "IND6_RESULTADO_PRIMARIO": {"2026": 0.008752576615248309, "2027": 0.008172608874129354, "2028": 0.008524101812063648, "2029": 0.0083110774028451}, "IND9_POUPANCA": {"2026": 0.2600623202162437, "2027": 0.24513875800701318, "2028": 0.25467314883337827, "2029": 0.2485818009932729}}, "GO": {"IND1_TAXA_INVEST": {"2026": 0.10851041419664367, "2027": 0.113756085821779, "2028": 0.11213984311120051, "2029": 0.11263782329108467}, "IND2_REGRA_OURO": {"2026": 0.14328965507049327, "2027": 0.1605824415585071, "2028": 0.15240899850801856, "2029": 0.15627217991871162}, "IND4_EXEC_ORCAMENTARIA": {"2026": 0.8865716246297463, "2027": 0.891170668236753, "2028": 0.889692188601352, "2029": 0.8901674835146173}, "IND5_DEPENDENCIA": {"2026": 0.22226674341491842, "2027": 0.2222358287271051, "2028": 0.22225154821872226, "2029": 0.22224355517612082}, "IND6_RESULTADO_PRIMARIO": {"2026": 0.0006597218365039731, "2027": -0.002372164299369745, "2028": -0.00041703518283674017, "2029": -0.0016778113766015383}, "IND9_POUPANCA": {"2026": 0.039403244471736334, "2027": 0.020346493849209425, "2028": 0.011755622291113673, "2029": 0.007882817551755001}}, "MA": {"IND1_TAXA_INVEST": {"2026": 0.14071018001038504, "2027": 0.14072044890489482, "2028": 0.1407206083364683, "2029": 0.14072061081175194}, "IND2_REGRA_OURO": {"2026": 0.15092648744142803, "2027": 0.1534659440793102, "2028": 0.1527071518124131, "2029": 0.15293387972566583}, "IND4_EXEC_ORCAMENTARIA": {"2026": 0.8954417759795924, "2027": 0.9034575891511084, "2028": 0.9078662697265166, "2029": 0.9102910348751168}, "IND5_DEPENDENCIA": {"2026": 0.5590976244979364, "2027": 0.5556789086483143, "2028": 0.5568152571111186, "2029": 0.5564375457464668}, "IND6_RESULTADO_PRIMARIO": {"2026": -0.00439407653524617, "2027": -0.004449822026818359, "2028": -0.004444840087645199, "2029": -0.004445285320384656}, "IND9_POUPANCA": {"2026": 0.20480996688160674, "2027": 0.20289406112617905, "2028": 0.20347704711452058, "2029": 0.20329965182164686}}, "MG": {"IND1_TAXA_INVEST": {"2026": 0.058880069558493814, "2027": 0.058882972600781174, "2028": 0.058883031053571754, "2029": 0.058883032230519376}, "IND2_REGRA_OURO": {"2026": 0.10615547205704619, "2027": 0.10629857787427012, "2028": 0.10628652226678179, "2029": 0.10628753786261662}, "IND4_EXEC_ORCAMENTARIA": {"2026": 0.8719479761280532, "2027": 0.8711088047518926, "2028": 0.8713496387799547, "2029": 0.8712805217548507}, "IND5_DEPENDENCIA": {"2026": 0.21474479418711984, "2027": 0.21007833076063262, "2028": 0.2133508662614802, "2029": 0.21105587589607416}, "IND6_RESULTADO_PRIMARIO": {"2026": -0.003937009106181499, "2027": -0.0038248224239243356, "2028": -0.0038583670441842137, "2029": -0.0038483369628435423}, "IND9_POUPANCA": {"2026": 0.12229508867156373, "2027": 0.12206041867268687, "2028": 0.12200229530682734, "2029": 0.12198789923713368}}, "MS": {"IND1_TAXA_INVEST": {"2026": 0.11098514051815929, "2027": 0.11093433865627157, "2028": 0.11093109568739296, "2029": 0.11093088867043026}, "IND2_REGRA_OURO": {"2026": 0.1266546986461111, "2027": 0.12627763981864362, "2028": 0.12622548189885477, "2029": 0.12621826698065494}, "IND4_EXEC_ORCAMENTARIA": {"2026": 0.8528575106685462, "2027": 0.8572830429749219, "2028": 0.8552996486616963, "2029": 0.8561885480594181}, "IND5_DEPENDENCIA": {"2026": 0.26537696491608165, "2027": 0.26631699293471994, "2028": 0.26604040362909576, "2029": 0.26612178593097274}, "IND6_RESULTADO_PRIMARIO": {"2026": -0.007187470225321588, "2027": -0.007178091685294048, "2028": -0.007177564204845166, "2029": -0.007177534537581057}, "IND9_POUPANCA": {"2026": 0.14007191110549622, "2027": 0.140494216179951, "2028": 0.14055515374343772, "2029": 0.14056394688107285}}, "MT": {"IND1_TAXA_INVEST": {"2026": 0.11738412156174016, "2027": 0.11589958446243072, "2028": 0.1151974854845293, "2029": 0.11486543384701917}, "IND2_REGRA_OURO": {"2026": 0.18998638757735867, "2027": 0.19128888896134918, "2028": 0.19169759658021748, "2029": 0.19182584359766724}, "IND4_EXEC_ORCAMENTARIA": {"2026": 0.8519913417794935, "2027": 0.8537580712748634, "2028": 0.8531948038054864, "2029": 0.8533743843484556}, "IND5_DEPENDENCIA": {"2026": 0.22080591428667462, "2027": 0.2198916683587222, "2028": 0.22041677461724757, "2029": 0.22011517460535573}, "IND6_RESULTADO_PRIMARIO": {"2026": -0.01125208276547968, "2027": -0.0112496765885295, "2028": -0.011249708794922188, "2029": -0.011249708363843447}, "IND9_POUPANCA": {"2026": 0.22954555693671394, "2027": 0.23051065795569708, "2028": 0.23074899929098946, "2029": 0.2308078600641019}}, "PA": {"IND1_TAXA_INVEST": {"2026": 0.13468673005752263, "2027": 0.13532588612141833, "2028": 0.135557625943082, "2029": 0.13564164821554137}, "IND2_REGRA_OURO": {"2026": 0.10152405671362079, "2027": 0.1014740222826517, "2028": 0.10146995531516911, "2029": 0.10146962473832065}, "IND4_EXEC_ORCAMENTARIA": {"2026": 0.8719991656335859, "2027": 0.936180678123876, "2028": 0.8737009359652829, "2029": 0.9345240301669794}, "IND5_DEPENDENCIA": {"2026": 0.3944783706436732, "2027": 0.4011044730854896, "2028": 0.3968339358033007, "2029": 0.3995863062712655}, "IND6_RESULTADO_PRIMARIO": {"2026": -0.01268918268005445, "2027": -0.011902585900331933, "2028": -0.011622280933707287, "2029": -0.011522393829742584}, "IND9_POUPANCA": {"2026": 0.12046255493778782, "2027": 0.12116493210840039, "2028": 0.12085142061274154, "2029": 0.12099135889949497}}, "PB": {"IND1_TAXA_INVEST": {"2026": 0.13265624017495536, "2027": 0.13805542802978865, "2028": 0.1404792984075366, "2029": 0.1415674523607028}, "IND2_REGRA_OURO": {"2026": 0.12195435215210502, "2027": 0.12202543613203208, "2028": 0.12202025885957074, "2029": 0.1220206359367992}, "IND4_EXEC_ORCAMENTARIA": {"2026": 0.883908712447397, "2027": 0.8845023818716797, "2028": 0.8846028190314247, "2029": 0.8846198110182865}, "IND5_DEPENDENCIA": {"2026": 0.48444547877762806, "2027": 0.48246883179169897, "2028": 0.483438136733696, "2029": 0.48296281054886475}, "IND6_RESULTADO_PRIMARIO": {"2026": 0.010017834348366577, "2027": 0.01001834765987426, "2028": 0.01001835733130173, "2029": 0.010018357513523457}, "IND9_POUPANCA": {"2026": 0.09892021948292179, "2027": 0.0840458617206817, "2028": 0.0746536767295741, "2029": 0.06872312562160467}}, "PE": {"IND1_TAXA_INVEST": {"2026": 0.08121278083088447, "2027": 0.08570517348491806, "2028": 0.08377894839185954, "2029": 0.08460486531294543}, "IND2_REGRA_OURO": {"2026": 0.07461562090773831, "2027": 0.07484509228194618, "2028": 0.0747394485158201, "2029": 0.07478808467080818}, "IND4_EXEC_ORCAMENTARIA": {"2026": 0.9169789621760694, "2027": 0.9202262014541739, "2028": 0.918756987075826, "2029": 0.9194217335588152}, "IND5_DEPENDENCIA": {"2026": 0.4186616466211303, "2027": 0.41453214210517847, "2028": 0.41652832168189224, "2029": 0.4155633795472859}, "IND6_RESULTADO_PRIMARIO": {"2026": 0.004569183666219436, "2027": 0.0056661588870446505, "2028": 0.005140879246313959, "2029": 0.0053924060773016275}, "IND9_POUPANCA": {"2026": 0.07659072319559317, "2027": 0.07552253476457653, "2028": 0.0757669102483736, "2029": 0.075711003092532}}, "PI": {"IND1_TAXA_INVEST": {"2026": 0.1705027774288095, "2027": 0.1704888632442828, "2028": 0.170490789601257, "2029": 0.17049052290570002}, "IND2_REGRA_OURO": {"2026": 0.12925206724179897, "2027": 0.13020081900360753, "2028": 0.12970372631357438, "2029": 0.1299641749919656}, "IND4_EXEC_ORCAMENTARIA": {"2026": 0.9247422217670844, "2027": 0.9244863504038004, "2028": 0.9245397857348194, "2029": 0.9245286264766498}, "IND5_DEPENDENCIA": {"2026": 0.5326425828445348, "2027": 0.5277216050834542, "2028": 0.5307645889218779, "2029": 0.5288828997352}, "IND6_RESULTADO_PRIMARIO": {"2026": -0.002868824978970239, "2027": -0.0031688563063044513, "2028": -0.0031177517133972018, "2029": -0.003126456402468908}, "IND9_POUPANCA": {"2026": 0.09936589432392637, "2027": 0.09800817268397023, "2028": 0.09830683795662976, "2029": 0.09824113896320746}}, "PR": {"IND1_TAXA_INVEST": {"2026": 0.1021834607755983, "2027": 0.11263799183293237, "2028": 0.11853645371562611, "2029": 0.12186437463247908}, "IND2_REGRA_OURO": {"2026": 0.11691595990387954, "2027": 0.11780763111678459, "2028": 0.1174730909345829, "2029": 0.11759860483689104}, "IND4_EXEC_ORCAMENTARIA": {"2026": 1.0405460561561681, "2027": 1.158490255278132, "2028": 1.2861667508564902, "2029": 1.4243786141318826}, "IND5_DEPENDENCIA": {"2026": 0.24171634385360088, "2027": 0.24360119176564055, "2028": 0.24288154107084417, "2029": 0.24315630972417307}, "IND6_RESULTADO_PRIMARIO": {"2026": -0.051023169098997796, "2027": -0.024448868084776, "2028": -0.03741111762754255, "2029": -0.031088471055614575}, "IND9_POUPANCA": {"2026": 0.12874208283760402, "2027": 0.12637429067930261, "2028": 0.12564229534909624, "2029": 0.1254160013470803}}, "RJ": {"IND1_TAXA_INVEST": {"2026": 0.05400525103059523, "2027": 0.05403096095680444, "2028": 0.05403410201329424, "2029": 0.05403448576530472}, "IND2_REGRA_OURO": {"2026": 0.062120835280974, "2027": 0.062214327704872355, "2028": 0.06219541403125038, "2029": 0.06219924029903725}, "IND4_EXEC_ORCAMENTARIA": {"2026": 0.839229702867986, "2027": 0.8395111182985088, "2028": 0.8395657890693708, "2029": 0.8395764099979429}, "IND5_DEPENDENCIA": {"2026": 0.10109048019923816, "2027": 0.10081848685242178, "2028": 0.10094101592914857, "2029": 0.1008858183486958}, "IND6_RESULTADO_PRIMARIO": {"2026": -0.003936737717412907, "2027": -0.003934593839016764, "2028": -0.003934587791247149, "2029": -0.003934587774186705}, "IND9_POUPANCA": {"2026": 0.07371816814351995, "2027": 0.07376119716953532, "2028": 0.0737586844852982, "2029": 0.07375883121374316}}, "RN": {"IND1_TAXA_INVEST": {"2026": 0.049047046234377056, "2027": 0.03297032971426837, "2028": 0.04730243734233474, "2029": 0.03452561759773372}, "IND2_REGRA_OURO": {"2026": 0.05762864089184335, "2027": 0.05802068803046389, "2028": 0.05789622357165832, "2029": 0.05793573770141392}, "IND4_EXEC_ORCAMENTARIA": {"2026": 0.9117568085276968, "2027": 0.9124280890264179, "2028": 0.9126445590024312, "2029": 0.9127143647700715}, "IND5_DEPENDENCIA": {"2026": 0.489018501864828, "2027": 0.4881656569738133, "2028": 0.4888278009884109, "2029": 0.4883137160701724}, "IND6_RESULTADO_PRIMARIO": {"2026": -0.008916066075196082, "2027": -0.008697836026258407, "2028": -0.008747851067663482, "2029": -0.008736388373231947}, "IND9_POUPANCA": {"2026": 0.05173695068060915, "2027": 0.05173710934321389, "2028": 0.05173711556801375, "2029": 0.05173711581223092}}, "RO": {"IND1_TAXA_INVEST": {"2026": 0.03940140451924516, "2027": 0.0381171531434328, "2028": 0.03857295561953609, "2029": 0.038411183632264145}, "IND2_REGRA_OURO": {"2026": 0.07818284130263684, "2027": 0.07576001406765001, "2028": 0.07474899670828324, "2029": 0.07432711103431502}, "IND4_EXEC_ORCAMENTARIA": {"2026": 0.8148827543290192, "2027": 0.8175194887095798, "2028": 0.8166390621956563, "2029": 0.8169330435887516}, "IND5_DEPENDENCIA": {"2026": 0.43906604198625404, "2027": 0.43750910945791804, "2028": 0.4381729465617713, "2029": 0.4378899030178592}, "IND6_RESULTADO_PRIMARIO": {"2026": -0.0027949467697778053, "2027": -0.0014721875787224296, "2028": -0.0018687883043952552, "2029": -0.0017498761572199897}, "IND9_POUPANCA": {"2026": 0.1449887335461411, "2027": 0.1387787697967162, "2028": 0.13622763459192816, "2029": 0.13517959452346373}}, "RR": {"IND1_TAXA_INVEST": {"2026": 0.033683993053306556, "2027": 0.03343292923315925, "2028": 0.033350788856402636, "2029": 0.0333239150460314}, "IND2_REGRA_OURO": {"2026": -0.04282274979974373, "2027": -0.09870066982867112, "2028": -0.15859775292936928, "2029": -0.2228030877398749}, "IND4_EXEC_ORCAMENTARIA": {"2026": 0.8449859876124703, "2027": 0.8453090779622778, "2028": 0.8452779695723383, "2029": 0.8452809648085785}, "IND5_DEPENDENCIA": {"2026": 0.6761084027520836, "2027": 0.6739812998373549, "2028": 0.6752509245836256, "2029": 0.6744931112285776}, "IND6_RESULTADO_PRIMARIO": {"2026": 0.021281943821982653, "2027": 0.019966327557664396, "2028": 0.020693827158151486, "2029": 0.02029153989319195}, "IND9_POUPANCA": {"2026": 0.16257097698807516, "2027": 0.1651849890160349, "2028": 0.16581507613754368, "2029": 0.16596695370216263}}, "SC": {"IND1_TAXA_INVEST": {"2026": 0.09178637485322659, "2027": 0.09556400146792642, "2028": 0.0936388800515926, "2029": 0.09461994378436217}, "IND2_REGRA_OURO": {"2026": 0.12578058253765584, "2027": 0.1270576317471625, "2028": 0.12668059751197874, "2029": 0.1267919125759891}, "IND4_EXEC_ORCAMENTARIA": {"2026": 0.8485697784421669, "2027": 0.8562997830269885, "2028": 0.8536550145093224, "2029": 0.8545599040776639}, "IND5_DEPENDENCIA": {"2026": 0.2162309934365571, "2027": 0.2177879332355674, "2028": 0.2171613846840811, "2029": 0.21741352229891958}, "IND6_RESULTADO_PRIMARIO": {"2026": -0.04153020379653629, "2027": -0.030178667959261312, "2028": -0.034792230263335916, "2029": -0.03291715737111239}, "IND9_POUPANCA": {"2026": 0.150359835909846, "2027": 0.15035109502950095, "2028": 0.15035126324294848, "2029": 0.15035126000577295}}, "SE": {"IND1_TAXA_INVEST": {"2026": 0.061618678414691465, "2027": 0.06222269289682499, "2028": 0.06212215927562903, "2029": 0.0621388923330138}, "IND2_REGRA_OURO": {"2026": 0.07748250578941313, "2027": 0.07834290769437398, "2028": 0.0780723278358539, "2029": 0.07815741999966086}, "IND4_EXEC_ORCAMENTARIA": {"2026": 0.9139527214231531, "2027": 0.9143510929317096, "2028": 0.9142756463692959, "2029": 0.9142899350010323}, "IND5_DEPENDENCIA": {"2026": 0.5290604559681316, "2027": 0.540673013680247, "2028": 0.5324429347455585, "2029": 0.5382757754470119}, "IND6_RESULTADO_PRIMARIO": {"2026": -0.0027884306961740695, "2027": 0.000224938879814055, "2028": -0.0021902238846948077, "2029": -0.00025451336795297434}, "IND9_POUPANCA": {"2026": 0.10386302370270449, "2027": 0.10368110234820654, "2028": 0.1036915403641576, "2029": 0.10369094146702816}}, "SP": {"IND1_TAXA_INVEST": {"2026": 0.04829177099862409, "2027": 0.04743594182947792, "2028": 0.047625918302153826, "2029": 0.04758374743269586}, "IND2_REGRA_OURO": {"2026": 0.1358316268070797, "2027": 0.1366427484054331, "2028": 0.13640570309386996, "2029": 0.1364749781320987}, "IND4_EXEC_ORCAMENTARIA": {"2026": 0.9104909986285062, "2027": 0.9081689110649881, "2028": 0.9088853690328831, "2029": 0.9086643127610075}, "IND5_DEPENDENCIA": {"2026": 0.12812618195051562, "2027": 0.1277361829143367, "2028": 0.12783293159056433, "2029": 0.12780893074573274}, "IND6_RESULTADO_PRIMARIO": {"2026": -0.0013413620350312596, "2027": -0.001348092488862781, "2028": -0.0013488585376743515, "2029": -0.001348945728047601}, "IND9_POUPANCA": {"2026": 0.11064732959874013, "2027": 0.11057272702741604, "2028": 0.11054857887556305, "2029": 0.11054076234554853}}, "TO": {"IND1_TAXA_INVEST": {"2026": 0.048514834845952225, "2027": 0.048154827519326336, "2028": 0.0482008877451757, "2029": 0.0481949946862061}, "IND2_REGRA_OURO": {"2026": 0.06305506540706968, "2027": 0.06206190456399349, "2028": 0.06234908276484923, "2029": 0.06226604352742693}, "IND4_EXEC_ORCAMENTARIA": {"2026": 0.7964466689798576, "2027": 0.7895722506275159, "2028": 0.7876145484533312, "2029": 0.7870570325143279}, "IND5_DEPENDENCIA": {"2026": 0.5171459117820107, "2027": 0.5170125160674733, "2028": 0.5170399633305028, "2029": 0.517034315830878}, "IND6_RESULTADO_PRIMARIO": {"2026": 0.003993091385716709, "2027": -0.008961382060314403, "2028": 0.0008283990197308546, "2029": -0.006569803153015482}, "IND9_POUPANCA": {"2026": 0.07528243686954582, "2027": 0.07474533295997347, "2028": 0.0746248765929544, "2029": 0.07459786182710214}}}};
+const ANOS_HIST = DADOS.anos;                       // [2019..2025]
+const ANOS_PROJ = [2026,2027,2028,2029];
+const ANOS_TODOS = [...ANOS_HIST,...ANOS_PROJ];
+const UFS  = DADOS.ufs;
+const HIST = DADOS.hist_scores;                     // {UF:{ano:{score,rank,ind1..}}}
+const PROJ26 = DADOS.proj26;                        // {UF:{IND_KEY:{ano:val}}}
+const RS_HIST_CONTAS = DADOS.rs_contas;             // {ano:{CONTA:val}}
+
+const LAST_HIST = Math.max(...ANOS_HIST);
+
+const INDS = ['ind1','ind2','ind4','ind5','ind6','ind9'];
+const INVERTIDOS = new Set(['ind5']);
+
+const LABELS_IND = {
+  ind1:'Taxa de Investimentos',  ind2:'Regra de Ouro',
+  ind4:'Sucesso no Planejamento',ind5:'Dependência Fiscal',
+  ind6:'Resultado Primário',     ind9:'Poupança Corrente',
+};
+const LABELS_SHORT = {
+  ind1:'Taxa Invest.', ind2:'Regra de Ouro', ind4:'Exec. Orçam.',
+  ind5:'Dep. Fiscal ↓',ind6:'Res. Primário', ind9:'Poupança',
+};
+
+// Cores do design system
+const C = {
+  red:'#92302a', green:'#3a6b3e', gold:'#a37714', steel:'#2f4e74',
+  muted:'#857a68', rule:'#c4b8a1', ink:'#1c1814',
+  projLine:'#a37714', histLine:'#92302a', medianaLine:'#c4b8a1',
+  paper:'#f1ecdf',
+};
+
+/* ── CONTAS SICONFI para sidebar ── */
+const CONTAS_DEF = [
+  {key:'RCL',                     label:'Receita Corrente Líquida',      desc:'Anexo 03 · Últimos 12 meses'},
+  {key:'RECEITAS_CORRENTES',      label:'Receitas Correntes',             desc:'Anexo 01 · Até o Bimestre'},
+  {key:'DESPESAS_CORRENTES',      label:'Despesas Correntes',             desc:'Anexo 01 · Liquidadas Até o Bimestre'},
+  {key:'TRANSFERENCIAS_CORRENTES',label:'Transferências Correntes',       desc:'Anexo 01 · Até o Bimestre'},
+  {key:'RECEITA_OP_CREDITO',      label:'Receita Operações de Crédito',   desc:'Anexo 01 · Até o Bimestre'},
+  {key:'DESPESA_CAPITAL_EMPENHADA',label:'Despesa de Capital Empenhada',  desc:'Anexo 01 · Empenhadas Até o Bimestre'},
+  {key:'INVESTIMENTO_LIQUIDADO',  label:'Investimentos Liquidados',       desc:'Anexo 01 · Liquidadas Até o Bimestre'},
+  {key:'DESPESA_LIQUIDADA_TOTAL', label:'Despesa Liquidada Total',        desc:'Anexo 01 · Liquidadas Até o Bimestre'},
+  {key:'DOTACAO_ATUALIZADA',      label:'Dotação Atualizada',             desc:'Anexo 01 · Dotação Atualizada'},
+  {key:'RECEITA_PRIMARIA',        label:'Receita Primária',               desc:'Anexo 06 · Até o Bimestre'},
+  {key:'DESPESA_PRIMARIA_EMPENHADA',label:'Despesa Primária Empenhada',   desc:'Anexo 06 · Empenhadas Até o Bimestre'},
+];
+
+// inputs[ano][conta] = valor
+const STORAGE_KEY = 'solidez_fiscal_inputs_v1';
+const STORAGE_META = 'solidez_fiscal_meta_v1';
+
+function salvarInputs(){
+  try{
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(inputs));
+    const agora = new Date().toLocaleString('pt-BR',{
+      day:'2-digit',month:'2-digit',year:'numeric',
+      hour:'2-digit',minute:'2-digit'
+    });
+    localStorage.setItem(STORAGE_META, JSON.stringify({ultima_alteracao: agora}));
+    atualizarDataAlteracao(agora);
+  }catch(e){}
+}
+
+function atualizarDataAlteracao(data){
+  const el = document.getElementById('ultima-alteracao');
+  if(el) el.textContent = data ? 'Última alteração: ' + data : '';
+}
+
+const inputs = {};
+// Default: valores históricos 2025
+ANOS_PROJ.forEach(ano => {
+  inputs[ano] = {};
+  const ref = RS_HIST_CONTAS[LAST_HIST] || RS_HIST_CONTAS[String(LAST_HIST)] || {};
+  CONTAS_DEF.forEach(c => { inputs[ano][c.key] = ref[c.key] || 0; });
+});
+// Sobrescrever com localStorage se existir
+try{
+  const saved = localStorage.getItem(STORAGE_KEY);
+  if(saved){
+    const parsed = JSON.parse(saved);
+    ANOS_PROJ.forEach(ano => {
+      if(parsed[ano]) Object.assign(inputs[ano], parsed[ano]);
+    });
+  }
+}catch(e){}
+
+/* ── Calcular indicadores a partir das contas brutas ── */
+function contasParaInds(contas){
+  const rcl = +contas.RCL || 1;
+  const rc  = +contas.RECEITAS_CORRENTES || 0;
+  const dc  = +contas.DESPESAS_CORRENTES || 0;
+  const tr  = +contas.TRANSFERENCIAS_CORRENTES || 0;
+  const oc  = +contas.RECEITA_OP_CREDITO || 0;
+  const cap = +contas.DESPESA_CAPITAL_EMPENHADA || 0;
+  const inv = +contas.INVESTIMENTO_LIQUIDADO || 0;
+  const liq = +contas.DESPESA_LIQUIDADA_TOTAL || 0;
+  const dot = +contas.DOTACAO_ATUALIZADA || 1;
+  const rp  = +contas.RECEITA_PRIMARIA || 0;
+  const dp  = +contas.DESPESA_PRIMARIA_EMPENHADA || 0;
+  const execR = liq/dot;
+  return {
+    ind1: inv/rcl, ind2:(cap-oc)/rcl, ind4:1-Math.abs(execR-1),
+    ind5:tr/rc,    ind6:(rp-dp)/rcl,  ind9:(rc-dc)/rcl,
+  };
+}
+
+/* ── Normalização min-max cross-sectional ── */
+function normAnno(rows){
+  // rows = [{uf, ind1..ind9}]
+  const out = rows.map(r=>({...r}));
+  INDS.forEach(ind=>{
+    const vals = out.map(r=>r[ind]).filter(v=>v!=null&&!isNaN(v));
+    const mn=Math.min(...vals), mx=Math.max(...vals);
+    out.forEach(r=>{
+      const v=r[ind];
+      if(v==null||isNaN(v)){r['sc_'+ind]=0;return;}
+      if(mx===mn){r['sc_'+ind]=50;return;}
+      r['sc_'+ind]=INVERTIDOS.has(ind)?((mx-v)/(mx-mn))*100:((v-mn)/(mx-mn))*100;
+    });
+  });
+  out.forEach(r=>{ r.score=INDS.reduce((s,i)=>s+(r['sc_'+i]||0),0)/INDS.length; });
+  const sorted=[...out].sort((a,b)=>b.score-a.score);
+  sorted.forEach((r,i)=>{ out.find(x=>x.uf===r.uf).rank=i+1; });
+  return out;
+}
+
+/* ── Montar rankings completos ── */
+function calcRankings(){
+  const res={};
+  const IND_MAP={ind1:'IND1_TAXA_INVEST',ind2:'IND2_REGRA_OURO',ind4:'IND4_EXEC_ORCAMENTARIA',
+                 ind5:'IND5_DEPENDENCIA',ind6:'IND6_RESULTADO_PRIMARIO',ind9:'IND9_POUPANCA'};
+  ANOS_TODOS.forEach(ano=>{
+    const rows=[];
+    UFS.forEach(uf=>{
+      if(ANOS_HIST.includes(ano)){
+        const h=HIST[uf]&&HIST[uf][ano];
+        if(h) rows.push({uf,...Object.fromEntries(INDS.map(i=>[i,h[i]]))});
+      } else {
+        if(uf==='RS'){
+          rows.push({uf:'RS',...contasParaInds(inputs[ano])});
+        } else {
+          const p=PROJ26[uf];
+          const row={uf};
+          INDS.forEach(ind=>{
+            const pind=p&&p[IND_MAP[ind]];
+            row[ind]=pind&&pind[ano]!==undefined?pind[ano]:(HIST[uf]&&HIST[uf][LAST_HIST]?HIST[uf][LAST_HIST][ind]:0);
+          });
+          rows.push(row);
+        }
+      }
+    });
+    res[ano]=normAnno(rows);
+  });
+  return res;
+}
+
+let rankings = calcRankings();
+function getRSRow(ano){ const r=rankings[ano]; return r?r.find(x=>x.uf==='RS'):null; }
+
+/* ── Formatadores ── */
+function fmtPct(v){ return (v*100).toFixed(2).replace('.',',')+' %'; }
+function fmtN4(v){ return v.toFixed(4).replace('.',','); }
+function fmtBi(v){
+  const b=Math.abs(v)/1e9, s=v<0?'−':'';
+  return s+'R$ '+b.toFixed(2).replace('.',',')+ ' bi';
+}
+
+/* ══════════════════════════════════════════════
+   SIDEBAR — INPUTS
+══════════════════════════════════════════════ */
+function buildSidebar(){
+  const el = document.getElementById('sidebar-inputs');
+  el.innerHTML = CONTAS_DEF.map(c => {
+    const yearsHtml = ANOS_PROJ.map(ano => {
+      const val = inputs[ano][c.key] || 0;
+      // Se tem valor: mostrar resumo; se não: campo vazio para digitar
+      const isText = val > 0;
+      const displayVal = isText ? fmtBiInline(val) : '';
+      const inputType = isText ? 'text' : 'number';
+      const hasCls = isText ? ' has-value' : '';
+      return `
+        <div class="conta-year-wrap">
+          <label>${ano}</label>
+          <input type="${inputType}" id="inp_${c.key}_${ano}"
+            value="${displayVal}"
+            step="100000000" min="0"
+            class="${hasCls.trim()}"
+            onfocus="onFocus(this,'${c.key}',${ano})"
+            oninput="onInput('${c.key}',${ano},this.value)"
+            onblur="onBlur(this,'${c.key}',${ano})">
+        </div>`;
+    }).join('');
+    return `<div class="conta-block">
+      <div class="conta-label">${c.label}</div>
+      <div class="conta-years">${yearsHtml}</div>
+    </div>`;
+  }).join('');
+}
+
+function fmtBiInline(v){
+  if(!v || isNaN(v)) return '';
+  const b = Math.abs(v)/1e9;
+  const sign = v < 0 ? '−' : '';
+  return sign + 'R$ ' + b.toFixed(1).replace('.',',') + ' bi';
+}
+
+// Ao focar: mostrar número bruto para edição
+function onFocus(el, conta, ano){
+  el.type = 'number';
+  el.value = inputs[ano][conta] || '';
+  el.classList.remove('has-value');
+  el.select();
+}
+
+// Ao sair do campo: salvar e mostrar resumo formatado
+function onBlur(el, conta, ano){
+  const val = parseFloat(el.value) || 0;
+  inputs[ano][conta] = val;
+  if(val){
+    el.type = 'text';
+    el.value = fmtBiInline(val);
+    el.classList.add('has-value');
+  } else {
+    el.type = 'number';
+    el.value = '';
+    el.classList.remove('has-value');
+  }
+  salvarInputs();
+  rankings = calcRankings();
+  refreshAll();
+}
+
+function onInput(conta, ano, val){
+  // Atualiza o valor interno durante a digitação (sem reformatar ainda)
+  inputs[ano][conta] = parseFloat(val) || 0;
+}
+
+function refreshAll(){
+  const activeTab=document.querySelector('.tab-pane.active');
+  if(!activeTab) return;
+  const id=activeTab.id;
+  if(id==='t1'){ buildTab1(); }
+  if(id==='t2') buildTab2();
+  if(id==='t3') buildTab3();
+  if(id==='t4') buildTab4();
+}
+
+/* ══════════════════════════════════════════════
+   TAB 1 — RANKING RS: HISTÓRICO & PROJEÇÃO
+══════════════════════════════════════════════ */
+let _chartRank=null, _chartIndT1=null;
+
+const IND_FORMULAS = {
+  ind1: 'Taxa de Investimentos = Investimento Liquidado ÷ RCL',
+  ind2: 'Regra de Ouro = (Despesa de Capital Empenhada − Receita de Op. de Crédito) ÷ RCL',
+  ind4: 'Sucesso no Planejamento = 1 − |Despesa Liquidada ÷ Dotação Atualizada − 1|',
+  ind5: 'Dependência Fiscal = Transferências Correntes ÷ Receitas Correntes  ↓ menor é melhor',
+  ind6: 'Resultado Primário = (Receita Primária − Despesa Primária Empenhada) ÷ RCL',
+  ind9: 'Poupança Corrente = (Receitas Correntes − Despesas Correntes) ÷ RCL',
+};
+
+function buildTab1(){
+  const el=document.getElementById('t1');
+  if(!el.innerHTML){
+    el.innerHTML=`
+      <div class="section-head">
+        <h2 class="section-title serif">Posição Projetada do RS — 2026 a 2029</h2>
+      </div>
+      <div class="metric-grid" id="t1-metrics"></div>
+      <hr class="rule-sep">
+      <div class="col-layout">
+        <div>
+          <div class="chart-block">
+            <div class="chart-eyebrow">Evolução do ranking</div>
+            <div class="chart-title serif">Ranking RS — histórico &amp; projeção</div>
+            <div class="legend-row">
+              <div class="legend-item"><div class="sq" style="background:${C.histLine}"></div>Histórico RS</div>
+              <div class="legend-item"><div class="sq" style="background:${C.projLine};opacity:.7"></div>Projeção RS (inputs)</div>
+              <div class="legend-item"><div class="sq" style="background:${C.medianaLine}"></div>Média outros estados</div>
+            </div>
+            <div class="chart-canvas"><canvas id="chart-rank" height="260"></canvas></div>
+          </div>
+        </div>
+        <div>
+          <div class="score-list">
+            <div class="score-list-title">Score Parcial RS por Ano</div>
+            <div id="t1-score-list"></div>
+          </div>
+        </div>
+      </div>
+      <hr class="rule-sep">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:12px">
+        <h2 class="section-title serif" style="font-size:19px">Evolução por Indicador — RS vs. Brasil</h2>
+        <select class="ctrl-sel" id="sel-ind-t1" onchange="renderIndChartT1()">
+          ${INDS.map(i=>`<option value="${i}">${LABELS_IND[i]}</option>`).join('')}
+        </select>
+      </div>
+      <div id="ind-formula-t1" style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:10px;padding:7px 12px;background:var(--paper-2);border-left:3px solid var(--rule);letter-spacing:.02em"></div>
+      <div class="chart-block">
+        <div class="legend-row">
+          <div class="legend-item"><div class="sq" style="background:rgba(47,78,116,.15);border:1px solid ${C.steel}"></div>Intervalo outros estados</div>
+          <div class="legend-item"><div class="sq" style="background:${C.steel}"></div>Mediana Brasil</div>
+          <div class="legend-item"><div class="sq" style="background:${C.histLine}"></div>RS histórico</div>
+          <div class="legend-item"><div class="sq" style="background:${C.projLine};opacity:.8"></div>RS projeção</div>
+        </div>
+        <div class="chart-canvas"><canvas id="chart-ind-t1" height="240"></canvas></div>
+      </div>`;
+  }
+
+  // MÉTRICAS
+  const rank2025 = getRSRow(LAST_HIST)?.rank || 27;
+  document.getElementById('t1-metrics').innerHTML = ANOS_PROJ.map(ano=>{
+    const r=getRSRow(ano); if(!r) return '';
+    const delta=rank2025-r.rank;
+    const imp=r.rank<rank2025;
+    const dStr=delta>0
+      ?`<div class="metric-delta pos">▲ ${delta} pos. vs ${LAST_HIST}</div>`
+      :delta<0?`<div class="metric-delta neg">▼ ${Math.abs(delta)} pos. vs ${LAST_HIST}</div>`
+      :`<div class="metric-delta neu">= estável</div>`;
+    return `<div class="metric-card">
+      <div class="metric-year">${ano}<span class="proj-tag">PROJ.</span></div>
+      <div class="metric-value${imp?' melhor':''}">${r.rank}º<span style="font-size:16px;font-weight:400;color:var(--muted)">/27</span></div>
+      <div class="metric-score">${r.score.toFixed(1)} pts</div>
+      ${dStr}
+    </div>`;
+  }).join('');
+
+  // SCORE LIST
+  document.getElementById('t1-score-list').innerHTML = ANOS_TODOS.map(ano=>{
+    const isH=ANOS_HIST.includes(ano);
+    const d=isH?HIST['RS'][ano]:getRSRow(ano);
+    if(!d) return '';
+    const score=d.score, rank=d.rank;
+    const fill=isH?C.histLine:C.projLine;
+    const rankStr=`<span class="s-rank" style="color:${rank<=10?C.green:rank>=22?C.red:C.gold}">${rank}º</span>`;
+    return `<div class="score-item">
+      <span class="s-year" style="color:${isH?C.steel:C.gold}">${ano}</span>
+      <div class="s-bar"><div class="s-fill" style="width:${score}%;background:${fill}"></div></div>
+      <span class="s-val">${score.toFixed(1)} pts</span>
+      ${rankStr}
+    </div>`;
+  }).join('');
+
+  // CHART RANKING
+  const ranksH=ANOS_HIST.map(a=>HIST['RS'][a]?.rank||null);
+  const ranksP=ANOS_PROJ.map(a=>getRSRow(a)?.rank||null);
+  const projLine=[...ANOS_HIST.map((_,i)=>i===ANOS_HIST.length-1?ranksH[i]:null), ...ranksP];
+  const medianaAll=ANOS_TODOS.map(ano=>{
+    const r=rankings[ano]; if(!r) return null;
+    const rks=r.filter(x=>x.uf!=='RS').map(x=>x.rank).sort((a,b)=>a-b);
+    return rks[Math.floor(rks.length/2)]||null;
+  });
+
+  const ctx1=document.getElementById('chart-rank');
+  if(_chartRank) _chartRank.destroy();
+  _chartRank=new Chart(ctx1,{
+    type:'line',
+    data:{
+      labels:ANOS_TODOS.map(String),
+      datasets:[
+        {label:'Histórico RS',
+          data:[...ranksH,...ANOS_PROJ.map(()=>null)],
+          borderColor:C.histLine,backgroundColor:'rgba(146,48,42,.1)',
+          borderWidth:2.5,pointRadius:6,pointBackgroundColor:C.histLine,
+          tension:.1,fill:false},
+        {label:'Projeção RS (inputs manuais)',
+          data:projLine,
+          borderColor:C.projLine,borderDash:[6,4],borderWidth:2.5,
+          pointRadius:6,pointStyle:'rectRot',pointBackgroundColor:C.projLine,
+          tension:.1,fill:false},
+        {label:'Média outros estados',
+          data:medianaAll,
+          borderColor:C.medianaLine,borderDash:[3,4],borderWidth:1.5,
+          pointRadius:0,tension:.3,fill:false},
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      scales:{
+        y:{reverse:true,min:1,max:27,
+          ticks:{stepSize:2,font:{family:'JetBrains Mono',size:11},color:C.muted},
+          grid:{color:'rgba(28,24,20,.06)'},
+          title:{display:true,text:'Posição (1 = melhor)',
+            font:{family:'PT Sans',size:11},color:C.muted}},
+        x:{ticks:{font:{family:'JetBrains Mono',size:11},color:C.muted},
+          grid:{display:false}}
+      },
+      plugins:{
+        legend:{labels:{font:{family:'PT Sans',size:11},boxWidth:12,color:C.ink}},
+        annotation:{annotations:{
+          zona:{type:'box',yMin:20,yMax:27,
+            backgroundColor:'rgba(146,48,42,.06)',borderWidth:0,
+            label:{display:true,content:'Zona crítica (20º–27º)',
+              font:{family:'PT Sans',size:9},color:C.red,position:{x:'end',y:'start'}}},
+          div:{type:'line',xMin:6.5,xMax:6.5,
+            borderColor:'rgba(28,24,20,.25)',borderWidth:1,borderDash:[4,4],
+            label:{display:true,content:'← Hist. | Proj. →',
+              font:{family:'PT Sans',size:9},color:C.muted,position:'start'}}
+        }}
+      }
+    },
+    plugins:[{
+      afterDraw(chart){
+        const ctx=chart.ctx;
+        chart.data.datasets.slice(0,2).forEach((ds,di)=>{
+          const meta=chart.getDatasetMeta(di);
+          meta.data.forEach((pt,i)=>{
+            const v=ds.data[i]; if(v==null) return;
+            ctx.save();
+            ctx.font='700 11px "JetBrains Mono"';
+            ctx.fillStyle=di===0?C.histLine:C.projLine;
+            ctx.textAlign='center';
+            ctx.fillText(v+'º',pt.x,pt.y-10);
+            ctx.restore();
+          });
+        });
+      }
+    }]
+  });
+
+  // Renderizar gráfico de indicador
+  renderIndChartT1();
+}
+
+function renderIndChartT1(){
+  const sel=document.getElementById('sel-ind-t1');
+  const ind=sel?sel.value:'ind1';
+
+  // Mostrar fórmula
+  const fEl=document.getElementById('ind-formula-t1');
+  if(fEl) fEl.textContent = IND_FORMULAS[ind] || '';
+
+  const rsH=ANOS_HIST.map(a=>HIST['RS'][a]?HIST['RS'][a][ind]:null);
+  const rsP=ANOS_PROJ.map(ano=>contasParaInds(inputs[ano])[ind]);
+  const rsProjLine=[...ANOS_HIST.map((_,i)=>i===ANOS_HIST.length-1?rsH[i]:null),...rsP];
+
+  const medOt=ANOS_TODOS.map(ano=>{
+    const r=rankings[ano];if(!r) return null;
+    const vals=r.filter(x=>x.uf!=='RS').map(x=>x[ind]).filter(v=>v!=null).sort((a,b)=>a-b);
+    return vals[Math.floor(vals.length/2)]||null;
+  });
+  const minOt=ANOS_TODOS.map(ano=>{
+    const r=rankings[ano];if(!r) return null;
+    const vals=r.filter(x=>x.uf!=='RS').map(x=>x[ind]).filter(v=>v!=null);
+    return vals.length?Math.min(...vals):null;
+  });
+  const maxOt=ANOS_TODOS.map(ano=>{
+    const r=rankings[ano];if(!r) return null;
+    const vals=r.filter(x=>x.uf!=='RS').map(x=>x[ind]).filter(v=>v!=null);
+    return vals.length?Math.max(...vals):null;
+  });
+
+  const ctx=document.getElementById('chart-ind-t1');
+  if(!ctx) return;
+  if(_chartIndT1) _chartIndT1.destroy();
+  _chartIndT1=new Chart(ctx,{
+    type:'line',
+    data:{
+      labels:ANOS_TODOS.map(String),
+      datasets:[
+        {label:'Intervalo outros estados',
+          data:maxOt,fill:'+1',
+          backgroundColor:'rgba(47,78,116,.10)',
+          borderColor:'rgba(0,0,0,0)',borderWidth:0,
+          pointRadius:0,tension:.3},
+        {label:'_min',data:minOt,fill:false,
+          borderColor:'rgba(0,0,0,0)',borderWidth:0,
+          pointRadius:0,tension:.3,showLine:true},
+        {label:'Mediana Brasil',data:medOt,
+          borderColor:C.steel,borderDash:[4,3],borderWidth:1.5,
+          pointRadius:0,tension:.3,fill:false},
+        {label:'RS — Histórico',
+          data:[...rsH,...ANOS_PROJ.map(()=>null)],
+          borderColor:C.histLine,borderWidth:2.5,
+          pointRadius:5,pointBackgroundColor:C.histLine,tension:.1,fill:false},
+        {label:'RS — Projeção',
+          data:rsProjLine,
+          borderColor:C.projLine,borderDash:[6,4],borderWidth:2.5,
+          pointRadius:5,pointStyle:'rectRot',pointBackgroundColor:C.projLine,
+          tension:.1,fill:false},
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      scales:{
+        y:{ticks:{font:{family:'JetBrains Mono',size:11},color:C.muted},
+          grid:{color:'rgba(28,24,20,.06)'},
+          title:{display:true,text:LABELS_IND[ind],font:{family:'PT Sans',size:11},color:C.muted}},
+        x:{ticks:{font:{family:'JetBrains Mono',size:11},color:C.muted},grid:{display:false}}
+      },
+      plugins:{
+        legend:{labels:{
+          font:{family:'PT Sans',size:11},boxWidth:12,color:C.ink,
+          filter:item=>item.text!=='_min'
+        }},
+        annotation:{annotations:{
+          div:{type:'line',xMin:6.5,xMax:6.5,
+            borderColor:'rgba(28,24,20,.25)',borderWidth:1,borderDash:[4,4]}
+        }}
+      }
+    }
+  });
+}
+
+/* ══════════════════════════════════════════════
+   TAB 2 — EVOLUÇÃO POR INDICADOR
+══════════════════════════════════════════════ */
+let _chartInd=null;
+
+function buildTab2(){
+  const el=document.getElementById('t2');
+  if(!el.innerHTML){
+    el.innerHTML=`
+      <div class="section-head">
+        <div class="section-eyebrow">Seção II</div>
+        <h2 class="section-title serif">Evolução do Indicador Bruto — RS vs. Brasil</h2>
+      </div>
+      <div class="control-row">
+        <div class="ctrl-group">
+          <span class="ctrl-label">Indicador</span>
+          <select class="ctrl-sel" id="sel-ind" onchange="renderIndChart()">
+            ${INDS.map(i=>`<option value="${i}">${LABELS_IND[i]}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+      <div class="chart-block">
+        <div class="chart-eyebrow" id="ind-eyebrow"></div>
+        <div class="chart-title serif" id="ind-chart-title"></div>
+        <div class="chart-deck">Banda azul = intervalo min-max dos outros estados · Pontilhado = mediana Brasil</div>
+        <div class="legend-row">
+          <div class="legend-item"><div class="sq" style="background:rgba(47,78,116,.15);border:1px solid ${C.steel}"></div>Intervalo outros estados</div>
+          <div class="legend-item"><div class="sq" style="background:${C.steel}"></div>Mediana Brasil</div>
+          <div class="legend-item"><div class="sq" style="background:${C.histLine}"></div>RS — Histórico</div>
+          <div class="legend-item"><div class="sq" style="background:${C.projLine};opacity:.7"></div>RS — Projeção manual</div>
+        </div>
+        <div class="chart-canvas"><canvas id="chart-ind" height="260"></canvas></div>
+
+      </div>
+      <hr class="rule-sep" style="margin:16px 0">
+      <div class="section-head">
+        <h2 class="section-title serif" style="font-size:16px">Valores RS — Histórico &amp; Projeção</h2>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table" id="tab-ind-rs">
+          <thead><tr><th>Ano</th><th>Valor</th><th>Tipo</th></tr></thead>
+          <tbody id="tbody-ind-rs"></tbody>
+        </table>
+      </div>`;
+  }
+  renderIndChart();
+}
+
+function renderIndChart(){
+  const ind=document.getElementById('sel-ind')?.value||'ind1';
+  document.getElementById('ind-eyebrow').textContent=LABELS_IND[ind];
+  document.getElementById('ind-chart-title').textContent=LABELS_IND[ind]+' — RS vs. Brasil 2019–2029';
+
+  // Dados RS histórico
+  const rsH=ANOS_HIST.map(a=>HIST['RS'][a]?HIST['RS'][a][ind]:null);
+  // Dados RS projetado
+  const IND_MAP={ind1:'IND1_TAXA_INVEST',ind2:'IND2_REGRA_OURO',ind4:'IND4_EXEC_ORCAMENTARIA',
+                 ind5:'IND5_DEPENDENCIA',ind6:'IND6_RESULTADO_PRIMARIO',ind9:'IND9_POUPANCA'};
+  const rsP=ANOS_PROJ.map(ano=>contasParaInds(inputs[ano])[ind]);
+  const rsProjLine=[...ANOS_HIST.map((_,i)=>i===ANOS_HIST.length-1?rsH[i]:null),...rsP];
+
+  // Mediana e banda outros estados
+  const medOt=ANOS_TODOS.map(ano=>{
+    const r=rankings[ano];if(!r) return null;
+    const vals=r.filter(x=>x.uf!=='RS').map(x=>x[ind]).filter(v=>v!=null).sort((a,b)=>a-b);
+    return vals[Math.floor(vals.length/2)]||null;
+  });
+  const minOt=ANOS_TODOS.map(ano=>{
+    const r=rankings[ano];if(!r) return null;
+    const vals=r.filter(x=>x.uf!=='RS').map(x=>x[ind]).filter(v=>v!=null);
+    return Math.min(...vals);
+  });
+  const maxOt=ANOS_TODOS.map(ano=>{
+    const r=rankings[ano];if(!r) return null;
+    const vals=r.filter(x=>x.uf!=='RS').map(x=>x[ind]).filter(v=>v!=null);
+    return Math.max(...vals);
+  });
+
+  const ctx=document.getElementById('chart-ind');
+  if(_chartInd) _chartInd.destroy();
+  _chartInd=new Chart(ctx,{
+    type:'line',
+    data:{
+      labels:ANOS_TODOS.map(String),
+      datasets:[
+        // Banda min-max (área preenchida)
+        {label:'Intervalo outros estados',
+          data:maxOt,fill:'+1',
+          backgroundColor:'rgba(47,78,116,.10)',
+          borderColor:'rgba(47,78,116,.0)',borderWidth:0,
+          pointRadius:0,tension:.3},
+        {label:'_min',data:minOt,fill:false,
+          borderColor:'rgba(47,78,116,.0)',borderWidth:0,
+          pointRadius:0,tension:.3,showLine:true},
+        {label:'Mediana Brasil',data:medOt,
+          borderColor:C.steel,borderDash:[4,3],borderWidth:1.5,
+          pointRadius:0,tension:.3,fill:false},
+        {label:'RS — Histórico',
+          data:[...rsH,...ANOS_PROJ.map(()=>null)],
+          borderColor:C.histLine,borderWidth:2.5,
+          pointRadius:5,pointBackgroundColor:C.histLine,tension:.1,fill:false},
+        {label:'RS — Projeção manual',
+          data:rsProjLine,
+          borderColor:C.projLine,borderDash:[6,4],borderWidth:2.5,
+          pointRadius:5,pointStyle:'rectRot',pointBackgroundColor:C.projLine,
+          tension:.1,fill:false},
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      scales:{
+        y:{ticks:{font:{family:'JetBrains Mono',size:11},color:C.muted},
+          grid:{color:'rgba(28,24,20,.06)'},
+          title:{display:true,text:LABELS_IND[ind],font:{family:'PT Sans',size:11},color:C.muted}},
+        x:{ticks:{font:{family:'JetBrains Mono',size:11},color:C.muted},grid:{display:false}}
+      },
+      plugins:{
+        legend:{labels:{
+          font:{family:'PT Sans',size:11},boxWidth:12,color:C.ink,
+          filter:item=>item.text!=='_min'
+        }},
+        annotation:{annotations:{
+          div:{type:'line',xMin:6.5,xMax:6.5,
+            borderColor:'rgba(28,24,20,.25)',borderWidth:1,borderDash:[4,4]}
+        }}
+      }
+    }
+  });
+
+  // Tabela
+  const tbody=document.getElementById('tbody-ind-rs');
+  if(tbody){
+    tbody.innerHTML=ANOS_TODOS.map(ano=>{
+      const isH=ANOS_HIST.includes(ano);
+      const v=isH?(HIST['RS'][ano]?HIST['RS'][ano][ind]:null):contasParaInds(inputs[ano])[ind];
+      if(v==null) return '';
+      const fmt=Math.abs(v)<1?fmtPct(v):fmtN4(v);
+      const tipo=isH?'📌 Histórico':'📍 Projeção';
+      return `<tr${!isH?' style="color:var(--gold)"':''}>
+        <td>${ano}</td><td class="mono">${fmtN4(v)}</td><td>${tipo}</td>
+      </tr>`;
+    }).join('');
+  }
+}
+
+/* ══════════════════════════════════════════════
+   TAB 3 — MAPA DE CALOR
+══════════════════════════════════════════════ */
+function buildTab3(){
+  const el=document.getElementById('t3');
+  if(!el.innerHTML){
+    el.innerHTML=`
+      <div class="section-head">
+        <h2 class="section-title serif">Ranking de Solidez Fiscal — Todos os Estados</h2>
+      </div>
+      <div class="control-row">
+        <div class="ctrl-group">
+          <span class="ctrl-label">Exibir</span>
+          <div class="radio-group">
+            <button class="radio-btn active" id="rb-rank" onclick="switchHeat('rank',this)">Ranking</button>
+            <button class="radio-btn" id="rb-score" onclick="switchHeat('score',this)">Score</button>
+          </div>
+        </div>
+      </div>
+      <div id="mapa-table"></div>
+      <hr class="rule-sep">
+      <div class="section-head" style="margin-top:24px">
+        <h2 class="section-title serif" style="font-size:16px">Top 5 e Bottom 5 — Anos Projetados</h2>
+      </div>
+      <div class="grid-2" id="top-bot-grid"></div>`;
+  }
+  renderHeat('rank');
+  renderTopBot();
+}
+
+let _heatMode='rank';
+function switchHeat(mode,btn){
+  document.querySelectorAll('.radio-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  _heatMode=mode;
+  renderHeat(mode);
+}
+
+function rankColor(rank){
+  const p=(rank-1)/26;
+  return `rgb(${Math.round(58+(146-58)*p)},${Math.round(107+(48-107)*p)},${Math.round(62+(42-62)*p)})`;
+}
+function scoreColor(score){
+  const p=score/100;
+  return `rgb(${Math.round(146+(58-146)*p)},${Math.round(48+(107-48)*p)},${Math.round(42+(62-42)*p)})`;
+}
+
+function renderHeat(mode){
+  const el=document.getElementById('mapa-table');if(!el)return;
+  const ord=UFS.map(uf=>{
+    const rks=ANOS_HIST.map(a=>HIST[uf][a]?HIST[uf][a].rank:27);
+    return{uf,med:rks.reduce((s,v)=>s+v,0)/rks.length};
+  }).sort((a,b)=>a.med-b.med).map(x=>x.uf);
+
+  const thead=`<thead><tr><th>Estado</th>
+    ${ANOS_HIST.map(a=>`<th>${a}</th>`).join('')}
+    ${ANOS_PROJ.map(a=>`<th class="proj-col"><div style="font-size:8px;letter-spacing:.06em;color:var(--gold)">proj.</div>${a}</th>`).join('')}
+  </tr></thead>`;
+
+  const tbody=ord.map(uf=>{
+    const isRS=uf==='RS';
+    const cells=ANOS_TODOS.map(ano=>{
+      const isP=ANOS_PROJ.includes(ano);
+      const d=ANOS_HIST.includes(ano)?(HIST[uf]&&HIST[uf][ano]):
+        (rankings[ano]&&rankings[ano].find(x=>x.uf===uf));
+      if(!d) return `<td class="${isP?'proj-col':''}">—</td>`;
+      const val=mode==='rank'?d.rank:d.score;
+      const bg=mode==='rank'?rankColor(d.rank):scoreColor(d.score);
+      const fg=d.rank<=8||d.rank>=22?'#f1ecdf':'#1c1814';
+      const disp=mode==='rank'?`${d.rank}º`:`${d.score.toFixed(1)}`;
+      return `<td class="${isP?'proj-col':''}"
+        style="background:${bg};color:${fg};font-weight:${isRS?700:400}">${disp}</td>`;
+    }).join('');
+    return `<tr${isRS?' class="rs-row"':''} style="${isRS?'outline:2px solid var(--red);outline-offset:-2px':''}">
+      <td>${uf}</td>${cells}</tr>`;
+  }).join('');
+
+  el.innerHTML=`<div class="table-wrap"><table class="data-table"><${thead}<tbody>${tbody}</tbody></table></div>`;
+}
+
+function renderTopBot(){
+  const el=document.getElementById('top-bot-grid');if(!el)return;
+  el.innerHTML=[2026,2028].map(ano=>{
+    const r=rankings[ano];if(!r) return '<div></div>';
+    const s=[...r].sort((a,b)=>a.rank-b.rank);
+    const rows=[...s.slice(0,5),{uf:'⋯',rank:'',score:''},...s.slice(-5)];
+    const trs=rows.map(x=>{
+      const isRS=x.uf==='RS';
+      return `<tr${isRS?' class="rs-row"':''}>
+        <td>${x.uf}</td>
+        <td>${x.rank?x.rank+'º':''}</td>
+        <td>${typeof x.score==='number'?x.score.toFixed(1):''}</td>
+      </tr>`;
+    }).join('');
+    return `<div>
+      <div class="section-eyebrow" style="margin-bottom:8px">${ano} — Projeção</div>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead><tr><th>Estado</th><th>Ranking</th><th>Score</th></tr></thead>
+          <tbody>${trs}</tbody>
+        </table>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ══════════════════════════════════════════════
+   TAB 4 — ALERTAS & REFERÊNCIAS
+══════════════════════════════════════════════ */
+function buildTab4(){
+  const el=document.getElementById('t4');
+  if(!el.innerHTML){
+    el.innerHTML=`
+      <div class="section-head">
+        <h2 class="section-title serif">Alertas &amp; Referências</h2>
+      </div>
+      <div class="control-row">
+        <div class="ctrl-group">
+          <span class="ctrl-label">Ano projetado</span>
+          <div class="radio-group" id="ytabs">
+            ${ANOS_PROJ.map((a,i)=>`<button class="radio-btn${i===0?' active':''}" onclick="selectAnoAlerta(${a},this)">${a}</button>`).join('')}
+          </div>
+        </div>
+      </div>
+      <div id="alertas-block"></div>
+      <div class="context-block">
+        <div class="section-eyebrow" style="margin-bottom:12px">Contexto RS</div>
+        <div class="context-item">
+          <span class="ctx-year">2023</span>
+          <div class="ctx-dot" style="background:${C.steel}"></div>
+          <div class="ctx-text">Adesão ao <strong>PRFE</strong> — altera estrutura da dívida, melhora perspectiva de Solvência Fiscal</div>
+        </div>
+        <div class="context-item">
+          <span class="ctx-year">2024</span>
+          <div class="ctx-dot" style="background:${C.red}"></div>
+          <div class="ctx-text"><strong>Enchentes de maio/2024</strong> — impacto em receitas, despesas emergenciais e transferências extraordinárias</div>
+        </div>
+        <div class="context-item">
+          <span class="ctx-year">⏳</span>
+          <div class="ctx-dot" style="background:${C.gold}"></div>
+          <div class="ctx-text"><strong>Dados pendentes (RGF):</strong> Solvência Fiscal (DCL/RCL), Gasto com Pessoal e Índice de Liquidez são os piores indicadores históricos do RS — o ranking completo será significativamente diferente</div>
+        </div>
+      </div>`;
+  }
+  renderAlertas(ANOS_PROJ[0]);
+}
+
+let _anoAlerta=ANOS_PROJ[0];
+function selectAnoAlerta(ano,btn){
+  document.querySelectorAll('#ytabs .radio-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  _anoAlerta=ano;
+  renderAlertas(ano);
+}
+
+const LIMS=[
+  {ind:'ind1',label:'Taxa de Investimentos',cap:'Mínimo: ≥ 5% da RCL',op:'>=',lim:0.05,fmt:fmtPct},
+  {ind:'ind2',label:'Regra de Ouro',cap:'Capital não financiado por crédito: ≥ 0',op:'>=',lim:0,fmt:fmtN4},
+  {ind:'ind4',label:'Sucesso no Planejamento',cap:'Execução ≥ 85% da dotação',op:'>=',lim:0.85,fmt:fmtN4},
+  {ind:'ind5',label:'Dependência Fiscal',cap:'Transferências ≤ 50% da receita corrente',op:'<=',lim:0.50,fmt:fmtPct},
+  {ind:'ind6',label:'Resultado Primário / RCL',cap:'Resultado primário ≥ 0',op:'>=',lim:0,fmt:fmtPct},
+  {ind:'ind9',label:'Poupança Corrente / RCL',cap:'Poupança corrente ≥ 0',op:'>=',lim:0,fmt:fmtPct},
+];
+
+function renderAlertas(ano){
+  const el=document.getElementById('alertas-block');if(!el)return;
+  const inds=contasParaInds(inputs[ano]);
+  el.innerHTML=`<div class="limits-block">
+    <div class="limits-block-title serif">Indicadores RS — ${ano}</div>
+    ${LIMS.map(L=>{
+      const v=inds[L.ind];
+      const ok=L.op==='>='?v>=L.lim:v<=L.lim;
+      const pct=Math.min(Math.max(
+        L.op==='>='?(L.lim===0?50+v*200:v/L.lim*100):(L.lim===0?50:(L.lim-v)/L.lim*100+50)
+      ,0),100);
+      const fill=ok?C.green:C.red;
+      return `<div class="limit-row">
+        <div class="limit-name">${L.label}<span class="lim-cap">${L.cap}</span></div>
+        <div class="limit-bar"><div class="limit-fill" style="width:${Math.min(pct,100)}%;background:${fill}"></div></div>
+        <div class="limit-val" style="color:${ok?C.green:C.red}">${L.fmt(v)}</div>
+        <div class="limit-status">${ok?'✅':'🚨'}</div>
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+
+/* ══════════════════════════════════════════════
+   NAVEGAÇÃO
+══════════════════════════════════════════════ */
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
+    btn.classList.add('active');
+    const pane=document.getElementById(btn.dataset.tab);
+    pane.classList.add('active');
+    if(btn.dataset.tab==='t1') buildTab1();
+    if(btn.dataset.tab==='t2') buildTab2();
+    if(btn.dataset.tab==='t3') buildTab3();
+    if(btn.dataset.tab==='t4') buildTab4();
+  });
+});
+
+/* ══════════════════════════════════════════════
+   INIT
+══════════════════════════════════════════════ */
+// Carregar data da última alteração salva
+try{
+  const meta = JSON.parse(localStorage.getItem(STORAGE_META)||'{}');
+  if(meta.ultima_alteracao) atualizarDataAlteracao(meta.ultima_alteracao);
+}catch(e){}
+
+function resetarInputs(){
+  if(!confirm('Restaurar todos os valores para o padrão de 2025?')) return;
+  const ref = RS_HIST_CONTAS[LAST_HIST] || RS_HIST_CONTAS[String(LAST_HIST)] || {};
+  ANOS_PROJ.forEach(ano => {
+    CONTAS_DEF.forEach(c => {
+      inputs[ano][c.key] = ref[c.key] || 0;
+      const inp = document.getElementById(`inp_${c.key}_${ano}`);
+      if(inp) inp.value = Math.round(inputs[ano][c.key]) || '';
+      const disp = document.getElementById(`disp_${c.key}_${ano}`);
+      if(disp) disp.textContent = fmtBiInline(inputs[ano][c.key]);
+    });
+  });
+  localStorage.removeItem(STORAGE_KEY);
+  localStorage.removeItem(STORAGE_META);
+  atualizarDataAlteracao(null);
+  rankings = calcRankings();
+  refreshAll();
+}
+
+buildSidebar();
+buildTab1();
+</script>
+</body>
+</html>
