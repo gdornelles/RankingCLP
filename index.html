@@ -1,0 +1,1329 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ranking CLP · Pilar Solidez Fiscal · 2019–2029</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=PT+Sans:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+/* ── TOKENS ── */
+:root{
+  --paper:#f1ecdf; --paper-2:#ebe4d1; --paper-3:#e4dcc4;
+  --ink:#1c1814;   --ink-2:#4a4239;   --muted:#857a68;
+  --rule:#c4b8a1;  --rule-soft:#d6cdb8;
+  --green:#3a6b3e; --gold:#a37714; --red:#92302a; --steel:#2f4e74;
+  --sidebar-bg:#1c1814; --sidebar-w:320px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--paper);color:var(--ink);
+  font-family:"PT Sans",sans-serif;font-size:15px;line-height:1.5;
+  -webkit-font-smoothing:antialiased}
+.serif{font-family:"Spectral",serif}
+.mono{font-family:"JetBrains Mono",monospace;font-variant-numeric:tabular-nums}
+
+/* ── APP SHELL (sidebar + main) ── */
+.app-shell{display:flex;min-height:100vh}
+
+/* ── SIDEBAR ── */
+.sidebar{
+  width:var(--sidebar-w);flex-shrink:0;
+  background:var(--sidebar-bg);color:#d6cdb8;
+  display:flex;flex-direction:column;
+  border-right:1px solid #333;
+  position:sticky;top:0;height:100vh;overflow-y:auto;
+}
+.sidebar::-webkit-scrollbar{width:4px}
+.sidebar::-webkit-scrollbar-thumb{background:#444}
+.sidebar-head{padding:22px 20px 14px;border-bottom:1px solid #333}
+.sidebar-kicker{font-size:9px;letter-spacing:.2em;text-transform:uppercase;
+  color:#857a68;font-weight:700;margin-bottom:8px}
+.sidebar-title{font-family:"Spectral",serif;font-size:18px;font-weight:600;
+  color:#f1ecdf;line-height:1.2}
+.sidebar-deck{font-family:"Spectral",serif;font-style:italic;font-size:12px;
+  color:#857a68;margin-top:4px;line-height:1.4}
+
+.sidebar-section{padding:14px 20px;border-bottom:1px solid #2a2520}
+.sidebar-section-label{font-size:9px;letter-spacing:.18em;text-transform:uppercase;
+  color:#857a68;font-weight:700;margin-bottom:10px;display:flex;
+  justify-content:space-between;align-items:center}
+.sidebar-section-label span{font-variant-numeric:tabular-nums;
+  font-family:"JetBrains Mono",monospace;color:#c4b8a1}
+
+/* Input conta */
+.conta-block{margin-bottom:10px}
+.conta-label{font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+  color:#c4b8a1;font-weight:700;margin-bottom:6px;line-height:1.3}
+.conta-years{display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
+.conta-year-wrap{display:flex;flex-direction:column;gap:2px}
+.conta-year-wrap label{font-size:9px;font-family:"JetBrains Mono",monospace;
+  color:#555;text-align:center;letter-spacing:.04em}
+.conta-year-wrap input{
+  width:100%;background:#2a2520;border:1px solid #383230;
+  color:#f1ecdf;font-family:"JetBrains Mono",monospace;
+  font-size:11px;padding:5px 6px;text-align:right;
+  font-variant-numeric:tabular-nums;-moz-appearance:textfield;
+  transition:border-color .12s,background .12s}
+.conta-year-wrap input::-webkit-outer-spin-button,
+.conta-year-wrap input::-webkit-inner-spin-button{-webkit-appearance:none}
+.conta-year-wrap input:focus{outline:none;border-color:#c4b8a1;background:#161310;color:#f1ecdf}
+.conta-year-wrap input.has-value:not(:focus){color:#a37714;font-size:11px}
+
+.sidebar-note{padding:12px 20px 16px;font-size:10px;font-family:"JetBrains Mono",monospace;
+  color:#555;line-height:1.6;border-top:1px solid #2a2520;margin-top:auto}
+.sidebar-note strong{color:#c4b8a1;font-weight:600}
+
+/* ── MAIN CONTENT ── */
+.main{flex:1;min-width:0;display:flex;flex-direction:column}
+
+/* MASTHEAD */
+.masthead{padding:20px 36px 14px;border-bottom:3px double var(--ink)}
+.kicker{font-size:10px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--ink-2);font-weight:700}
+.kicker .sep{margin:0 .5em;color:var(--rule)}
+.masthead-row{display:flex;align-items:flex-end;justify-content:space-between;
+  gap:24px;margin-top:10px;flex-wrap:wrap}
+.title{font-family:"Spectral",serif;font-weight:600;
+  font-size:clamp(28px,3.5vw,48px);line-height:.95;letter-spacing:-.012em}
+.edition{text-align:right;font-family:"Spectral",serif;font-size:12px;
+  font-style:italic;color:var(--ink-2);line-height:1.55}
+.edition .ed-em{font-style:normal;font-weight:600;color:var(--ink)}
+
+/* AVISO METODOLOGIA */
+.aviso{background:var(--paper-2);border-left:3px solid var(--gold);
+  padding:9px 16px;margin:0 36px;font-family:"Spectral",serif;font-style:italic;
+  font-size:13px;color:var(--ink-2);line-height:1.5}
+.aviso strong{color:var(--ink);font-style:normal}
+
+/* NAV TABS */
+nav.tabs{display:flex;gap:0;border-bottom:1px solid var(--ink);
+  padding:0 36px;overflow-x:auto}
+.tab-btn{background:none;border:none;cursor:pointer;
+  padding:14px 18px 12px;font-family:"Spectral",serif;font-size:14px;
+  color:var(--ink-2);white-space:nowrap;position:relative;transition:color .12s}
+.tab-btn:hover{color:var(--ink)}
+.tab-btn.active{color:var(--ink);font-weight:600}
+.tab-btn.active::after{content:"";position:absolute;left:18px;right:18px;
+  bottom:-1px;height:3px;background:var(--ink)}
+.tab-btn .tab-num{font-family:"JetBrains Mono",monospace;font-size:9px;
+  color:var(--muted);margin-right:7px;font-weight:400;letter-spacing:.05em;top:-1px;position:relative}
+.tab-btn.active .tab-num{color:var(--ink)}
+
+/* TAB CONTENT */
+.tab-content{padding:28px 36px 60px;flex:1}
+.tab-pane{display:none}.tab-pane.active{display:block}
+
+/* SECTION HEADS */
+.section-head{margin:0 0 16px}
+.section-eyebrow{font-size:10px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--muted);font-weight:700;margin-bottom:5px}
+.section-title{font-family:"Spectral",serif;font-size:22px;font-weight:600;
+  line-height:1.15;letter-spacing:-.005em}
+.section-deck{font-family:"Spectral",serif;font-style:italic;color:var(--ink-2);
+  font-size:13.5px;margin-top:4px;line-height:1.5;max-width:72ch}
+
+/* METRIC CARDS (4 posições projetadas) */
+.metric-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0;
+  border-top:2px solid var(--ink);border-bottom:1px solid var(--ink);margin:18px 0 24px}
+.metric-card{padding:14px 16px 16px;border-right:1px solid var(--rule-soft)}
+.metric-card:last-child{border-right:none}
+.metric-year{font-size:10px;font-family:"JetBrains Mono",monospace;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--muted);margin-bottom:4px;
+  display:flex;justify-content:space-between;align-items:center}
+.proj-tag{font-size:8px;letter-spacing:.1em;background:var(--gold);
+  color:var(--paper);padding:2px 5px;font-weight:700;font-family:"PT Sans",sans-serif}
+.metric-value{font-family:"JetBrains Mono",monospace;font-size:32px;font-weight:600;
+  line-height:1;font-variant-numeric:tabular-nums;color:var(--red)}
+.metric-value.melhor{color:var(--green)}
+.metric-score{font-size:12px;color:var(--muted);font-family:"Spectral",serif;
+  font-style:italic;margin-top:3px}
+.metric-delta{font-size:11px;font-family:"JetBrains Mono",monospace;
+  margin-top:5px;font-weight:600}
+.metric-delta.pos{color:var(--green)}.metric-delta.neg{color:var(--red)}
+.metric-delta.neu{color:var(--muted)}
+
+/* LAYOUT 2 COLUNAS */
+.col-layout{display:grid;grid-template-columns:3fr 1fr;gap:18px;align-items:start}
+@media(max-width:1100px){.col-layout{grid-template-columns:1fr}}
+
+/* CHART BLOCK */
+.chart-block{background:var(--paper);padding:18px 22px 22px;
+  border:1px solid var(--rule);margin:0}
+.chart-eyebrow{font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--muted);font-weight:700;margin-bottom:3px}
+.chart-title{font-family:"Spectral",serif;font-size:17px;font-weight:600;line-height:1.2}
+.chart-deck{font-family:"Spectral",serif;font-style:italic;font-size:12.5px;
+  color:var(--ink-2);margin-top:3px;line-height:1.4}
+.chart-source{font-size:10px;color:var(--muted);margin-top:8px;letter-spacing:.04em;
+  padding-top:7px;border-top:1px dotted var(--rule)}
+.chart-canvas{position:relative}
+.legend-row{display:flex;gap:14px;flex-wrap:wrap;margin:8px 0 10px;font-size:11px}
+.legend-item{display:inline-flex;align-items:center;gap:5px;color:var(--ink-2)}
+.legend-item .sq{display:inline-block;width:10px;height:10px;flex-shrink:0}
+
+/* SCORE LIST (coluna direita tab1) */
+.score-list{background:var(--paper);border:1px solid var(--rule);padding:14px 16px}
+.score-list-title{font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--muted);font-weight:700;margin-bottom:10px}
+.score-item{display:flex;align-items:center;gap:8px;padding:5px 0;
+  border-bottom:1px solid var(--rule-soft);font-size:13px}
+.score-item:last-child{border-bottom:none}
+.score-item .s-year{font-family:"JetBrains Mono",monospace;font-weight:600;
+  font-size:12px;min-width:36px;color:var(--ink-2)}
+.score-item .s-bar{flex:1;height:6px;background:var(--paper-3);
+  border:1px solid var(--rule);position:relative}
+.score-item .s-fill{position:absolute;top:0;left:0;bottom:0;transition:width .3s}
+.score-item .s-val{font-family:"JetBrains Mono",monospace;font-size:11px;
+  min-width:70px;text-align:right;color:var(--ink)}
+.score-item .s-rank{font-family:"JetBrains Mono",monospace;font-size:11px;
+  min-width:28px;text-align:right}
+
+/* EDITORIAL NOTE */
+.editorial-note{background:var(--paper-2);border-left:3px solid var(--ink);
+  padding:12px 16px;margin:18px 0;font-family:"Spectral",serif;font-size:13.5px;
+  line-height:1.6;color:var(--ink-2)}
+.editorial-note .note-tag{display:block;font-family:"PT Sans",sans-serif;font-size:9px;
+  letter-spacing:.18em;text-transform:uppercase;color:var(--muted);font-weight:700;
+  margin-bottom:5px;font-style:normal}
+.editorial-note strong{color:var(--ink);font-weight:700}
+
+/* GRID 2 */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:18px}
+@media(max-width:1000px){.grid-2{grid-template-columns:1fr}}
+
+/* SEPARADOR */
+.rule-sep{border:none;border-top:1px solid var(--rule);margin:24px 0}
+
+/* SELECT / RADIO */
+.control-row{display:flex;gap:20px;flex-wrap:wrap;align-items:flex-end;
+  padding:10px 0;border-bottom:1px solid var(--rule-soft);margin-bottom:18px}
+.ctrl-group{display:flex;flex-direction:column;gap:4px}
+.ctrl-label{font-size:9px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--muted);font-weight:700}
+select.ctrl-sel{background:var(--paper);border:1px solid var(--rule);color:var(--ink);
+  padding:6px 10px;font-family:"PT Sans",sans-serif;font-size:13px;cursor:pointer;
+  -webkit-appearance:none;appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23857a68'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 10px center;padding-right:28px}
+.radio-group{display:flex;gap:2px}
+.radio-btn{background:none;border:1px solid var(--rule);cursor:pointer;
+  padding:6px 14px;font-family:"JetBrains Mono",monospace;font-size:12px;
+  color:var(--ink-2);transition:all .12s;letter-spacing:.01em}
+.radio-btn:hover{border-color:var(--ink);color:var(--ink)}
+.radio-btn.active{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.radio-btn+.radio-btn{border-left:none}
+
+/* TABELAS */
+.table-wrap{overflow-x:auto;border:1px solid var(--ink);margin-top:14px}
+table.data-table{width:100%;border-collapse:collapse;font-size:12.5px;background:var(--paper)}
+table.data-table thead th{background:var(--ink);color:var(--paper);font-weight:600;
+  padding:9px 11px;text-align:center;font-family:"PT Sans",sans-serif;font-size:10px;
+  letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
+table.data-table thead th:first-child{text-align:left}
+table.data-table tbody td{padding:8px 11px;text-align:center;
+  border-bottom:1px solid var(--rule-soft);font-family:"JetBrains Mono",monospace;
+  font-variant-numeric:tabular-nums;color:var(--ink);font-size:12px}
+table.data-table tbody td:first-child{text-align:left;font-family:"PT Sans",sans-serif;
+  font-size:13px;font-weight:600}
+table.data-table tbody tr:hover td{background:var(--paper-2)}
+table.data-table tbody tr.rs-row td{background:#fff7f5 !important;color:var(--red);font-weight:700}
+.proj-col{border-left:2px dashed var(--rule) !important}
+.cell-pos{color:var(--green)}.cell-neg{color:var(--red)}
+.cell-gold{color:var(--gold)}.cell-nd{color:var(--rule)}
+
+/* LIMITES / ALERTAS */
+.limits-block{border:1px solid var(--ink);background:var(--paper-2);padding:18px 22px;margin-top:18px}
+.limits-block-title{font-family:"Spectral",serif;font-size:15px;font-weight:600;margin-bottom:14px}
+.limit-row{display:grid;grid-template-columns:220px 1fr 90px 80px;gap:16px;
+  align-items:center;padding:11px 0;border-bottom:1px solid var(--rule-soft)}
+.limit-row:last-child{border-bottom:none}
+.limit-name{font-family:"Spectral",serif;font-size:14px;color:var(--ink)}
+.limit-name .lim-cap{font-size:10px;color:var(--muted);font-family:"PT Sans",sans-serif;
+  letter-spacing:.04em;display:block;margin-top:1px;text-transform:uppercase}
+.limit-bar{position:relative;height:10px;background:var(--paper-3);border:1px solid var(--rule)}
+.limit-fill{position:absolute;top:0;left:0;bottom:0;transition:width .4s}
+.limit-val{text-align:right;font-family:"JetBrains Mono",monospace;
+  font-size:14px;font-weight:600;font-variant-numeric:tabular-nums}
+.limit-status{text-align:center;font-size:16px}
+.year-tabs-inline{display:flex;gap:0;margin-bottom:14px}
+.ytab{background:none;border:1px solid var(--rule);cursor:pointer;padding:5px 12px;
+  font-family:"JetBrains Mono",monospace;font-size:12px;color:var(--ink-2);
+  transition:all .12s}
+.ytab.active{background:var(--ink);color:var(--paper)}
+.ytab+.ytab{border-left:none}
+
+/* CONTEXTO RS */
+.context-block{margin-top:20px;border-top:1px solid var(--rule);padding-top:16px}
+.context-item{display:flex;gap:12px;padding:8px 0;border-bottom:1px solid var(--rule-soft);
+  font-size:13.5px;font-family:"Spectral",serif;line-height:1.5}
+.context-item:last-child{border-bottom:none}
+.context-item .ctx-year{font-family:"JetBrains Mono",monospace;font-size:12px;
+  font-weight:600;color:var(--ink-2);min-width:36px}
+.context-item .ctx-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:6px}
+.context-item .ctx-text{color:var(--ink-2)}
+.context-item .ctx-text strong{color:var(--ink)}
+
+/* FOOTER */
+footer.colophon{margin:60px 36px 0;padding:22px 0 40px;
+  border-top:3px double var(--ink);font-size:12px;color:var(--ink-2);
+  line-height:1.65;font-family:"Spectral",serif}
+.colophon-grid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:36px}
+@media(max-width:760px){.colophon-grid{grid-template-columns:1fr;gap:18px}}
+.colophon h4{font-family:"PT Sans",sans-serif;font-size:10px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--ink);font-weight:700;margin-bottom:8px}
+.colophon-aside{font-style:italic;color:var(--muted);font-size:11px;
+  margin-top:12px;padding-top:12px;border-top:1px solid var(--rule)}
+
+/* Responsive */
+@media(max-width:900px){
+  .sidebar{display:none}
+  .metric-grid{grid-template-columns:repeat(2,1fr)}
+  .limit-row{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+<div class="app-shell">
+
+<!-- ═══════════════════════════════════════════
+     SIDEBAR
+═══════════════════════════════════════════ -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-head">
+    <div class="sidebar-kicker">Contas SICONFI</div>
+    <div class="sidebar-title">RS · 2026–2029</div>
+  </div>
+
+  <div class="sidebar-section" style="padding-top:10px">
+    <div id="sidebar-inputs"></div>
+  </div>
+
+  <div class="sidebar-note">
+    <div id="ultima-alteracao" style="color:#555;margin-bottom:8px"></div>
+    <button onclick="resetarInputs()" style="background:none;border:1px solid #333;color:#555;padding:5px 10px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;width:100%;transition:all .15s" onmouseover="this.style.borderColor='#c4b8a1';this.style.color='#c4b8a1'" onmouseout="this.style.borderColor='#333';this.style.color='#555'">↺ restaurar padrão 2025</button>
+  </div>
+</aside>
+
+<!-- ═══════════════════════════════════════════
+     MAIN
+═══════════════════════════════════════════ -->
+<div class="main">
+
+  <header class="masthead">
+    <div class="kicker">
+      Centro de Liderança Pública <span class="sep">·</span> Ranking de Competitividade dos Estados <span class="sep">·</span> Pilar Solidez Fiscal
+    </div>
+    <div class="masthead-row">
+      <h1 class="title serif">Pilar Solidez Fiscal<br><span style="font-size:.55em;font-weight:400;color:var(--ink-2)">Ranking CLP · 27 Estados · 2019–2025 + Projeções 2026–2029</span></h1>
+      <div class="edition">
+        <span style="display:block"><em class="ed-em">Ranking CLP</em> · Solidez Fiscal</span>
+        <span style="display:block;margin-top:2px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted)">2019–2025 histórico · 2026–2029 projeção</span>
+      </div>
+    </div>
+  </header>
+
+  <div style="padding:7px 36px;background:var(--paper-2);border-bottom:1px solid var(--rule-soft);font-size:11px;color:var(--muted);font-family:'JetBrains Mono',monospace;letter-spacing:.02em">
+    9/9 indicadores · dados SICONFI oficiais · fórmulas metodologia CLP · pesos iguais
+  </div>
+
+  <nav class="tabs">
+    <button class="tab-btn active" data-tab="t1"><span class="tab-num">I</span>Ranking RS — Histórico &amp; Projeção</button>
+    <button class="tab-btn" data-tab="t3"><span class="tab-num">II</span>Mapa de Calor — Todos os Estados</button>
+    <button class="tab-btn" data-tab="t4"><span class="tab-num">III</span>Alertas &amp; Referências</button>
+  </nav>
+
+  <div class="tab-content">
+    <div id="t1" class="tab-pane active"></div>
+    <div id="t2" class="tab-pane"></div>
+    <div id="t3" class="tab-pane"></div>
+    <div id="t4" class="tab-pane"></div>
+  </div>
+
+  <footer class="colophon">
+    <div class="colophon-grid">
+      <div>
+        <h4>Sobre este painel</h4>
+        Acompanhamento do Pilar Solidez Fiscal do Ranking de Competitividade dos Estados (CLP/Tendências).
+        Dados históricos via API SICONFI/Tesouro Nacional — RREO 6º bimestre e RGF 3º quadrimestre.
+        Projeções ARIMA(1,1,0) para 26 estados; inputs manuais para o Rio Grande do Sul.
+        <div class="colophon-aside">Ranking parcial: 6 de 9 indicadores. Pesos iguais como proxy — CLP não divulga pesos reais.</div>
+      </div>
+      <div>
+        <h4>Indicadores disponíveis</h4>
+        <ul style="list-style:none;font-size:11.5px">
+          <li>✓ Taxa de Investimentos</li><li>✓ Regra de Ouro</li>
+          <li>✓ Solvência Fiscal</li><li>✓ Sucesso no Planejamento</li>
+          <li>✓ Dependência Fiscal</li><li>✓ Resultado Primário</li>
+          <li>✓ Gasto com Pessoal</li><li>✓ Índice de Liquidez</li>
+          <li>✓ Poupança Corrente</li>
+        </ul>
+      </div>
+      <div>
+        <h4>Fontes</h4>
+        <ul style="list-style:none;font-size:11.5px">
+          <li>SICONFI — Tesouro Nacional</li>
+          <li>Ranking CLP — clp.org.br</li>
+          <li>LC 101/2000 — Lei de Responsabilidade Fiscal</li>
+        </ul>
+      </div>
+    </div>
+  </footer>
+
+</div><!-- /main -->
+</div><!-- /app-shell -->
+
+<script>
+/* ══════════════════════════════════════════════════════════
+   DADOS EMBUTIDOS
+══════════════════════════════════════════════════════════ */
+const DADOS = {"anos": [2019, 2020, 2021, 2022, 2023, 2024, 2025], "ufs": ["AC", "AL", "AM", "AP", "BA", "CE", "DF", "ES", "GO", "MA", "MG", "MS", "MT", "PA", "PB", "PE", "PI", "PR", "RJ", "RN", "RO", "RR", "RS", "SC", "SE", "SP", "TO"], "hist_scores": {"AC": {"2019": {"score": 51.1411, "rank": 13, "sc_ind1": 15.0629, "sc_ind2": 65.2255, "sc_ind3": 81.5464, "sc_ind4": 67.4942, "sc_ind5": 0.0, "sc_ind6": 48.6081, "sc_ind7": 39.555, "sc_ind8": 97.5771, "sc_ind9": 45.2008, "ind1": 2.534937, "ind2": 7.993873, "ind3": 58.17858, "ind4": 89.224124, "ind5": 64.904229, "ind6": 3.214032, "ind7": 69.470983, "ind8": 10.829988, "ind9": 7.595376}, "2020": {"score": 47.9371, "rank": 19, "sc_ind1": 29.1337, "sc_ind2": 62.6168, "sc_ind3": 82.2198, "sc_ind4": 60.2321, "sc_ind5": 4.4915, "sc_ind6": 34.9591, "sc_ind7": 38.1088, "sc_ind8": 87.994, "sc_ind9": 31.6779, "ind1": 3.418306, "ind2": 9.269639, "ind3": 58.514907, "ind4": 84.15013, "ind5": 67.608056, "ind6": 2.288337, "ind7": 68.55624, "ind8": 19.966075, "ind9": 8.658922}, "2021": {"score": 48.8607, "rank": 19, "sc_ind1": 25.6371, "sc_ind2": 32.1213, "sc_ind3": 71.1431, "sc_ind4": 78.6432, "sc_ind5": 3.8308, "sc_ind6": 62.2111, "sc_ind7": 45.3283, "sc_ind8": 98.6667, "sc_ind9": 22.1645, "ind1": 5.164439, "ind2": 11.198504, "ind3": 42.563889, "ind4": 88.433143, "ind5": 65.636245, "ind6": 2.493486, "ind7": 63.201917, "ind8": 5.877098, "ind9": 9.73746}, "2022": {"score": 52.2396, "rank": 20, "sc_ind1": 36.0253, "sc_ind2": 49.4252, "sc_ind3": 75.0465, "sc_ind4": 85.4395, "sc_ind5": 2.549, "sc_ind6": 57.1274, "sc_ind7": 59.0653, "sc_ind8": 76.0761, "sc_ind9": 29.4017, "ind1": 9.09494, "ind2": 16.064298, "ind3": 31.337254, "ind4": 92.63799, "ind5": 67.598682, "ind6": 0.393839, "ind7": 58.486825, "ind8": 46.6889, "ind9": 9.882802}, "2023": {"score": 36.7887, "rank": 23, "sc_ind1": 18.5566, "sc_ind2": 27.8957, "sc_ind3": 78.9957, "sc_ind4": 78.2312, "sc_ind5": 3.4567, "sc_ind6": 63.8161, "sc_ind7": 48.079, "sc_ind8": 4.647, "sc_ind9": 7.4208, "ind1": 4.60252, "ind2": 10.181928, "ind3": 23.930045, "ind4": 88.504944, "ind5": 66.747124, "ind6": 1.051158, "ind7": 61.769175, "ind8": 108.426647, "ind9": 6.303305}, "2024": {"score": 39.9554, "rank": 23, "sc_ind1": 11.1768, "sc_ind2": 25.9222, "sc_ind3": 84.927, "sc_ind4": 73.322, "sc_ind5": 0.0, "sc_ind6": 84.8025, "sc_ind7": 54.2362, "sc_ind8": 0.0, "sc_ind9": 25.212, "ind1": 4.275631, "ind2": 9.201852, "ind3": 19.568084, "ind4": 89.326176, "ind5": 68.149689, "ind6": 1.731562, "ind7": 58.697024, "ind8": 132.112358, "ind9": 7.119485}, "2025": {"score": 41.3155, "rank": 23, "sc_ind1": 17.2558, "sc_ind2": 38.6164, "sc_ind3": 75.6701, "sc_ind4": 63.3859, "sc_ind5": 0.0, "sc_ind6": 94.1378, "sc_ind7": 60.6561, "sc_ind8": 0.0, "sc_ind9": 22.1172, "ind1": 5.506603, "ind2": 9.207343, "ind3": 13.159227, "ind4": 89.516368, "ind5": 67.974223, "ind6": 0.298256, "ind7": 57.568871, "ind8": 133.034148, "ind9": 6.380695}}, "AL": {"2019": {"score": 64.3094, "rank": 4, "sc_ind1": 95.8478, "sc_ind2": 100.0, "sc_ind3": 75.4845, "sc_ind4": 44.354, "sc_ind5": 22.6816, "sc_ind6": 35.5758, "sc_ind7": 65.1595, "sc_ind8": 71.1654, "sc_ind9": 68.5162, "ind1": 8.46318, "ind2": 10.834784, "ind3": 74.823186, "ind4": 83.997298, "ind5": 51.484606, "ind6": 1.399223, "ind7": 60.529989, "ind8": 60.603407, "ind9": 14.288053}, "2020": {"score": 68.2587, "rank": 3, "sc_ind1": 85.7072, "sc_ind2": 65.6445, "sc_ind3": 82.4482, "sc_ind4": 65.3595, "sc_ind5": 34.3083, "sc_ind6": 36.6743, "sc_ind7": 75.1495, "sc_ind8": 88.7783, "sc_ind9": 80.2581, "ind1": 8.070697, "ind2": 9.596161, "ind3": 57.791063, "ind4": 85.85482, "ind5": 49.642665, "ind6": 2.402407, "ind7": 58.530427, "ind8": 18.888349, "ind9": 19.29654}, "2021": {"score": 68.0035, "rank": 2, "sc_ind1": 100.0, "sc_ind2": 100.0, "sc_ind3": 73.2328, "sc_ind4": 37.1125, "sc_ind5": 37.0674, "sc_ind6": 0.0, "sc_ind7": 88.4915, "sc_ind8": 91.3118, "sc_ind9": 84.8158, "ind1": 14.022632, "ind2": 30.935294, "ind3": 37.978265, "ind4": 76.973875, "ind5": 44.978317, "ind6": -0.712715, "ind7": 49.056594, "ind8": 19.928273, "ind9": 21.890444}, "2022": {"score": 55.3714, "rank": 17, "sc_ind1": 100.0, "sc_ind2": 46.7185, "sc_ind3": 64.4737, "sc_ind4": 71.3819, "sc_ind5": 26.1649, "sc_ind6": 15.9658, "sc_ind7": 69.5277, "sc_ind8": 74.7681, "sc_ind9": 29.3415, "ind1": 18.495443, "ind2": 15.435895, "ind3": 54.980754, "ind4": 89.643169, "ind5": 53.164797, "ind6": -1.435847, "ind7": 55.311003, "ind8": 49.020873, "ind9": 9.869116}, "2023": {"score": 44.5567, "rank": 21, "sc_ind1": 88.2023, "sc_ind2": 51.0424, "sc_ind3": 56.8332, "sc_ind4": 66.6706, "sc_ind5": 30.2461, "sc_ind6": 0.0, "sc_ind7": 64.2234, "sc_ind8": 30.3486, "sc_ind9": 13.4436, "ind1": 13.752911, "ind2": 14.825341, "ind3": 70.074482, "ind4": 86.547835, "ind5": 51.622422, "ind6": -1.47941, "ind7": 56.493889, "ind8": 80.93498, "ind9": 7.261897}, "2024": {"score": 55.7129, "rank": 14, "sc_ind1": 84.9143, "sc_ind2": 75.527, "sc_ind3": 60.0424, "sc_ind4": 34.7107, "sc_ind5": 26.7225, "sc_ind6": 40.2982, "sc_ind7": 79.8608, "sc_ind8": 34.563, "sc_ind9": 64.7774, "ind1": 14.932558, "ind2": 17.214384, "ind3": 75.726769, "ind4": 84.098189, "ind5": 52.659455, "ind6": -0.235091, "ind7": 50.630648, "ind8": 88.349505, "ind9": 15.179272}, "2025": {"score": 54.5653, "rank": 14, "sc_ind1": 45.403, "sc_ind2": 86.9674, "sc_ind3": 54.0569, "sc_ind4": 0.0, "sc_ind5": 25.5734, "sc_ind6": 100.0, "sc_ind7": 80.9387, "sc_ind8": 42.8818, "sc_ind9": 55.2661, "ind1": 9.430014, "ind2": 19.570535, "ind3": 71.437452, "ind4": 79.325638, "ind5": 53.160675, "ind6": 0.426755, "ind7": 51.109683, "ind8": 77.669557, "ind9": 12.0852}}, "AM": {"2019": {"score": 61.1887, "rank": 7, "sc_ind1": 41.4481, "sc_ind2": 41.6047, "sc_ind3": 92.0654, "sc_ind4": 70.1771, "sc_ind5": 60.4748, "sc_ind6": 30.1995, "sc_ind7": 80.696, "sc_ind8": 88.4438, "sc_ind9": 45.5885, "ind1": 4.471164, "ind2": 6.064167, "ind3": 29.296123, "ind4": 89.830127, "ind5": 29.124213, "ind6": 0.650558, "ind7": 55.104712, "ind8": 28.041988, "ind9": 7.70666}, "2020": {"score": 62.2487, "rank": 9, "sc_ind1": 41.0031, "sc_ind2": 37.3257, "sc_ind3": 95.2712, "sc_ind4": 71.3049, "sc_ind5": 64.6266, "sc_ind6": 16.1435, "sc_ind7": 96.3694, "sc_ind8": 99.9342, "sc_ind9": 38.2597, "ind1": 4.394397, "ind2": 6.542162, "ind3": 17.160494, "ind4": 87.831494, "ind5": 31.375177, "ind6": 1.036957, "ind7": 52.786853, "ind8": 3.55786, "ind9": 10.100128}, "2021": {"score": 52.8733, "rank": 14, "sc_ind1": 32.3546, "sc_ind2": 13.3064, "sc_ind3": 80.4282, "sc_ind4": 79.3031, "sc_ind5": 62.6782, "sc_ind6": 19.5404, "sc_ind7": 80.6725, "sc_ind8": 99.084, "sc_ind9": 8.4929, "ind1": 5.964635, "ind2": 5.727768, "ind3": 22.188888, "ind4": 88.615207, "ind5": 29.060163, "ind6": 0.294347, "ind7": 51.619043, "ind8": 5.079864, "ind9": 7.085463}, "2022": {"score": 57.9771, "rank": 11, "sc_ind1": 30.9487, "sc_ind2": 16.2006, "sc_ind3": 78.6162, "sc_ind4": 84.0457, "sc_ind5": 62.1015, "sc_ind6": 43.4774, "sc_ind7": 93.2469, "sc_ind8": 95.6149, "sc_ind9": 17.5419, "ind1": 8.348983, "ind2": 8.350551, "ind3": 23.35469, "ind4": 92.341051, "ind5": 31.200544, "ind6": -0.212921, "ind7": 48.111163, "ind8": 11.854508, "ind9": 7.184779}, "2023": {"score": 53.589, "rank": 12, "sc_ind1": 25.6515, "sc_ind2": 0.0, "sc_ind3": 78.0756, "sc_ind4": 100.0, "sc_ind5": 66.5777, "sc_ind6": 25.3517, "sc_ind7": 89.0299, "sc_ind8": 97.4748, "sc_ind9": 0.1401, "ind1": 5.534684, "ind2": 4.585824, "ind3": 25.845699, "ind4": 92.190223, "ind5": 31.110511, "ind6": -0.474113, "ind7": 48.388221, "ind8": 9.133374, "ind9": 5.144501}, "2024": {"score": 54.8706, "rank": 15, "sc_ind1": 22.1382, "sc_ind2": 0.0, "sc_ind3": 80.4831, "sc_ind4": 81.6376, "sc_ind5": 63.3352, "sc_ind6": 43.2509, "sc_ind7": 92.6727, "sc_ind8": 92.1643, "sc_ind9": 18.1532, "ind1": 5.859818, "ind2": 5.014706, "ind3": 29.596875, "ind4": 90.452117, "ind5": 31.436166, "ind6": -0.104614, "ind7": 46.597573, "ind8": 15.416043, "ind9": 5.68155}, "2025": {"score": 61.0868, "rank": 7, "sc_ind1": 8.9227, "sc_ind2": 23.8416, "sc_ind3": 70.7686, "sc_ind4": 100.0, "sc_ind5": 64.6843, "sc_ind6": 84.9877, "sc_ind7": 97.4449, "sc_ind8": 81.3808, "sc_ind9": 17.7505, "ind1": 4.345063, "ind2": 6.04061, "ind3": 26.37584, "ind4": 95.402908, "ind5": 30.505488, "ind6": 0.097688, "ind7": 45.853126, "ind8": 27.963601, "ind9": 5.629242}}, "AP": {"2019": {"score": 47.4159, "rank": 15, "sc_ind1": 13.3815, "sc_ind2": 30.9891, "sc_ind3": 90.1393, "sc_ind4": 7.1352, "sc_ind5": 5.9277, "sc_ind6": 40.0487, "sc_ind7": 76.8035, "sc_ind8": 62.3179, "sc_ind9": 100.0, "ind1": 2.411547, "ind2": 5.196926, "ind3": 34.584706, "ind4": 75.590439, "ind5": 61.397086, "ind6": 2.022102, "ind7": 56.463949, "ind8": 77.276727, "ind9": 23.325434}, "2020": {"score": 39.9297, "rank": 23, "sc_ind1": 10.2062, "sc_ind2": 2.7188, "sc_ind3": 88.1599, "sc_ind4": 18.5718, "sc_ind5": 5.0579, "sc_ind6": 36.3975, "sc_ind7": 86.5206, "sc_ind8": 11.7349, "sc_ind9": 100.0, "ind1": 1.861775, "ind2": 2.810016, "ind3": 39.693146, "ind4": 70.299317, "ind5": 67.266799, "ind6": 2.383997, "ind7": 55.452616, "ind8": 124.761034, "ind9": 23.619436}, "2021": {"score": 53.3421, "rank": 13, "sc_ind1": 5.7406, "sc_ind2": 5.3195, "sc_ind3": 100.0, "sc_ind4": 46.5905, "sc_ind5": 0.0, "sc_ind6": 76.2807, "sc_ind7": 63.6811, "sc_ind8": 82.4665, "sc_ind9": 100.0, "ind1": 2.794346, "ind2": 3.405462, "ind3": -20.758926, "ind4": 79.58908, "ind5": 68.017248, "ind6": 3.218597, "ind7": 57.187396, "ind8": 36.826735, "ind9": 24.835842}, "2022": {"score": 56.5752, "rank": 14, "sc_ind1": 26.3922, "sc_ind2": 27.5728, "sc_ind3": 75.034, "sc_ind4": 38.5288, "sc_ind5": 0.7442, "sc_ind6": 100.0, "sc_ind7": 60.5331, "sc_ind8": 80.8102, "sc_ind9": 99.5615, "ind1": 7.679438, "ind2": 10.990826, "ind3": 31.365405, "ind4": 82.644184, "ind5": 68.701759, "ind6": 2.299578, "ind7": 58.041278, "ind8": 38.248858, "ind9": 25.843731}, "2023": {"score": 51.3878, "rank": 13, "sc_ind1": 10.463, "sc_ind2": 28.5933, "sc_ind3": 85.5236, "sc_ind4": 65.4241, "sc_ind5": 1.7795, "sc_ind6": 100.0, "sc_ind7": 47.8546, "sc_ind8": 22.8521, "sc_ind9": 100.0, "ind1": 3.53914, "ind2": 10.321878, "ind3": 10.338339, "ind4": 86.336813, "ind5": 67.69398, "ind6": 2.485996, "ind7": 61.842486, "ind8": 88.953621, "ind9": 21.038359}, "2024": {"score": 50.6756, "rank": 18, "sc_ind1": 13.3836, "sc_ind2": 35.4073, "sc_ind3": 96.6404, "sc_ind4": 76.1864, "sc_ind5": 0.114, "sc_ind6": 76.3077, "sc_ind7": 38.9794, "sc_ind8": 48.6136, "sc_ind9": 70.4478, "ind1": 4.59456, "ind2": 10.733945, "ind3": -6.866364, "ind4": 89.714019, "ind5": 68.083627, "ind6": 1.356176, "ind7": 63.499731, "ind8": 70.559004, "ind9": 16.334376}, "2025": {"score": 41.0245, "rank": 24, "sc_ind1": 31.2649, "sc_ind2": 42.547, "sc_ind3": 83.499, "sc_ind4": 61.8714, "sc_ind5": 5.6008, "sc_ind6": 32.4226, "sc_ind7": 47.5287, "sc_ind8": 0.0, "sc_ind9": 64.486, "ind1": 7.459317, "ind2": 10.049799, "ind3": -7.950641, "ind4": 89.27287, "ind5": 64.729926, "ind6": -1.054536, "ind7": 61.749419, "ind8": 393.89348, "ind9": 13.671821}}, "BA": {"2019": {"score": 63.7844, "rank": 5, "sc_ind1": 68.6187, "sc_ind2": 77.375, "sc_ind3": 80.0273, "sc_ind4": 80.6881, "sc_ind5": 58.5837, "sc_ind6": 27.702, "sc_ind7": 52.7588, "sc_ind8": 89.841, "sc_ind9": 38.4646, "ind1": 6.465025, "ind2": 8.986433, "ind3": 62.349633, "ind4": 92.204312, "ind5": 30.243106, "ind6": 0.302767, "ind7": 64.860281, "ind8": 25.40882, "ind9": 5.661751}, "2020": {"score": 60.4413, "rank": 10, "sc_ind1": 58.9107, "sc_ind2": 59.287, "sc_ind3": 82.7632, "sc_ind4": 70.2316, "sc_ind5": 60.4673, "sc_ind6": 14.9637, "sc_ind7": 67.2114, "sc_ind8": 95.6523, "sc_ind9": 34.4851, "ind1": 5.867051, "ind2": 8.910542, "ind3": 56.793105, "ind4": 87.474658, "ind5": 33.881272, "ind6": 0.95849, "ind7": 60.679038, "ind8": 9.442089, "ind9": 9.273605}, "2021": {"score": 64.2784, "rank": 4, "sc_ind1": 41.7073, "sc_ind2": 36.9573, "sc_ind3": 73.2123, "sc_ind4": 84.7599, "sc_ind5": 60.9778, "sc_ind6": 46.161, "sc_ind7": 82.1825, "sc_ind8": 100.0, "sc_ind9": 52.5474, "ind1": 7.07874, "ind2": 12.604648, "ind3": 38.023133, "ind4": 90.120856, "ind5": 30.117045, "ind6": 1.666307, "ind7": 51.12417, "ind8": 3.329883, "ind9": 15.631072}, "2022": {"score": 73.1, "rank": 3, "sc_ind1": 91.1171, "sc_ind2": 74.4786, "sc_ind3": 75.6037, "sc_ind4": 65.1082, "sc_ind5": 54.6762, "sc_ind6": 51.5024, "sc_ind7": 85.3343, "sc_ind8": 99.6638, "sc_ind9": 60.416, "ind1": 17.190181, "ind2": 21.88093, "ind3": 30.091407, "ind4": 88.306638, "ind5": 35.738847, "ind6": 0.143798, "ind7": 50.512993, "ind8": 4.635883, "ind9": 16.938367}, "2023": {"score": 63.7328, "rank": 4, "sc_ind1": 88.9241, "sc_ind2": 66.1692, "sc_ind3": 72.9985, "sc_ind4": 82.1159, "sc_ind5": 59.7149, "sc_ind6": 26.1199, "sc_ind7": 69.7617, "sc_ind8": 81.3759, "sc_ind9": 26.4154, "ind1": 13.847735, "ind2": 17.85991, "ind3": 36.416754, "ind4": 89.162593, "ind5": 34.985074, "ind6": -0.443648, "ind7": 54.68422, "ind8": 26.353589, "ind9": 9.326515}, "2024": {"score": 58.3945, "rank": 6, "sc_ind1": 58.2012, "sc_ind2": 48.0845, "sc_ind3": 77.192, "sc_ind4": 74.58, "sc_ind5": 48.9691, "sc_ind6": 42.622, "sc_ind7": 73.7234, "sc_ind8": 61.6629, "sc_ind9": 40.5159, "ind1": 11.071837, "ind2": 12.781663, "ind3": 37.02418, "ind4": 89.496513, "ind5": 39.763785, "ind6": -0.132402, "ind7": 52.562662, "ind8": 54.03626, "ind9": 10.237012}, "2025": {"score": 52.9064, "rank": 17, "sc_ind1": 54.3738, "sc_ind2": 43.851, "sc_ind3": 67.3439, "sc_ind4": 36.1532, "sc_ind5": 50.8093, "sc_ind6": 60.3195, "sc_ind7": 72.7324, "sc_ind8": 58.4383, "sc_ind9": 32.1365, "ind1": 10.680443, "ind2": 10.329286, "ind3": 35.609985, "ind4": 85.138092, "ind5": 38.542653, "ind6": -0.443039, "ind7": 53.723053, "ind8": 57.58468, "ind9": 8.104898}}, "CE": {"2019": {"score": 67.6781, "rank": 2, "sc_ind1": 100.0, "sc_ind2": 81.8086, "sc_ind3": 83.5586, "sc_ind4": 55.118, "sc_ind5": 51.7563, "sc_ind6": 29.904, "sc_ind7": 78.9779, "sc_ind8": 75.5716, "sc_ind9": 52.4078, "ind1": 8.767878, "ind2": 9.348636, "ind3": 52.653756, "ind4": 86.428622, "ind5": 34.282562, "ind6": 0.609412, "ind7": 55.704678, "ind8": 52.299859, "ind9": 9.664132}, "2020": {"score": 65.1988, "rank": 5, "sc_ind1": 87.4362, "sc_ind2": 72.5403, "sc_ind3": 83.5325, "sc_ind4": 53.1305, "sc_ind5": 52.7163, "sc_ind6": 13.3981, "sc_ind7": 91.5357, "sc_ind8": 83.3175, "sc_ind9": 49.1822, "ind1": 8.212886, "ind2": 10.339827, "ind3": 54.355601, "ind4": 81.789038, "ind5": 38.551414, "ind6": 0.854369, "ind7": 54.095186, "ind8": 26.392456, "ind9": 12.491844}, "2021": {"score": 60.2429, "rank": 7, "sc_ind1": 58.4102, "sc_ind2": 42.704, "sc_ind3": 70.4286, "sc_ind4": 65.6323, "sc_ind5": 51.1967, "sc_ind6": 29.0547, "sc_ind7": 87.1463, "sc_ind8": 91.8357, "sc_ind9": 45.7781, "ind1": 9.068408, "ind2": 14.275585, "ind3": 44.131762, "ind4": 84.843118, "ind5": 36.19635, "ind6": 0.784692, "ind7": 49.497461, "ind8": 18.927405, "ind9": 14.317976}, "2022": {"score": 63.6708, "rank": 7, "sc_ind1": 52.5502, "sc_ind2": 48.818, "sc_ind3": 74.0224, "sc_ind4": 73.9171, "sc_ind5": 39.9687, "sc_ind6": 59.6024, "sc_ind7": 87.4877, "sc_ind8": 86.3866, "sc_ind9": 50.2843, "ind1": 11.523118, "ind2": 15.923335, "ind3": 33.62749, "ind4": 90.183265, "ind5": 44.727942, "ind6": 0.503853, "ind7": 49.859343, "ind8": 28.307014, "ind9": 14.63347}, "2023": {"score": 47.9834, "rank": 17, "sc_ind1": 40.395, "sc_ind2": 24.3945, "sc_ind3": 76.2159, "sc_ind4": 34.6111, "sc_ind5": 43.5803, "sc_ind6": 39.6934, "sc_ind7": 63.9538, "sc_ind8": 95.0429, "sc_ind9": 13.9636, "ind1": 7.471757, "ind2": 9.479566, "ind3": 29.717804, "ind4": 81.120435, "ind5": 44.094279, "ind6": 0.094596, "ind7": 56.581996, "ind8": 11.734651, "ind9": 7.344665}, "2024": {"score": 54.6441, "rank": 16, "sc_ind1": 46.3796, "sc_ind2": 52.2482, "sc_ind3": 78.9713, "sc_ind4": 37.1411, "sc_ind5": 41.1221, "sc_ind6": 40.2694, "sc_ind7": 73.4215, "sc_ind8": 91.734, "sc_ind9": 30.5098, "ind1": 9.36332, "ind2": 13.454218, "ind3": 33.008555, "ind4": 84.427267, "ind5": 44.312464, "ind6": -0.236367, "ind7": 52.65767, "ind8": 15.960858, "ind9": 8.198696}, "2025": {"score": 55.271, "rank": 13, "sc_ind1": 52.9936, "sc_ind2": 29.4549, "sc_ind3": 69.3467, "sc_ind4": 59.4916, "sc_ind5": 42.2608, "sc_ind6": 47.4857, "sc_ind7": 74.7736, "sc_ind8": 94.3115, "sc_ind9": 27.321, "ind1": 10.488052, "ind2": 7.243732, "ind3": 30.209774, "ind4": 88.890262, "ind5": 43.494449, "ind6": -0.724355, "ind7": 53.073018, "ind8": 11.268865, "ind9": 7.276203}}, "DF": {"2019": {"score": 44.0124, "rank": 20, "sc_ind1": 20.7727, "sc_ind2": 20.0626, "sc_ind3": 89.5995, "sc_ind4": 42.9656, "sc_ind5": 91.9896, "sc_ind6": 25.604, "sc_ind7": 71.1376, "sc_ind8": 0.0, "sc_ind9": 33.98, "ind1": 2.953934, "ind2": 4.304284, "ind3": 36.066946, "ind4": 83.683694, "ind5": 10.478429, "ind6": 0.010609, "ind7": 58.442457, "ind8": 373.813431, "ind9": 4.374476}, "2020": {"score": 50.5085, "rank": 17, "sc_ind1": 16.4875, "sc_ind2": 10.5822, "sc_ind3": 90.3684, "sc_ind4": 55.2725, "sc_ind5": 90.3285, "sc_ind6": 7.8639, "sc_ind7": 94.7116, "sc_ind8": 59.0888, "sc_ind9": 29.8727, "ind1": 2.378329, "ind2": 3.658041, "ind3": 32.695344, "ind4": 82.501199, "ind5": 15.889147, "ind6": 0.486302, "ind7": 53.235557, "ind8": 59.687542, "ind9": 8.263626}, "2021": {"score": 47.5992, "rank": 21, "sc_ind1": 3.192, "sc_ind2": 11.0159, "sc_ind3": 81.1859, "sc_ind4": 50.3648, "sc_ind5": 78.1571, "sc_ind6": 23.0424, "sc_ind7": 83.5825, "sc_ind8": 83.1766, "sc_ind9": 14.6752, "ind1": 2.490751, "ind2": 5.061764, "ind3": 20.526096, "ind4": 80.630472, "ind5": 19.439401, "ind6": 0.474832, "ind7": 50.665376, "ind8": 35.470124, "ind9": 8.284711}, "2022": {"score": 43.1245, "rank": 23, "sc_ind1": 0.0, "sc_ind2": 0.0, "sc_ind3": 77.2896, "sc_ind4": 53.3318, "sc_ind5": 79.3214, "sc_ind6": 40.0402, "sc_ind7": 69.6657, "sc_ind8": 68.4713, "sc_ind9": 0.0, "ind1": 3.801344, "ind2": 4.589267, "ind3": 26.321132, "ind4": 85.797795, "ind5": 20.675827, "ind6": -0.365709, "ind7": 55.269111, "ind8": 60.24696, "ind9": 3.194101}, "2023": {"score": 51.1811, "rank": 15, "sc_ind1": 13.6641, "sc_ind2": 2.9101, "sc_ind3": 79.4558, "sc_ind4": 37.2232, "sc_ind5": 85.2764, "sc_ind6": 42.7051, "sc_ind7": 100.0, "sc_ind8": 66.6997, "sc_ind9": 32.6958, "ind1": 3.95972, "ind2": 5.169618, "ind3": 22.972017, "ind4": 81.562628, "ind5": 20.553666, "ind6": 0.214019, "ind7": 44.803679, "ind8": 42.051941, "ind9": 10.326111}, "2024": {"score": 42.2607, "rank": 21, "sc_ind1": 11.0571, "sc_ind2": 12.8097, "sc_ind3": 87.8131, "sc_ind4": 20.9658, "sc_ind5": 84.7365, "sc_ind6": 36.6418, "sc_ind7": 81.7703, "sc_ind8": 44.5523, "sc_ind9": 0.0, "ind1": 4.258325, "ind2": 7.083822, "ind3": 13.054752, "ind4": 82.237118, "ind5": 19.030463, "ind6": -0.396672, "ind7": 50.029551, "ind8": 75.701218, "ind9": 1.983608}, "2025": {"score": 45.8448, "rank": 18, "sc_ind1": 11.3049, "sc_ind2": 27.7576, "sc_ind3": 74.6648, "sc_ind4": 46.2793, "sc_ind5": 87.2667, "sc_ind6": 60.5356, "sc_ind7": 86.1923, "sc_ind8": 18.6017, "sc_ind9": 0.0, "ind1": 4.677111, "ind2": 6.879935, "ind3": 15.869972, "ind4": 86.766083, "ind5": 17.424511, "ind6": -0.438302, "ind7": 49.436626, "ind8": 109.017538, "ind9": 2.574612}}, "ES": {"2019": {"score": 73.2647, "rank": 1, "sc_ind1": 53.6085, "sc_ind2": 76.0313, "sc_ind3": 97.6215, "sc_ind4": 56.7431, "sc_ind5": 46.936, "sc_ind6": 35.7423, "sc_ind7": 100.0, "sc_ind8": 100.0, "sc_ind9": 92.6999, "ind1": 5.363527, "ind2": 8.876656, "ind3": 14.040717, "ind4": 86.795713, "ind5": 37.13448, "ind6": 1.42241, "ind7": 48.363837, "ind8": 6.26405, "ind9": 21.22994}, "2020": {"score": 71.7077, "rank": 1, "sc_ind1": 75.5065, "sc_ind2": 100.0, "sc_ind3": 97.8313, "sc_ind4": 39.3105, "sc_ind5": 55.1773, "sc_ind6": 10.0604, "sc_ind7": 98.909, "sc_ind8": 100.0, "sc_ind9": 68.574, "ind1": 7.231833, "ind2": 13.301188, "ind3": 9.048855, "ind4": 77.194324, "ind5": 37.068577, "ind6": 0.63239, "ind7": 52.099467, "ind8": 3.467499, "ind9": 16.738069}, "2021": {"score": 66.8355, "rank": 3, "sc_ind1": 54.0781, "sc_ind2": 52.0904, "sc_ind3": 90.9113, "sc_ind4": 32.1923, "sc_ind5": 53.8019, "sc_ind6": 30.9716, "sc_ind7": 100.0, "sc_ind8": 99.1197, "sc_ind9": 88.3543, "ind1": 8.552359, "ind2": 17.004811, "ind3": -0.815007, "ind4": 75.616285, "ind5": 34.577152, "ind6": 0.883483, "ind7": 45.285074, "ind8": 5.011716, "ind9": 22.576824}, "2022": {"score": 76.4498, "rank": 2, "sc_ind1": 75.9247, "sc_ind2": 79.8472, "sc_ind3": 90.9138, "sc_ind4": 35.3601, "sc_ind5": 62.3036, "sc_ind6": 45.494, "sc_ind7": 100.0, "sc_ind8": 98.2051, "sc_ind9": 100.0, "ind1": 14.957789, "ind2": 23.12737, "ind3": -4.146024, "ind4": 81.969137, "ind5": 31.077037, "ind6": -0.123281, "ind7": 46.061283, "ind8": 7.236639, "ind9": 25.943496}, "2023": {"score": 79.6838, "rank": 1, "sc_ind1": 98.9343, "sc_ind2": 91.8295, "sc_ind3": 93.6718, "sc_ind4": 65.0212, "sc_ind5": 69.4147, "sc_ind6": 24.2082, "sc_ind7": 91.9125, "sc_ind8": 90.9502, "sc_ind9": 91.2124, "ind1": 15.162922, "ind2": 23.007571, "ind3": -6.627007, "ind4": 86.268597, "ind5": 29.508781, "ind6": -0.519455, "ind7": 47.446319, "ind8": 16.112473, "ind9": 19.639713}, "2024": {"score": 80.9583, "rank": 1, "sc_ind1": 73.8373, "sc_ind2": 100.0, "sc_ind3": 97.9092, "sc_ind4": 53.7972, "sc_ind5": 69.9744, "sc_ind6": 40.0509, "sc_ind7": 100.0, "sc_ind8": 93.0562, "sc_ind9": 100.0, "ind1": 13.331653, "ind2": 21.167439, "ind3": -9.729675, "ind4": 86.682511, "ind5": 27.587661, "ind6": -0.246022, "ind7": 44.291018, "ind8": 14.286737, "ind9": 22.354398}, "2025": {"score": 81.8712, "rank": 1, "sc_ind1": 84.1797, "sc_ind2": 100.0, "sc_ind3": 100.0, "sc_ind4": 31.001, "sc_ind5": 70.0492, "sc_ind6": 63.5605, "sc_ind7": 99.0406, "sc_ind8": 89.0101, "sc_ind9": 100.0, "ind1": 14.835054, "ind2": 22.363857, "ind3": -52.444223, "ind4": 84.309758, "ind5": 27.397823, "ind6": -0.371996, "ind7": 45.344969, "ind8": 18.113451, "ind9": 19.783333}}, "GO": {"2019": {"score": 38.6423, "rank": 21, "sc_ind1": 0.4927, "sc_ind2": 50.9097, "sc_ind3": 74.1711, "sc_ind4": 56.1825, "sc_ind5": 74.643, "sc_ind6": 33.5069, "sc_ind7": 37.2637, "sc_ind8": 0.0, "sc_ind9": 20.611, "ind1": 1.46573, "ind2": 6.824341, "ind3": 78.429329, "ind4": 86.669072, "ind5": 20.741583, "ind6": 1.111124, "ind7": 70.271114, "ind8": 296.401889, "ind9": 0.536893}, "2020": {"score": 43.4036, "rank": 21, "sc_ind1": 18.0933, "sc_ind2": 49.7933, "sc_ind3": 77.8329, "sc_ind4": 61.9402, "sc_ind5": 75.5522, "sc_ind6": 17.309, "sc_ind7": 60.5277, "sc_ind8": 0.0, "sc_ind9": 29.5837, "ind1": 2.510387, "ind2": 7.886708, "ind3": 72.415013, "ind4": 84.718007, "ind5": 24.792215, "ind6": 1.114472, "ind7": 62.488108, "ind8": 248.7295, "ind9": 8.200356}, "2021": {"score": 58.3459, "rank": 8, "sc_ind1": 44.1476, "sc_ind2": 44.6234, "sc_ind3": 69.6394, "sc_ind4": 58.1532, "sc_ind5": 74.6585, "sc_ind6": 18.294, "sc_ind7": 68.8091, "sc_ind8": 95.8502, "sc_ind9": 50.938, "ind1": 7.369433, "ind2": 14.833677, "ind3": 45.86352, "ind4": 82.77948, "ind5": 21.61389, "ind6": 0.23011, "ind7": 55.506852, "ind8": 11.257778, "ind9": 15.318885}, "2022": {"score": 58.7618, "rank": 9, "sc_ind1": 4.7819, "sc_ind2": 11.9241, "sc_ind3": 74.5196, "sc_ind4": 53.2884, "sc_ind5": 76.6571, "sc_ind6": 73.8119, "sc_ind7": 77.4456, "sc_ind8": 96.7761, "sc_ind9": 59.651, "ind1": 4.503996, "ind2": 7.35769, "ind3": 32.515671, "ind4": 85.788553, "ind5": 22.304205, "ind6": 1.135485, "ind7": 52.907555, "ind8": 9.784221, "ind9": 16.764347}, "2023": {"score": 57.1319, "rank": 6, "sc_ind1": 33.7247, "sc_ind2": 24.1715, "sc_ind3": 76.3211, "sc_ind4": 29.5791, "sc_ind5": 78.937, "sc_ind6": 48.4167, "sc_ind7": 64.8058, "sc_ind8": 100.0, "sc_ind9": 58.2312, "ind1": 6.595378, "ind2": 9.434823, "ind3": 29.498761, "ind4": 80.268553, "ind5": 24.132691, "ind6": 0.440509, "ind7": 56.303598, "ind8": 6.43232, "ind9": 14.390367}, "2024": {"score": 61.838, "rank": 4, "sc_ind1": 30.2199, "sc_ind2": 32.3918, "sc_ind3": 82.832, "sc_ind4": 46.0804, "sc_ind5": 79.2126, "sc_ind6": 57.9247, "sc_ind7": 66.7857, "sc_ind8": 99.7972, "sc_ind9": 61.2977, "ind1": 7.027839, "ind2": 10.246867, "ind3": 24.295944, "ind4": 85.637646, "ind5": 22.232551, "ind6": 0.543824, "ind7": 54.746558, "ind8": 5.751465, "ind9": 14.470426}, "2025": {"score": 60.7644, "rank": 8, "sc_ind1": 67.812, "sc_ind2": 79.5822, "sc_ind3": 68.1386, "sc_ind4": 66.94, "sc_ind5": 78.987, "sc_ind6": 10.5858, "sc_ind7": 62.2238, "sc_ind8": 94.5933, "sc_ind9": 18.0166, "ind1": 12.553575, "ind2": 17.98765, "ind3": 33.467152, "ind4": 90.087767, "ind5": 22.220595, "ind6": -1.533199, "ind7": 57.069602, "ind8": 10.905077, "ind9": 5.675032}}, "MA": {"2019": {"score": 44.6522, "rank": 19, "sc_ind1": 65.5688, "sc_ind2": 95.0439, "sc_ind3": 86.5057, "sc_ind4": 0.0, "sc_ind5": 20.3435, "sc_ind6": 27.6156, "sc_ind7": 62.9866, "sc_ind8": 0.0, "sc_ind9": 43.8057, "ind1": 6.241212, "ind2": 10.429897, "ind3": 44.561688, "ind4": 73.978767, "ind5": 52.867972, "ind6": 0.290739, "ind7": 61.288785, "ind8": 318.536336, "ind9": 7.194907}, "2020": {"score": 53.4132, "rank": 16, "sc_ind1": 62.7882, "sc_ind2": 65.8392, "sc_ind3": 87.5008, "sc_ind4": 47.0971, "sc_ind5": 25.4353, "sc_ind6": 11.8922, "sc_ind7": 83.546, "sc_ind8": 59.9843, "sc_ind9": 36.6359, "ind1": 6.185924, "ind2": 9.617161, "ind3": 41.781614, "ind4": 79.783117, "ind5": 54.988899, "ind6": 0.754214, "ind7": 56.25776, "ind8": 58.456876, "ind9": 9.744566}, "2021": {"score": 47.2542, "rank": 22, "sc_ind1": 76.3218, "sc_ind2": 59.9025, "sc_ind3": 71.7092, "sc_ind4": 63.5717, "sc_ind5": 24.112, "sc_ind6": 10.5241, "sc_ind7": 82.2326, "sc_ind8": 0.0, "sc_ind9": 36.9144, "ind1": 11.202054, "ind2": 19.276317, "ind3": 41.321667, "ind4": 84.274559, "ind5": 53.030662, "ind6": -0.170331, "ind7": 51.107763, "ind8": 194.374769, "ind9": 12.598623}, "2022": {"score": 56.3331, "rank": 16, "sc_ind1": 49.9644, "sc_ind2": 39.4125, "sc_ind3": 70.6582, "sc_ind4": 55.1674, "sc_ind5": 27.101, "sc_ind6": 65.542, "sc_ind7": 91.5764, "sc_ind8": 61.504, "sc_ind9": 46.0717, "ind1": 11.14316, "ind2": 13.739648, "ind3": 41.150725, "ind4": 86.188859, "ind5": 52.592649, "ind6": 0.767875, "ind7": 48.618224, "ind8": 72.668557, "ind9": 13.675129}, "2023": {"score": 48.4899, "rank": 16, "sc_ind1": 39.2293, "sc_ind2": 27.7623, "sc_ind3": 81.2793, "sc_ind4": 56.538, "sc_ind5": 25.0381, "sc_ind6": 61.0083, "sc_ind7": 85.8264, "sc_ind8": 17.1943, "sc_ind9": 42.5335, "ind1": 7.318598, "ind2": 10.155168, "ind3": 19.175296, "ind4": 84.832469, "ind5": 54.562781, "ind6": 0.939816, "ind7": 49.434997, "ind8": 95.005405, "ind9": 11.891904}, "2024": {"score": 68.8295, "rank": 2, "sc_ind1": 49.0188, "sc_ind2": 50.0443, "sc_ind3": 92.2599, "sc_ind4": 44.5976, "sc_ind5": 17.5516, "sc_ind6": 95.0548, "sc_ind7": 98.7109, "sc_ind8": 85.779, "sc_ind9": 86.4484, "ind1": 9.744751, "ind2": 13.098223, "ind3": 3.019446, "ind4": 85.436876, "ind5": 57.975564, "ind6": 2.184612, "ind7": 44.696803, "ind8": 23.501029, "ind9": 19.593834}, "2025": {"score": 72.3365, "rank": 3, "sc_ind1": 78.2239, "sc_ind2": 70.0404, "sc_ind3": 78.568, "sc_ind4": 54.4938, "sc_ind5": 22.6031, "sc_ind6": 82.4872, "sc_ind7": 100.0, "sc_ind8": 82.5134, "sc_ind9": 82.0986, "ind1": 14.004877, "ind2": 15.942531, "ind3": 5.345406, "ind4": 88.086752, "ind5": 54.881238, "ind6": 0.042876, "ind7": 45.039432, "ind8": 26.501372, "ind9": 16.702727}}, "MG": {"2019": {"score": 37.7342, "rank": 22, "sc_ind1": 11.386, "sc_ind2": 90.9144, "sc_ind3": 32.9914, "sc_ind4": 62.7715, "sc_ind5": 79.3422, "sc_ind6": 26.3797, "sc_ind7": 25.4944, "sc_ind8": 0.0, "sc_ind9": 10.3278, "ind1": 2.265114, "ind2": 10.092534, "ind3": 191.497943, "ind4": 88.157377, "ind5": 17.961301, "ind6": 0.118631, "ind7": 74.380884, "ind8": 5665.334454, "ind9": -2.414877}, "2020": {"score": 35.112, "rank": 24, "sc_ind1": 10.1398, "sc_ind2": 61.7629, "sc_ind3": 41.2053, "sc_ind4": 69.337, "sc_ind5": 80.9447, "sc_ind6": 14.7414, "sc_ind7": 31.6522, "sc_ind8": 0.0, "sc_ind9": 6.2243, "ind1": 1.856321, "ind2": 9.177558, "ind3": 188.471918, "ind4": 87.177205, "ind5": 21.543105, "ind6": 0.943708, "ind7": 70.303843, "ind8": 976.178465, "ind9": 3.085344}, "2021": {"score": 35.098, "rank": 26, "sc_ind1": 23.8584, "sc_ind2": 45.2488, "sc_ind3": 13.3691, "sc_ind4": 61.5258, "sc_ind5": 79.9104, "sc_ind6": 41.6575, "sc_ind7": 43.3176, "sc_ind8": 0.0, "sc_ind9": 6.9947, "ind1": 4.952556, "ind2": 15.015508, "ind3": 169.341299, "ind4": 83.710053, "ind5": 18.34964, "ind6": 1.434206, "ind7": 63.860874, "ind8": 614.3962, "ind9": 6.794857}, "2022": {"score": 41.0601, "rank": 25, "sc_ind1": 29.0772, "sc_ind2": 43.9066, "sc_ind3": 18.8762, "sc_ind4": 0.0, "sc_ind5": 72.2856, "sc_ind6": 58.5901, "sc_ind7": 39.8106, "sc_ind8": 73.7421, "sc_ind9": 33.252, "ind1": 8.073978, "ind2": 14.783049, "ind3": 156.948289, "ind4": 74.436065, "ind5": 24.976045, "ind6": 0.458858, "ind7": 64.331502, "ind8": 50.850074, "ind9": 10.758723}, "2023": {"score": 34.1217, "rank": 25, "sc_ind1": 24.6429, "sc_ind2": 38.5208, "sc_ind3": 9.6876, "sc_ind4": 70.948, "sc_ind5": 83.2227, "sc_ind6": 40.0732, "sc_ind7": 23.6385, "sc_ind8": 0.0, "sc_ind9": 16.362, "ind1": 5.402162, "ind2": 12.313412, "ind3": 168.236446, "ind4": 87.271955, "ind5": 21.713104, "ind6": 0.109656, "ind7": 69.755225, "ind8": 113.397336, "ind9": 7.726407}, "2024": {"score": 36.4108, "rank": 25, "sc_ind1": 17.2789, "sc_ind2": 23.2421, "sc_ind3": 21.5639, "sc_ind4": 62.946, "sc_ind5": 80.0314, "sc_ind6": 57.8201, "sc_ind7": 30.6092, "sc_ind8": 0.0, "sc_ind9": 34.2057, "ind1": 5.157529, "ind2": 8.768942, "ind3": 162.563586, "ind4": 87.921258, "ind5": 21.75791, "ind6": 0.539203, "ind7": 66.134595, "ind8": -649.971745, "ind9": 8.951572}, "2025": {"score": 41.7732, "rank": 22, "sc_ind1": 19.8886, "sc_ind2": 45.9792, "sc_ind3": 18.4514, "sc_ind4": 47.1271, "sc_ind5": 81.4237, "sc_ind6": 91.8266, "sc_ind7": 36.94, "sc_ind8": 0.0, "sc_ind9": 34.3223, "ind1": 5.873589, "ind2": 10.785421, "ind3": 167.444422, "ind4": 86.902394, "ind5": 20.809066, "ind6": 0.247595, "ind7": 65.121481, "ind8": -393.559455, "ind9": 8.481036}}, "MS": {"2019": {"score": 58.9839, "rank": 8, "sc_ind1": 83.9456, "sc_ind2": 98.776, "sc_ind3": 80.4925, "sc_ind4": 57.7332, "sc_ind5": 55.7432, "sc_ind6": 29.5168, "sc_ind7": 43.0246, "sc_ind8": 33.9257, "sc_ind9": 47.6978, "ind1": 7.589757, "ind2": 10.734789, "ind3": 61.072463, "ind4": 87.019354, "ind5": 31.923718, "ind6": 0.555492, "ind7": 68.259421, "ind8": 130.782373, "ind9": 8.312148}, "2020": {"score": 62.6945, "rank": 8, "sc_ind1": 65.4729, "sc_ind2": 49.9924, "sc_ind3": 87.8046, "sc_ind4": 61.4457, "sc_ind5": 60.4899, "sc_ind6": 30.458, "sc_ind7": 65.7693, "sc_ind8": 70.1233, "sc_ind9": 72.6945, "ind1": 6.406701, "ind2": 7.908181, "ind3": 40.818935, "ind4": 84.553618, "ind5": 33.867624, "ind6": 1.988977, "ind7": 61.069374, "ind8": 44.52399, "ind9": 17.640345}, "2021": {"score": 60.6208, "rank": 6, "sc_ind1": 58.4249, "sc_ind2": 45.323, "sc_ind3": 80.7914, "sc_ind4": 48.9917, "sc_ind5": 60.1016, "sc_ind6": 38.0902, "sc_ind7": 58.1974, "sc_ind8": 94.2377, "sc_ind9": 61.4295, "ind1": 9.070155, "ind2": 15.037093, "ind3": 21.391844, "ind4": 80.251617, "ind5": 30.661619, "ind6": 1.250357, "ind7": 58.984496, "ind8": 14.338376, "ind9": 17.354003}, "2022": {"score": 69.4729, "rank": 5, "sc_ind1": 97.7462, "sc_ind2": 77.5034, "sc_ind3": 79.1613, "sc_ind4": 54.4166, "sc_ind5": 62.6313, "sc_ind6": 40.4918, "sc_ind7": 64.9516, "sc_ind8": 95.5382, "sc_ind9": 52.8154, "ind1": 18.164272, "ind2": 22.583202, "ind3": 22.13564, "ind4": 86.028904, "ind5": 30.876749, "ind6": -0.345636, "ind7": 56.700058, "ind8": 11.991218, "ind9": 15.209278}, "2023": {"score": 63.92, "rank": 3, "sc_ind1": 100.0, "sc_ind2": 67.2727, "sc_ind3": 82.8987, "sc_ind4": 48.7467, "sc_ind5": 67.3893, "sc_ind6": 30.5443, "sc_ind7": 52.4031, "sc_ind8": 84.4381, "sc_ind9": 41.5867, "ind1": 15.302944, "ind2": 18.081291, "ind3": 15.803671, "ind4": 83.513471, "ind5": 30.652261, "ind6": -0.268205, "ind7": 60.356225, "ind8": 23.078103, "ind9": 11.741205}, "2024": {"score": 55.9843, "rank": 12, "sc_ind1": 67.5624, "sc_ind2": 61.2521, "sc_ind3": 82.6736, "sc_ind4": 34.5017, "sc_ind5": 73.1077, "sc_ind6": 37.2089, "sc_ind7": 51.0696, "sc_ind8": 65.7729, "sc_ind9": 30.7092, "ind1": 12.424772, "ind2": 14.908599, "ind3": 24.653313, "ind4": 84.069892, "ind5": 25.771374, "ind6": -0.371608, "ind7": 59.693841, "ind8": 48.832181, "ind9": 8.239323}, "2025": {"score": 59.0848, "rank": 9, "sc_ind1": 57.9441, "sc_ind2": 56.0226, "sc_ind3": 71.3063, "sc_ind4": 43.2137, "sc_ind5": 70.9826, "sc_ind6": 69.9539, "sc_ind7": 56.0532, "sc_ind8": 65.4655, "sc_ind9": 40.8209, "ind1": 11.178096, "ind2": 12.938052, "ind3": 24.925757, "ind4": 86.273217, "ind5": 26.857178, "ind6": -0.231853, "ind7": 59.034706, "ind8": 48.511811, "ind9": 9.599375}}, "MT": {"2019": {"score": 47.3759, "rank": 16, "sc_ind1": 32.1153, "sc_ind2": 66.1339, "sc_ind3": 92.8689, "sc_ind4": 38.9302, "sc_ind5": 67.7808, "sc_ind6": 32.6892, "sc_ind7": 38.0766, "sc_ind8": 0.0, "sc_ind9": 57.7883, "ind1": 3.786291, "ind2": 8.068089, "ind3": 27.090087, "ind4": 82.772194, "ind5": 24.801633, "ind6": 0.997262, "ind7": 69.987251, "ind8": -709.911164, "ind9": 11.208616}, "2020": {"score": 68.0707, "rank": 4, "sc_ind1": 42.5564, "sc_ind2": 51.6834, "sc_ind3": 99.3351, "sc_ind4": 56.8953, "sc_ind5": 67.6591, "sc_ind6": 38.2357, "sc_ind7": 70.9406, "sc_ind8": 87.5072, "sc_ind9": 97.8236, "ind1": 4.522134, "ind2": 8.090545, "ind3": 4.283884, "ind4": 83.040739, "ind5": 29.547986, "ind6": 2.506252, "ind7": 59.669658, "ind8": 20.635081, "ind9": 23.14286}, "2021": {"score": 70.0914, "rank": 1, "sc_ind1": 41.2836, "sc_ind2": 57.7, "sc_ind3": 98.5663, "sc_ind4": 46.1183, "sc_ind5": 71.9728, "sc_ind6": 42.6974, "sc_ind7": 78.9465, "sc_ind8": 97.0533, "sc_ind9": 96.4847, "ind1": 7.028261, "ind2": 18.6359, "ind3": -17.612929, "ind4": 79.458776, "ind5": 23.283197, "ind6": 1.487798, "ind7": 52.184654, "ind8": 8.959425, "ind9": 24.153957}, "2022": {"score": 78.6895, "rank": 1, "sc_ind1": 64.9908, "sc_ind2": 100.0, "sc_ind3": 100.0, "sc_ind4": 34.8176, "sc_ind5": 72.6988, "sc_ind6": 53.1489, "sc_ind7": 86.9663, "sc_ind8": 96.9793, "sc_ind9": 98.6035, "ind1": 13.351151, "ind2": 27.806232, "ind3": -24.464987, "ind4": 81.853563, "ind5": 24.723551, "ind6": 0.216989, "ind7": 50.017611, "ind8": 9.42191, "ind9": 25.625792}, "2023": {"score": 78.5026, "rank": 2, "sc_ind1": 95.3638, "sc_ind2": 100.0, "sc_ind3": 100.0, "sc_ind4": 67.8978, "sc_ind5": 79.9943, "sc_ind6": 20.6364, "sc_ind7": 76.4684, "sc_ind8": 90.493, "sc_ind9": 75.6701, "ind1": 14.693815, "ind2": 24.646648, "ind3": -19.803051, "ind4": 86.755587, "ind5": 23.535792, "ind6": -0.661093, "ind7": 52.49275, "ind8": 16.601461, "ind9": 17.165976}, "2024": {"score": 68.253, "rank": 3, "sc_ind1": 69.5776, "sc_ind2": 75.8138, "sc_ind3": 100.0, "sc_ind4": 34.0975, "sc_ind5": 79.2712, "sc_ind6": 28.5193, "sc_ind7": 73.3928, "sc_ind8": 92.5957, "sc_ind9": 61.0094, "ind1": 12.716014, "ind2": 17.260702, "ind3": -14.448193, "ind4": 84.015157, "ind5": 22.198552, "ind6": -0.755604, "ind7": 52.666712, "ind8": 14.869783, "ind9": 14.411711}, "2025": {"score": 74.3091, "rank": 2, "sc_ind1": 64.2158, "sc_ind2": 82.3624, "sc_ind3": 86.0747, "sc_ind4": 39.9797, "sc_ind5": 79.5034, "sc_ind6": 61.2504, "sc_ind7": 86.498, "sc_ind8": 90.1008, "sc_ind9": 78.7963, "ind1": 12.052307, "ind2": 18.583547, "ind3": -14.895825, "ind4": 85.753282, "ind5": 21.921415, "ind6": -0.422634, "ind7": 49.339264, "ind8": 16.705258, "ind9": 16.134444}}, "PA": {"2019": {"score": 66.3846, "rank": 3, "sc_ind1": 62.6734, "sc_ind2": 50.6993, "sc_ind3": 100.0, "sc_ind4": 86.548, "sc_ind5": 51.0955, "sc_ind6": 29.4096, "sc_ind7": 69.9075, "sc_ind8": 89.1472, "sc_ind9": 57.9809, "ind1": 6.028741, "ind2": 6.807159, "ind3": 7.509907, "ind4": 93.527932, "ind5": 34.673524, "ind6": 0.540557, "ind7": 58.872031, "ind8": 26.71629, "ind9": 11.2639}, "2020": {"score": 68.8898, "rank": 2, "sc_ind1": 100.0, "sc_ind2": 63.3275, "sc_ind3": 100.0, "sc_ind4": 79.5037, "sc_ind5": 53.2722, "sc_ind6": 8.1881, "sc_ind7": 86.0037, "sc_ind8": 86.8242, "sc_ind9": 42.8891, "ind1": 9.246082, "ind2": 9.346288, "ind3": 2.177153, "ind4": 90.557355, "ind5": 38.216479, "ind6": 0.507866, "ind7": 55.59254, "ind8": 21.573581, "ind9": 11.11384}, "2021": {"score": 62.0312, "rank": 5, "sc_ind1": 80.4679, "sc_ind2": 39.1017, "sc_ind3": 89.7886, "sc_ind4": 88.3641, "sc_ind5": 51.7151, "sc_ind6": 14.9448, "sc_ind7": 73.8966, "sc_ind8": 92.5172, "sc_ind9": 27.4853, "ind1": 11.695946, "ind2": 13.228142, "ind3": 1.648723, "ind4": 91.115335, "ind5": 35.874141, "ind6": 0.057502, "ind7": 53.839603, "ind8": 17.625415, "ind9": 10.769582}, "2022": {"score": 69.6107, "rank": 4, "sc_ind1": 82.4616, "sc_ind2": 49.3982, "sc_ind3": 89.3953, "sc_ind4": 81.3684, "sc_ind5": 49.1205, "sc_ind6": 47.351, "sc_ind7": 79.465, "sc_ind8": 90.3521, "sc_ind9": 57.5844, "ind1": 15.91834, "ind2": 16.058024, "ind3": -0.750248, "ind4": 91.770682, "ind5": 39.13447, "ind6": -0.040734, "ind7": 52.294597, "ind8": 21.237077, "ind9": 16.294212}, "2023": {"score": 55.5526, "rank": 9, "sc_ind1": 94.7488, "sc_ind2": 30.8349, "sc_ind3": 88.3108, "sc_ind4": 92.2753, "sc_ind5": 55.5168, "sc_ind6": 16.1619, "sc_ind7": 60.6205, "sc_ind8": 38.3168, "sc_ind9": 23.1874, "ind1": 14.613018, "ind2": 10.771554, "ind3": 4.534981, "ind4": 90.882503, "ind5": 37.355192, "ind6": -0.838526, "ind7": 57.67117, "ind8": 72.411762, "ind9": 8.812747}, "2024": {"score": 57.4827, "rank": 9, "sc_ind1": 70.2015, "sc_ind2": 36.8764, "sc_ind3": 90.4225, "sc_ind4": 56.2923, "sc_ind5": 50.4924, "sc_ind6": 33.8735, "sc_ind7": 64.0529, "sc_ind8": 84.4279, "sc_ind9": 30.7046, "ind1": 12.806184, "ind2": 10.971257, "ind3": 7.165968, "ind4": 87.020343, "ind5": 38.880754, "ind6": -0.519002, "ind7": 55.60684, "ind8": 25.211661, "ind9": 8.238376}, "2025": {"score": 65.8595, "rank": 5, "sc_ind1": 73.1124, "sc_ind2": 43.313, "sc_ind3": 77.2096, "sc_ind4": 89.9857, "sc_ind5": 47.4718, "sc_ind6": 66.6009, "sc_ind7": 76.6404, "sc_ind8": 78.5851, "sc_ind9": 39.8166, "ind1": 13.292389, "ind2": 10.213961, "ind3": 9.008134, "ind4": 93.79288, "ind5": 40.475933, "ind6": -0.30535, "ind7": 52.478527, "ind8": 31.573148, "ind9": 9.426545}}, "PB": {"2019": {"score": 55.16, "rank": 12, "sc_ind1": 41.0289, "sc_ind2": 53.4036, "sc_ind3": 94.2664, "sc_ind4": 57.1272, "sc_ind5": 26.3511, "sc_ind6": 33.3415, "sc_ind7": 56.0165, "sc_ind8": 80.761, "sc_ind9": 54.1442, "ind1": 4.440396, "ind2": 7.028087, "ind3": 23.252904, "ind4": 86.882456, "ind5": 49.313584, "ind6": 1.088098, "ind7": 63.722694, "ind8": 42.520256, "ind9": 10.162579}, "2020": {"score": 50.0408, "rank": 18, "sc_ind1": 26.3677, "sc_ind2": 16.8041, "sc_ind3": 97.2379, "sc_ind4": 49.7924, "sc_ind5": 28.7603, "sc_ind6": 35.5364, "sc_ind7": 49.7589, "sc_ind8": 85.8934, "sc_ind9": 60.216, "ind1": 3.190838, "ind2": 4.329035, "ind3": 10.929126, "ind4": 80.679239, "ind5": 52.985534, "ind6": 2.326731, "ind7": 65.402909, "ind8": 22.852758, "ind9": 14.907911}, "2021": {"score": 52.7138, "rank": 15, "sc_ind1": 18.9047, "sc_ind2": 28.2634, "sc_ind3": 91.939, "sc_ind4": 39.5512, "sc_ind5": 29.9745, "sc_ind6": 52.236, "sc_ind7": 54.2963, "sc_ind8": 95.249, "sc_ind9": 64.0103, "ind1": 4.36247, "ind2": 10.076761, "ind3": -3.070157, "ind4": 77.646757, "ind5": 49.386878, "ind6": 1.979392, "ind7": 60.262948, "ind8": 12.40644, "ind9": 17.85462}, "2022": {"score": 58.2114, "rank": 10, "sc_ind1": 28.6974, "sc_ind2": 34.1623, "sc_ind3": 91.8264, "sc_ind4": 38.3482, "sc_ind5": 31.8748, "sc_ind6": 72.8555, "sc_ind7": 62.1506, "sc_ind8": 97.018, "sc_ind9": 66.9697, "ind1": 8.018174, "ind2": 12.520723, "ind3": -6.186829, "ind4": 82.605708, "ind5": 49.674946, "ind6": 1.092969, "ind7": 57.550282, "ind8": 9.352901, "ind9": 18.429294}, "2023": {"score": 56.293, "rank": 8, "sc_ind1": 51.4903, "sc_ind2": 38.8548, "sc_ind3": 91.0484, "sc_ind4": 46.3746, "sc_ind5": 33.2769, "sc_ind6": 35.1425, "sc_ind7": 52.0695, "sc_ind8": 95.0613, "sc_ind9": 63.3183, "ind1": 8.929506, "ind2": 12.380426, "ind3": -1.164838, "ind4": 83.111892, "ind5": 49.911341, "ind6": -0.085866, "ind7": 60.465254, "ind8": 11.714995, "ind9": 15.200043}, "2024": {"score": 56.4853, "rank": 11, "sc_ind1": 46.5226, "sc_ind2": 36.7635, "sc_ind3": 94.6482, "sc_ind4": 48.5039, "sc_ind5": 33.2711, "sc_ind6": 44.3533, "sc_ind7": 47.8593, "sc_ind8": 96.6145, "sc_ind9": 59.8312, "ind1": 9.383989, "ind2": 10.953008, "ind3": -2.370517, "ind4": 85.965788, "ind5": 48.863452, "ind6": -0.055896, "ind7": 60.704443, "ind8": 9.781373, "ind9": 14.171697}, "2025": {"score": 53.2599, "rank": 16, "sc_ind1": 64.2922, "sc_ind2": 53.0132, "sc_ind3": 79.3644, "sc_ind4": 54.2028, "sc_ind5": 34.411, "sc_ind6": 0.0, "sc_ind7": 50.4679, "sc_ind8": 100.0, "sc_ind9": 43.5875, "ind1": 12.062951, "ind2": 12.293034, "ind3": 3.197851, "ind4": 88.039962, "ind5": 48.041462, "ind6": -1.765238, "ind7": 60.813392, "ind8": 3.92447, "ind9": 10.075463}}, "PE": {"2019": {"score": 46.8938, "rank": 17, "sc_ind1": 15.2967, "sc_ind2": 47.2396, "sc_ind3": 83.6808, "sc_ind4": 95.3323, "sc_ind5": 56.6856, "sc_ind6": 31.795, "sc_ind7": 56.4856, "sc_ind8": 0.0, "sc_ind9": 35.5282, "ind1": 2.552088, "ind2": 6.524517, "ind3": 52.318217, "ind4": 95.512107, "ind5": 31.366145, "ind6": 0.872739, "ind7": 63.558888, "ind8": 194.715914, "ind9": 4.818877}, "2020": {"score": 47.934, "rank": 20, "sc_ind1": 18.3855, "sc_ind2": 34.242, "sc_ind3": 85.5304, "sc_ind4": 81.6691, "sc_ind5": 57.6631, "sc_ind6": 17.5621, "sc_ind7": 67.3493, "sc_ind8": 48.8545, "sc_ind9": 20.1499, "ind1": 2.534413, "ind2": 6.209594, "ind3": 48.02483, "ind4": 91.277284, "ind5": 35.570824, "ind6": 1.131305, "ind7": 60.641708, "ind8": 73.751446, "ind9": 6.134631}, "2021": {"score": 49.6117, "rank": 18, "sc_ind1": 12.1125, "sc_ind2": 22.3059, "sc_ind3": 74.0727, "sc_ind4": 83.9227, "sc_ind5": 57.4051, "sc_ind6": 40.4461, "sc_ind7": 69.2971, "sc_ind8": 68.4345, "sc_ind9": 18.5084, "ind1": 3.553366, "ind2": 8.344503, "ind3": 36.135124, "ind4": 89.889867, "ind5": 32.337574, "ind6": 1.371773, "ind7": 55.346958, "ind8": 63.63411, "ind9": 9.028269}, "2022": {"score": 52.7767, "rank": 19, "sc_ind1": 30.5224, "sc_ind2": 22.1683, "sc_ind3": 73.2656, "sc_ind4": 100.0, "sc_ind5": 51.5157, "sc_ind6": 44.4076, "sc_ind7": 66.146, "sc_ind8": 72.1538, "sc_ind9": 14.8108, "ind1": 8.286338, "ind2": 9.736078, "ind3": 35.319783, "ind4": 95.739932, "ind5": 37.670482, "ind6": -0.171574, "ind7": 56.337514, "ind8": 53.681678, "ind9": 6.563465}, "2023": {"score": 43.9262, "rank": 22, "sc_ind1": 12.5742, "sc_ind2": 0.4495, "sc_ind3": 75.1663, "sc_ind4": 86.5527, "sc_ind5": 54.9821, "sc_ind6": 46.7572, "sc_ind7": 58.1497, "sc_ind8": 60.704, "sc_ind9": 0.0, "ind1": 3.816519, "ind2": 4.676001, "ind3": 31.903177, "ind4": 89.913706, "ind5": 37.657096, "ind6": 0.374704, "ind7": 58.478518, "ind8": 48.465286, "ind9": 5.1222}, "2024": {"score": 53.1278, "rank": 17, "sc_ind1": 28.1278, "sc_ind2": 14.7866, "sc_ind3": 80.2808, "sc_ind4": 84.4236, "sc_ind5": 43.7673, "sc_ind6": 55.3982, "sc_ind7": 67.5647, "sc_ind8": 73.0302, "sc_ind9": 30.7714, "ind1": 6.725468, "ind2": 7.403139, "ind3": 30.05349, "ind4": 90.829344, "ind5": 42.779129, "ind6": 0.432178, "ind7": 54.501346, "ind8": 39.643229, "ind9": 8.251981}, "2025": {"score": 54.2874, "rank": 15, "sc_ind1": 43.5305, "sc_ind2": 30.7038, "sc_ind3": 68.7804, "sc_ind4": 81.419, "sc_ind5": 46.5465, "sc_ind6": 57.7197, "sc_ind7": 69.288, "sc_ind8": 67.9642, "sc_ind9": 22.6346, "ind1": 9.169006, "ind2": 7.511406, "ind3": 31.736748, "ind4": 92.415597, "ind5": 41.011892, "ind6": -0.500026, "ind7": 54.819961, "ind8": 45.285751, "ind9": 6.469733}}, "PI": {"2019": {"score": 36.2407, "rank": 23, "sc_ind1": 60.9568, "sc_ind2": 66.6007, "sc_ind3": 82.8084, "sc_ind4": 58.6012, "sc_ind5": 22.0813, "sc_ind6": 0.0, "sc_ind7": 35.1179, "sc_ind8": 0.0, "sc_ind9": 0.0, "ind1": 5.902767, "ind2": 8.106222, "ind3": 54.71347, "ind4": 87.215415, "ind5": 51.839783, "ind6": -3.554847, "ind7": 71.020398, "ind8": 347.75913, "ind9": -5.379459}, "2020": {"score": 63.3968, "rank": 7, "sc_ind1": 64.0051, "sc_ind2": 55.9252, "sc_ind3": 88.9769, "sc_ind4": 52.7856, "sc_ind5": 16.6443, "sc_ind6": 56.9153, "sc_ind7": 100.0, "sc_ind8": 64.7291, "sc_ind9": 70.5902, "ind1": 6.285994, "ind2": 8.547994, "ind3": 37.104646, "ind4": 81.674382, "ind5": 60.285717, "ind6": 3.748584, "ind7": 51.804158, "ind8": 51.936558, "ind9": 17.179553}, "2021": {"score": 48.2923, "rank": 20, "sc_ind1": 69.4507, "sc_ind2": 19.8911, "sc_ind3": 69.1794, "sc_ind4": 48.4905, "sc_ind5": 25.718, "sc_ind6": 8.9081, "sc_ind7": 76.9685, "sc_ind8": 84.2054, "sc_ind9": 31.8191, "ind1": 10.383562, "ind2": 7.642363, "ind3": 46.872819, "ind4": 80.11331, "ind5": 52.032476, "ind6": -0.253612, "ind7": 52.832907, "ind8": 33.50465, "ind9": 11.61024}, "2022": {"score": 56.3345, "rank": 15, "sc_ind1": 89.8231, "sc_ind2": 76.2909, "sc_ind3": 66.2621, "sc_ind4": 67.8004, "sc_ind5": 24.419, "sc_ind6": 0.0, "sc_ind7": 80.8108, "sc_ind8": 78.8485, "sc_ind9": 22.7559, "ind1": 17.000035, "ind2": 22.301708, "ind3": 50.981503, "ind4": 88.880173, "ind5": 54.231841, "ind6": -2.145548, "ind7": 51.886081, "ind8": 41.746113, "ind9": 8.370931}, "2023": {"score": 51.2679, "rank": 14, "sc_ind1": 83.4315, "sc_ind2": 38.1268, "sc_ind3": 67.8913, "sc_ind4": 71.5394, "sc_ind5": 26.7104, "sc_ind6": 4.4602, "sc_ind7": 77.084, "sc_ind8": 62.753, "sc_ind9": 29.4146, "ind1": 13.126094, "ind2": 12.234377, "ind3": 47.050493, "ind4": 87.372086, "ind5": 53.618616, "ind6": -1.302545, "ind7": 52.291604, "ind8": 46.273609, "ind9": 9.803872}, "2024": {"score": 55.7469, "rank": 13, "sc_ind1": 100.0, "sc_ind2": 47.9546, "sc_ind3": 65.8655, "sc_ind4": 100.0, "sc_ind5": 24.8319, "sc_ind6": 0.0, "sc_ind7": 75.6399, "sc_ind8": 57.896, "sc_ind9": 29.5344, "ind1": 17.112821, "ind2": 12.760678, "ind3": 62.585263, "ind4": 92.938389, "ind5": 53.75539, "ind6": -2.015879, "ind7": 51.959364, "ind8": 58.805794, "ind9": 7.999992}, "2025": {"score": 56.1749, "rank": 11, "sc_ind1": 100.0, "sc_ind2": 56.8075, "sc_ind3": 54.1189, "sc_ind4": 81.0216, "sc_ind5": 26.7684, "sc_ind6": 19.2362, "sc_ind7": 81.1392, "sc_ind8": 59.956, "sc_ind9": 26.5262, "ind1": 17.040227, "ind2": 13.106286, "ind3": 71.270234, "ind4": 92.3517, "ind5": 52.46846, "ind6": -1.343582, "ind7": 51.045826, "ind8": 55.625129, "ind9": 7.139431}}, "PR": {"2019": {"score": 58.4357, "rank": 10, "sc_ind1": 25.2627, "sc_ind2": 95.8405, "sc_ind3": 86.814, "sc_ind4": 43.0851, "sc_ind5": 77.452, "sc_ind6": 25.2979, "sc_ind7": 45.9064, "sc_ind8": 78.9944, "sc_ind9": 47.2681, "ind1": 3.28343, "ind2": 10.494974, "ind3": 43.715273, "ind4": 83.710689, "ind5": 19.079643, "ind6": -0.032016, "ind7": 67.25309, "ind8": 45.849428, "ind9": 8.188807}, "2020": {"score": 55.9547, "rank": 13, "sc_ind1": 44.2628, "sc_ind2": 79.0078, "sc_ind3": 88.9848, "sc_ind4": 44.2783, "sc_ind5": 69.7363, "sc_ind6": 0.8844, "sc_ind7": 43.9163, "sc_ind8": 94.1832, "sc_ind9": 38.3387, "ind1": 4.662463, "ind2": 11.037309, "ind3": 37.079426, "ind4": 78.845954, "ind5": 28.296411, "ind6": 0.022119, "ind7": 66.98432, "ind8": 11.46091, "ind9": 10.117444}, "2021": {"score": 57.434, "rank": 10, "sc_ind1": 24.4552, "sc_ind2": 48.5488, "sc_ind3": 80.394, "sc_ind4": 34.1925, "sc_ind5": 70.6217, "sc_ind6": 30.3933, "sc_ind7": 65.8832, "sc_ind8": 98.3003, "sc_ind9": 64.1172, "ind1": 5.023651, "ind2": 15.97505, "ind3": 22.263792, "ind4": 76.168188, "ind5": 24.122909, "ind6": 0.853676, "ind7": 56.465736, "ind8": 6.577015, "ind9": 17.875371}, "2022": {"score": 57.8771, "rank": 12, "sc_ind1": 9.3917, "sc_ind2": 27.8598, "sc_ind3": 84.304, "sc_ind4": 15.8751, "sc_ind5": 75.2666, "sc_ind6": 60.8248, "sc_ind7": 76.8208, "sc_ind8": 100.0, "sc_ind9": 70.5511, "ind1": 5.181376, "ind2": 11.057462, "ind3": 10.63522, "ind4": 77.818082, "ind5": 23.154093, "ind6": 0.558191, "ind7": 53.097209, "ind8": 4.036552, "ind9": 19.244055}, "2023": {"score": 56.5711, "rank": 7, "sc_ind1": 13.8182, "sc_ind2": 29.3691, "sc_ind3": 92.8039, "sc_ind4": 25.5557, "sc_ind5": 77.1534, "sc_ind6": 61.8466, "sc_ind7": 65.9296, "sc_ind8": 98.7068, "sc_ind9": 43.9561, "ind1": 3.97996, "ind2": 10.477516, "ind3": -4.820031, "ind4": 79.587424, "ind5": 25.139669, "ind6": 0.973061, "ind7": 55.936368, "ind8": 7.81556, "ind9": 12.118328}, "2024": {"score": 57.7938, "rank": 8, "sc_ind1": 16.7502, "sc_ind2": 38.8857, "sc_ind3": 95.8423, "sc_ind4": 27.297, "sc_ind5": 77.2463, "sc_ind6": 60.7538, "sc_ind7": 63.093, "sc_ind8": 98.9277, "sc_ind9": 41.3487, "ind1": 5.081118, "ind2": 11.295801, "ind3": -5.065352, "ind4": 83.094367, "ind5": 23.372337, "ind6": 0.668843, "ind7": 55.909014, "ind8": 6.852453, "ind9": 10.406675}, "2025": {"score": 64.971, "rank": 6, "sc_ind1": 37.7651, "sc_ind2": 51.3159, "sc_ind3": 82.3726, "sc_ind4": 86.0444, "sc_ind5": 74.7665, "sc_ind6": 47.4044, "sc_ind7": 67.838, "sc_ind8": 96.9775, "sc_ind9": 40.2548, "ind1": 8.365368, "ind2": 11.929259, "ind3": -4.9136, "ind4": 93.15923, "ind5": 24.665298, "ind6": -0.726136, "ind7": 55.281715, "ind8": 7.826752, "ind9": 9.501944}}, "RJ": {"2019": {"score": 26.7129, "rank": 27, "sc_ind1": 3.0975, "sc_ind2": 0.0, "sc_ind3": 0.0, "sc_ind4": 12.329, "sc_ind5": 90.3861, "sc_ind6": 27.51, "sc_ind7": 37.7609, "sc_ind8": 30.2886, "sc_ind9": 39.0435, "ind1": 1.656879, "ind2": 2.665268, "ind3": 282.083746, "ind4": 76.76361, "ind5": 11.427164, "ind6": 0.276034, "ind7": 70.097472, "ind8": 137.636417, "ind9": 5.827937}, "2020": {"score": 22.5886, "rank": 27, "sc_ind1": 5.0992, "sc_ind2": 0.0, "sc_ind3": 0.0, "sc_ind4": 21.6376, "sc_ind5": 91.9465, "sc_ind6": 6.1806, "sc_ind7": 36.8641, "sc_ind8": 22.4758, "sc_ind9": 19.0938, "ind1": 1.441798, "ind2": 2.516814, "ind3": 319.033417, "ind4": 71.3186, "ind5": 14.914238, "ind6": 0.374351, "ind7": 68.893156, "ind8": 110.000928, "ind9": 5.903384}, "2021": {"score": 43.3318, "rank": 24, "sc_ind1": 0.0, "sc_ind2": 0.0, "sc_ind3": 0.0, "sc_ind4": 23.4316, "sc_ind5": 93.843, "sc_ind6": 47.9198, "sc_ind7": 75.678, "sc_ind8": 84.2765, "sc_ind9": 64.8376, "ind1": 2.110516, "ind2": 1.85872, "ind3": 198.678076, "ind4": 73.199008, "ind5": 9.689927, "ind6": 1.756951, "ind7": 53.255811, "ind8": 33.368903, "ind9": 18.015116}, "2022": {"score": 47.0328, "rank": 22, "sc_ind1": 14.4518, "sc_ind2": 9.3012, "sc_ind3": 13.8097, "sc_ind4": 37.5384, "sc_ind5": 97.6234, "sc_ind6": 58.9805, "sc_ind7": 57.1257, "sc_ind8": 91.1681, "sc_ind9": 43.296, "ind1": 5.924912, "ind2": 6.748732, "ind3": 168.278331, "ind4": 82.4332, "ind5": 9.489738, "ind6": 0.476212, "ind7": 59.075587, "ind8": 19.782433, "ind9": 13.043685}, "2023": {"score": 46.8007, "rank": 20, "sc_ind1": 27.622, "sc_ind2": 8.8293, "sc_ind3": 0.0, "sc_ind4": 60.3739, "sc_ind5": 100.0, "sc_ind6": 92.0815, "sc_ind7": 37.4383, "sc_ind8": 89.5199, "sc_ind9": 5.341, "ind1": 5.793574, "ind2": 6.357063, "ind3": 188.407035, "ind4": 85.481858, "ind5": 12.241049, "ind6": 2.171997, "ind7": 65.246087, "ind8": 17.642326, "ind9": 5.972281}, "2024": {"score": 40.9094, "rank": 22, "sc_ind1": 17.6228, "sc_ind2": 6.2847, "sc_ind3": 0.0, "sc_ind4": 26.8398, "sc_ind5": 100.0, "sc_ind6": 89.9648, "sc_ind7": 32.0078, "sc_ind8": 83.8609, "sc_ind9": 11.604, "ind1": 5.207234, "ind2": 6.029855, "ind3": 211.228298, "ind4": 83.032466, "ind5": 10.182699, "ind6": 1.959684, "ind7": 65.694333, "ind8": 25.929638, "ind9": 4.34744}, "2025": {"score": 41.8122, "rank": 21, "sc_ind1": 16.3438, "sc_ind2": 24.8573, "sc_ind3": 0.0, "sc_ind4": 27.6942, "sc_ind5": 100.0, "sc_ind6": 81.7885, "sc_ind7": 42.7704, "sc_ind8": 64.931, "sc_ind9": 17.9247, "ind1": 5.379481, "ind2": 6.258298, "ind3": 217.197095, "ind4": 83.778113, "ind5": 10.04867, "ind6": 0.027559, "ind7": 63.264722, "ind8": 49.201945, "ind9": 5.659229}}, "RN": {"2019": {"score": 32.5978, "rank": 25, "sc_ind1": 45.2441, "sc_ind2": 65.2324, "sc_ind3": 91.0935, "sc_ind4": 28.0207, "sc_ind5": 32.5848, "sc_ind6": 18.9859, "sc_ind7": 0.0, "sc_ind8": 0.0, "sc_ind9": 12.2188, "ind1": 4.749721, "ind2": 7.994441, "ind3": 31.964878, "ind4": 80.307992, "ind5": 45.625369, "ind6": -0.910986, "ind7": 83.28344, "ind8": 231.438504, "ind9": -1.872053}, "2020": {"score": 28.6858, "rank": 26, "sc_ind1": 30.1686, "sc_ind2": 32.5048, "sc_ind3": 89.038, "sc_ind4": 61.8277, "sc_ind5": 34.8962, "sc_ind6": 0.0, "sc_ind7": 0.0, "sc_ind8": 0.0, "sc_ind9": 9.737, "ind1": 3.503409, "ind2": 6.022255, "ind3": 36.91094, "ind4": 84.680608, "ind5": 49.288492, "ind6": -0.036703, "ind7": 78.871148, "ind8": 1822.973713, "ind9": 3.854502}, "2021": {"score": 24.5279, "rank": 27, "sc_ind1": 4.0048, "sc_ind2": 11.2262, "sc_ind3": 74.8163, "sc_ind4": 74.5525, "sc_ind5": 34.6424, "sc_ind6": 21.5093, "sc_ind7": 0.0, "sc_ind8": 0.0, "sc_ind9": 0.0, "ind1": 2.587571, "ind2": 5.122921, "ind3": 34.503413, "ind4": 87.304421, "ind5": 46.485546, "ind6": 0.395817, "ind7": 78.056791, "ind8": 19474.055486, "ind9": 5.438036}, "2022": {"score": 28.4071, "rank": 27, "sc_ind1": 7.8151, "sc_ind2": 9.2418, "sc_ind3": 75.6072, "sc_ind4": 69.3099, "sc_ind5": 31.6982, "sc_ind6": 50.7046, "sc_ind7": 0.0, "sc_ind8": 0.0, "sc_ind9": 11.2871, "ind1": 4.949698, "ind2": 6.73494, "ind3": 30.083423, "ind4": 89.201743, "ind5": 49.782865, "ind6": 0.108335, "ind7": 76.415821, "ind8": 22408.672683, "ind9": 5.761855}, "2023": {"score": 28.3293, "rank": 27, "sc_ind1": 0.0, "sc_ind2": 1.5638, "sc_ind3": 78.341, "sc_ind4": 74.3355, "sc_ind5": 41.8681, "sc_ind6": 56.2921, "sc_ind7": 0.0, "sc_ind8": 0.0, "sc_ind9": 2.5632, "ind1": 2.164462, "ind2": 4.899539, "ind3": 25.293217, "ind4": 87.845437, "ind5": 45.060933, "ind6": 0.752799, "ind7": 77.479252, "ind8": -1659.651921, "ind9": 5.530159}, "2024": {"score": 28.6647, "rank": 26, "sc_ind1": 17.0484, "sc_ind2": 2.9882, "sc_ind3": 75.8002, "sc_ind4": 80.6765, "sc_ind5": 33.1503, "sc_ind6": 41.9946, "sc_ind7": 0.0, "sc_ind8": 0.0, "sc_ind9": 6.324, "ind1": 5.124224, "ind2": 5.497377, "ind3": 40.165036, "ind4": 90.321984, "ind5": 48.933487, "ind6": -0.16013, "ind7": 75.770094, "ind8": 1263.079072, "ind9": 3.27185}, "2025": {"score": 31.1452, "rank": 27, "sc_ind1": 0.0, "sc_ind2": 23.1219, "sc_ind3": 62.5482, "sc_ind4": 72.412, "sc_ind5": 33.1153, "sc_ind6": 88.9599, "sc_ind7": 0.0, "sc_ind8": 0.0, "sc_ind9": 0.1497, "ind1": 3.101335, "ind2": 5.886354, "ind3": 48.541312, "ind4": 90.967515, "ind5": 48.792003, "ind6": 0.184758, "ind7": 76.885363, "ind8": 1823.02312, "ind9": 2.600376}}, "RO": {"2019": {"score": 58.218, "rank": 11, "sc_ind1": 24.3758, "sc_ind2": 45.5137, "sc_ind3": 92.5674, "sc_ind4": 37.1086, "sc_ind5": 33.1382, "sc_ind6": 38.6804, "sc_ind7": 75.863, "sc_ind8": 95.7606, "sc_ind9": 80.9546, "ind1": 3.218341, "ind2": 6.38352, "ind3": 27.917874, "ind4": 82.360732, "ind5": 45.297943, "ind6": 1.831549, "ind7": 56.79239, "ind8": 14.253253, "ind9": 17.858482}, "2020": {"score": 64.1435, "rank": 6, "sc_ind1": 33.7068, "sc_ind2": 72.1356, "sc_ind3": 94.2438, "sc_ind4": 20.8605, "sc_ind5": 36.7035, "sc_ind6": 33.3457, "sc_ind7": 96.5143, "sc_ind8": 98.0766, "sc_ind9": 91.7045, "ind1": 3.794381, "ind2": 10.296182, "ind3": 20.415935, "ind4": 71.060236, "ind5": 48.199552, "ind6": 2.181029, "ind7": 52.747635, "ind8": 6.110658, "ind9": 21.802964}, "2021": {"score": 54.9559, "rank": 11, "sc_ind1": 12.2384, "sc_ind2": 37.3049, "sc_ind3": 92.8616, "sc_ind4": 28.0761, "sc_ind5": 37.6646, "sc_ind6": 43.215, "sc_ind7": 80.1348, "sc_ind8": 92.0685, "sc_ind9": 71.0393, "ind1": 3.568373, "ind2": 12.705699, "ind3": -5.094601, "ind4": 74.480539, "ind5": 44.607147, "ind6": 1.514474, "ind7": 51.795235, "ind8": 18.482576, "ind9": 19.218109}, "2022": {"score": 57.1848, "rank": 13, "sc_ind1": 29.6876, "sc_ind2": 34.0277, "sc_ind3": 86.8672, "sc_ind4": 38.4411, "sc_ind5": 40.3152, "sc_ind6": 58.924, "sc_ind7": 73.4544, "sc_ind8": 90.93, "sc_ind9": 62.0155, "ind1": 8.163676, "ind2": 12.489459, "ind3": 4.903167, "ind4": 82.625513, "ind5": 44.516172, "ind6": 0.473697, "ind7": 54.119068, "ind8": 20.206817, "ind9": 17.302259}, "2023": {"score": 47.196, "rank": 19, "sc_ind1": 24.9521, "sc_ind2": 28.1807, "sc_ind3": 87.9235, "sc_ind4": 0.0, "sc_ind5": 39.4282, "sc_ind6": 39.8661, "sc_ind7": 63.7603, "sc_ind8": 98.0472, "sc_ind9": 42.6063, "ind1": 5.442786, "ind2": 10.239102, "ind3": 5.341469, "ind4": 75.261059, "ind5": 46.43845, "ind6": 0.101444, "ind7": 56.64522, "ind8": 8.521108, "ind9": 11.903488}, "2024": {"score": 47.8944, "rank": 19, "sc_ind1": 13.4061, "sc_ind2": 29.5652, "sc_ind3": 94.1916, "sc_ind4": 3.8012, "sc_ind5": 40.9747, "sc_ind6": 45.0033, "sc_ind7": 59.2461, "sc_ind8": 96.9257, "sc_ind9": 47.9352, "ind1": 4.597817, "ind2": 9.79029, "ind3": -1.340047, "ind4": 79.913034, "ind5": 44.397868, "ind6": -0.027175, "ind7": 57.11997, "ind8": 9.387267, "ind9": 11.748391}, "2025": {"score": 45.0929, "rank": 19, "sc_ind1": 3.4218, "sc_ind2": 34.8445, "sc_ind3": 82.4111, "sc_ind4": 18.3632, "sc_ind5": 42.1796, "sc_ind6": 40.6726, "sc_ind7": 56.78, "sc_ind8": 96.3673, "sc_ind9": 30.7962, "ind1": 3.578295, "ind2": 8.398896, "ind3": -5.017308, "ind4": 82.277935, "ind5": 43.541449, "ind6": -0.873697, "ind7": 58.803242, "ind8": 8.614669, "ind9": 7.874245}}, "RR": {"2019": {"score": 50.6758, "rank": 14, "sc_ind1": 0.0, "sc_ind2": 38.3849, "sc_ind3": 88.626, "sc_ind4": 15.2063, "sc_ind5": 3.0448, "sc_ind6": 100.0, "sc_ind7": 76.6972, "sc_ind8": 49.6892, "sc_ind9": 84.434, "ind1": 1.429572, "ind2": 5.801132, "ind3": 38.740067, "ind4": 77.413509, "ind5": 63.102779, "ind6": 10.370558, "ind7": 56.501096, "ind8": 101.07569, "ind9": 18.857231}, "2020": {"score": 57.4886, "rank": 12, "sc_ind1": 11.3243, "sc_ind2": 34.8211, "sc_ind3": 98.7206, "sc_ind4": 0.0, "sc_ind5": 0.0, "sc_ind6": 100.0, "sc_ind7": 96.1139, "sc_ind8": 85.8688, "sc_ind9": 90.5488, "ind1": 1.953727, "ind2": 6.272053, "ind3": 6.230895, "ind4": 64.124762, "ind5": 70.314305, "ind6": 6.614031, "ind7": 52.85601, "ind8": 22.886576, "ind9": 21.549898}, "2021": {"score": 50.2594, "rank": 17, "sc_ind1": 6.3338, "sc_ind2": 24.0912, "sc_ind3": 91.904, "sc_ind4": 0.0, "sc_ind5": 4.132, "sc_ind6": 100.0, "sc_ind7": 81.7731, "sc_ind8": 80.7496, "sc_ind9": 63.3507, "ind1": 2.865005, "ind2": 8.863603, "ind3": -2.993409, "ind4": 66.733694, "ind5": 65.449059, "ind6": 4.441029, "ind7": 51.258342, "ind8": 40.106839, "ind9": 17.726686}, "2022": {"score": 42.1447, "rank": 24, "sc_ind1": 8.1, "sc_ind2": 24.8439, "sc_ind3": 87.2208, "sc_ind4": 29.6554, "sc_ind5": 0.0, "sc_ind6": 67.668, "sc_ind7": 62.6423, "sc_ind8": 80.2162, "sc_ind9": 18.9556, "ind1": 4.991567, "ind2": 10.35726, "ind3": 4.112466, "ind4": 80.753811, "ind5": 69.156613, "ind6": 0.862382, "ind7": 57.401046, "ind8": 39.307763, "ind9": 7.506394}, "2023": {"score": 35.8252, "rank": 24, "sc_ind1": 18.5855, "sc_ind2": 23.7204, "sc_ind3": 87.9267, "sc_ind4": 14.6178, "sc_ind5": 0.0, "sc_ind6": 22.1727, "sc_ind7": 56.8251, "sc_ind8": 80.3132, "sc_ind9": 18.2658, "ind1": 4.606313, "ind2": 9.344322, "ind3": 5.334812, "ind4": 77.735729, "ind5": 68.698671, "ind6": -0.600172, "ind7": 58.91131, "ind8": 27.490345, "ind9": 8.029415}, "2024": {"score": 36.7245, "rank": 24, "sc_ind1": 7.0534, "sc_ind2": 4.8222, "sc_ind3": 89.1699, "sc_ind4": 14.4069, "sc_ind5": 0.5144, "sc_ind6": 35.0472, "sc_ind7": 61.2933, "sc_ind8": 92.3267, "sc_ind9": 25.8865, "ind1": 3.679689, "ind2": 5.793627, "ind3": 9.992783, "ind4": 81.349046, "ind5": 67.851525, "ind6": -0.467135, "ind7": 56.475531, "ind8": 15.210437, "ind9": 7.256902}, "2025": {"score": 45.0447, "rank": 20, "sc_ind1": 2.4665, "sc_ind2": 0.0, "sc_ind3": 77.0334, "sc_ind4": 34.2628, "sc_ind5": 1.2425, "sc_ind6": 86.2196, "sc_ind7": 69.422, "sc_ind8": 80.2929, "sc_ind9": 54.4622, "ind1": 3.445137, "ind2": 0.93057, "ind3": 9.483305, "ind4": 84.834159, "ind5": 67.25447, "ind6": 0.124691, "ind7": 54.777287, "ind8": 29.368203, "ind9": 11.946855}}, "RS": {"2019": {"score": 31.849, "rank": 26, "sc_ind1": 0.1415, "sc_ind2": 39.6468, "sc_ind3": 21.0173, "sc_ind4": 92.2614, "sc_ind5": 83.671, "sc_ind6": 25.6538, "sc_ind7": 14.1774, "sc_ind8": 0.0, "sc_ind9": 10.0718, "ind1": 1.439953, "ind2": 5.904223, "ind3": 224.375717, "ind4": 94.818461, "ind5": 15.400184, "ind6": 0.017553, "ind7": 78.332753, "ind8": -344.39412, "ind9": -2.488364}, "2020": {"score": 28.9777, "rank": 25, "sc_ind1": 0.0, "sc_ind2": 36.4144, "sc_ind3": 30.729, "sc_ind4": 82.7134, "sc_ind5": 76.416, "sc_ind6": 10.8439, "sc_ind7": 23.6822, "sc_ind8": 0.0, "sc_ind9": 0.0, "ind1": 1.022459, "ind2": 6.443875, "ind3": 221.666527, "ind4": 91.624465, "ind5": 24.271735, "ind6": 0.684495, "ind7": 72.461094, "ind8": -668.938757, "ind9": 1.722396}, "2021": {"score": 36.1798, "rank": 25, "sc_ind1": 0.1882, "sc_ind2": 41.0501, "sc_ind3": 7.3725, "sc_ind4": 84.4517, "sc_ind5": 78.5515, "sc_ind6": 28.5335, "sc_ind7": 61.9058, "sc_ind8": 0.0, "sc_ind9": 23.5652, "ind1": 2.132934, "ind2": 13.794684, "ind3": 182.500048, "ind4": 90.035829, "ind5": 19.194219, "ind6": 0.757829, "ind7": 57.769199, "ind8": 7722.650667, "ind9": 10.009176}, "2022": {"score": 31.2914, "rank": 26, "sc_ind1": 5.8326, "sc_ind2": 14.5936, "sc_ind3": 0.0, "sc_ind4": 73.6566, "sc_ind5": 80.299, "sc_ind6": 53.8024, "sc_ind7": 36.484, "sc_ind8": 0.0, "sc_ind9": 16.9546, "ind1": 4.65839, "ind2": 7.977466, "ind3": 199.160283, "ind4": 90.127777, "ind5": 20.078297, "ind6": 0.246036, "ind7": 65.341271, "ind8": 182.320007, "ind9": 7.051179}, "2023": {"score": 33.7297, "rank": 26, "sc_ind1": 1.348, "sc_ind2": 28.6706, "sc_ind3": 1.5377, "sc_ind4": 86.6189, "sc_ind5": 84.1047, "sc_ind6": 40.1812, "sc_ind7": 42.59, "sc_ind8": 8.4071, "sc_ind9": 10.109, "ind1": 2.341569, "ind2": 10.337377, "ind3": 185.20548, "ind4": 89.924912, "ind5": 21.215158, "ind6": 0.113937, "ind7": 63.56273, "ind8": 104.404733, "ind9": 6.731171}, "2024": {"score": 25.788, "rank": 27, "sc_ind1": 0.0, "sc_ind2": 26.6056, "sc_ind3": 11.8891, "sc_ind4": 0.0, "sc_ind5": 81.0175, "sc_ind6": 41.2649, "sc_ind7": 45.0621, "sc_ind8": 0.0, "sc_ind9": 26.253, "ind1": 2.660296, "ind2": 9.31223, "ind3": 184.39729, "ind4": 79.398345, "ind5": 21.186285, "ind6": -0.192375, "ind7": 61.584946, "ind8": 702.979175, "ind9": 7.331559}, "2025": {"score": 33.892, "rank": 25, "sc_ind1": 3.5029, "sc_ind2": 20.2137, "sc_ind3": 16.0927, "sc_ind4": 28.3972, "sc_ind5": 85.1445, "sc_ind6": 56.0462, "sc_ind7": 42.9304, "sc_ind8": 29.2431, "sc_ind9": 23.4576, "ind1": 3.589595, "ind2": 5.263023, "ind3": 173.804441, "ind4": 83.89114, "ind5": 18.653788, "ind6": -0.536709, "ind7": 63.213781, "ind8": 95.278529, "ind9": 6.611366}}, "SC": {"2019": {"score": 58.515, "rank": 9, "sc_ind1": 30.2683, "sc_ind2": 68.1922, "sc_ind3": 73.4928, "sc_ind4": 49.3049, "sc_ind5": 76.5874, "sc_ind6": 28.8825, "sc_ind7": 60.312, "sc_ind8": 93.7663, "sc_ind9": 45.829, "ind1": 3.650756, "ind2": 8.236242, "ind3": 80.291708, "ind4": 85.115581, "ind5": 19.591216, "ind6": 0.467163, "ind7": 62.222736, "ind8": 18.011579, "ind9": 7.775708}, "2020": {"score": 58.6389, "rank": 11, "sc_ind1": 43.3853, "sc_ind2": 51.2525, "sc_ind3": 78.3376, "sc_ind4": 50.2251, "sc_ind5": 75.2392, "sc_ind6": 13.2279, "sc_ind7": 67.4884, "sc_ind8": 97.6923, "sc_ind9": 50.9015, "ind1": 4.5903, "ind2": 8.044079, "ind3": 70.815775, "ind4": 80.823089, "ind5": 24.98079, "ind6": 0.84305, "ind7": 60.604079, "ind8": 6.638713, "ind9": 12.868311}, "2021": {"score": 54.5065, "rank": 12, "sc_ind1": 30.0428, "sc_ind2": 36.6454, "sc_ind3": 66.352, "sc_ind4": 55.8856, "sc_ind5": 74.1574, "sc_ind6": 27.5541, "sc_ind7": 61.5356, "sc_ind8": 99.8145, "sc_ind9": 38.5708, "ind1": 5.689253, "ind2": 12.513957, "ind3": 53.077331, "ind4": 82.153787, "ind5": 21.92534, "ind6": 0.707353, "ind7": 57.890516, "ind8": 3.684319, "ind9": 12.919929}, "2022": {"score": 66.1931, "rank": 6, "sc_ind1": 60.9037, "sc_ind2": 63.0001, "sc_ind3": 70.0827, "sc_ind4": 69.0123, "sc_ind5": 78.6605, "sc_ind6": 48.1616, "sc_ind7": 61.5302, "sc_ind8": 95.6369, "sc_ind9": 48.75, "ind1": 12.75059, "ind2": 19.215978, "ind3": 42.437731, "ind4": 89.138352, "ind5": 21.079757, "ind6": -0.004704, "ind7": 57.738608, "ind8": 11.815224, "ind9": 14.284426}, "2023": {"score": 57.9059, "rank": 5, "sc_ind1": 27.9807, "sc_ind2": 26.8311, "sc_ind3": 74.5559, "sc_ind4": 58.4113, "sc_ind5": 82.7253, "sc_ind6": 50.2039, "sc_ind7": 58.0638, "sc_ind8": 95.8427, "sc_ind9": 46.538, "ind1": 5.840707, "ind2": 9.968371, "ind3": 33.174213, "ind4": 85.149612, "ind5": 21.993925, "ind6": 0.51138, "ind7": 58.506569, "ind8": 10.879166, "ind9": 12.529264}, "2024": {"score": 58.2896, "rank": 7, "sc_ind1": 40.1662, "sc_ind2": 40.4317, "sc_ind3": 81.0581, "sc_ind4": 8.2317, "sc_ind5": 81.255, "sc_ind6": 54.6792, "sc_ind7": 63.3707, "sc_ind8": 100.0, "sc_ind9": 55.4135, "ind1": 8.465323, "ind2": 11.545526, "ind3": 28.299134, "ind4": 80.512923, "ind5": 21.048586, "ind6": 0.400405, "ind7": 55.821588, "ind8": 5.494676, "ind9": 13.27178}, "2025": {"score": 66.4116, "rank": 4, "sc_ind1": 48.9176, "sc_ind2": 56.3611, "sc_ind3": 71.9191, "sc_ind4": 48.4574, "sc_ind5": 79.3505, "sc_ind6": 76.3712, "sc_ind7": 69.0822, "sc_ind8": 96.1819, "sc_ind9": 51.0631, "ind1": 9.919913, "ind2": 13.010606, "ind3": 23.273367, "ind4": 87.116267, "ind5": 22.009991, "ind6": -0.091186, "ind7": 54.885499, "ind8": 8.853947, "ind9": 11.361917}}, "SE": {"2019": {"score": 46.234, "rank": 18, "sc_ind1": 15.3129, "sc_ind2": 28.1293, "sc_ind3": 86.0244, "sc_ind4": 100.0, "sc_ind5": 17.8257, "sc_ind6": 26.6552, "sc_ind7": 46.3382, "sc_ind8": 68.6477, "sc_ind9": 27.1726, "ind1": 2.553283, "ind2": 4.963299, "ind3": 45.883294, "ind4": 96.566423, "ind5": 54.357635, "ind6": 0.157003, "ind7": 67.102313, "ind8": 65.348037, "ind9": 2.420419}, "2020": {"score": 54.5816, "rank": 15, "sc_ind1": 26.9104, "sc_ind2": 39.8293, "sc_ind3": 88.517, "sc_ind4": 100.0, "sc_ind5": 23.9335, "sc_ind6": 24.572, "sc_ind7": 59.9539, "sc_ind8": 94.2024, "sc_ind9": 33.3158, "ind1": 3.23547, "ind2": 6.81215, "ind3": 38.561877, "ind4": 97.371742, "ind5": 55.89375, "ind6": 1.597515, "ind7": 62.64343, "ind8": 11.434557, "ind9": 9.01757}, "2021": {"score": 50.9025, "rank": 16, "sc_ind1": 18.4862, "sc_ind2": 17.5589, "sc_ind3": 77.1468, "sc_ind4": 100.0, "sc_ind5": 22.8692, "sc_ind6": 49.8499, "sc_ind7": 60.3584, "sc_ind8": 90.2512, "sc_ind9": 21.6019, "ind1": 4.312617, "ind2": 6.964261, "ind3": 29.389535, "ind4": 94.325956, "ind5": 53.803109, "ind6": 1.856421, "ind7": 58.276301, "ind8": 21.954503, "ind9": 9.628328}, "2022": {"score": 50.206, "rank": 21, "sc_ind1": 33.6742, "sc_ind2": 20.635, "sc_ind3": 75.0316, "sc_ind4": 96.1133, "sc_ind5": 22.1758, "sc_ind6": 43.7054, "sc_ind7": 58.6872, "sc_ind8": 81.6387, "sc_ind9": 20.1926, "ind1": 8.749463, "ind2": 9.38008, "ind3": 31.370763, "ind4": 94.911922, "ind5": 55.602904, "ind6": -0.202787, "ind7": 58.601581, "ind8": 36.771702, "ind9": 7.787799}, "2023": {"score": 55.2341, "rank": 10, "sc_ind1": 30.4673, "sc_ind2": 13.3369, "sc_ind3": 79.519, "sc_ind4": 93.851, "sc_ind5": 24.1072, "sc_ind6": 71.5377, "sc_ind7": 68.2058, "sc_ind8": 74.2073, "sc_ind9": 41.8745, "ind1": 6.167406, "ind2": 7.261324, "ind3": 22.840526, "ind4": 91.149257, "ind5": 55.088318, "ind6": 1.357352, "ind7": 55.192615, "ind8": 34.021444, "ind9": 11.787008}, "2024": {"score": 60.3558, "rank": 5, "sc_ind1": 11.653, "sc_ind2": 13.2309, "sc_ind3": 88.4917, "sc_ind4": 81.954, "sc_ind5": 27.4588, "sc_ind6": 100.0, "sc_ind7": 79.2022, "sc_ind8": 86.7766, "sc_ind9": 54.4348, "ind1": 4.344449, "ind2": 7.151857, "ind3": 11.523291, "ind4": 90.494947, "ind5": 52.23263, "ind6": 2.403142, "ind7": 50.837963, "ind8": 22.237838, "ind9": 13.072411}, "2025": {"score": 56.6457, "rank": 10, "sc_ind1": 24.5603, "sc_ind2": 33.0853, "sc_ind3": 77.9415, "sc_ind4": 76.381, "sc_ind5": 23.1843, "sc_ind6": 80.9556, "sc_ind7": 73.3669, "sc_ind8": 87.4862, "sc_ind9": 32.8502, "ind1": 6.524765, "ind2": 8.021845, "ind3": 7.034482, "ind4": 91.60562, "ind5": 54.544566, "ind6": 0.009304, "ind7": 53.520993, "ind8": 20.081058, "ind9": 8.227705}}, "SP": {"2019": {"score": 62.9084, "rank": 6, "sc_ind1": 41.2373, "sc_ind2": 87.4217, "sc_ind3": 42.1888, "sc_ind4": 87.8706, "sc_ind5": 100.0, "sc_ind6": 30.1545, "sc_ind7": 75.1299, "sc_ind8": 67.5056, "sc_ind9": 34.6676, "ind1": 4.455691, "ind2": 9.807197, "ind3": 166.244439, "ind4": 93.82667, "ind5": 5.739092, "ind6": 0.644283, "ind7": 57.048395, "ind8": 67.500285, "ind9": 4.571827}, "2020": {"score": 54.7978, "rank": 14, "sc_ind1": 35.6398, "sc_ind2": 53.6141, "sc_ind3": 48.1779, "sc_ind4": 72.8816, "sc_ind5": 100.0, "sc_ind6": 8.4263, "sc_ind7": 75.5243, "sc_ind8": 72.2367, "sc_ind9": 26.6798, "ind1": 3.953343, "ind2": 8.29876, "ind3": 166.378719, "ind4": 88.355679, "ind5": 10.0618, "ind6": 0.523708, "ind7": 58.428993, "ind8": 41.619754, "ind9": 7.564492}, "2021": {"score": 57.8033, "rank": 9, "sc_ind1": 23.0578, "sc_ind2": 51.6098, "sc_ind3": 32.8301, "sc_ind4": 86.51, "sc_ind5": 100.0, "sc_ind6": 31.6865, "sc_ind7": 89.703, "sc_ind8": 73.3522, "sc_ind9": 31.4801, "ind1": 4.857189, "ind2": 16.865073, "ind3": 126.636707, "ind4": 90.603758, "ind5": 5.863106, "ind6": 0.920325, "ind7": 48.659589, "ind8": 54.23912, "ind9": 11.544493}, "2022": {"score": 62.0612, "rank": 8, "sc_ind1": 29.6494, "sc_ind2": 44.4187, "sc_ind3": 37.4796, "sc_ind4": 84.2218, "sc_ind5": 100.0, "sc_ind6": 64.2637, "sc_ind7": 90.2315, "sc_ind8": 72.0174, "sc_ind9": 36.2686, "ind1": 8.158055, "ind2": 14.901932, "ind3": 115.346387, "ind4": 92.378559, "ind5": 8.037184, "ind6": 0.711056, "ind7": 49.026469, "ind8": 53.924917, "ind9": 11.444995}, "2023": {"score": 54.067, "rank": 11, "sc_ind1": 31.1591, "sc_ind2": 37.3968, "sc_ind3": 29.1148, "sc_ind4": 97.7199, "sc_ind5": 95.1524, "sc_ind6": 45.4946, "sc_ind7": 72.3989, "sc_ind8": 66.4179, "sc_ind9": 11.7488, "ind1": 6.258289, "ind2": 12.087922, "ind3": 127.787142, "ind4": 91.804221, "ind5": 14.977913, "ind6": 0.324636, "ind7": 53.822493, "ind8": 42.353399, "ind9": 6.992164}, "2024": {"score": 57.1713, "rank": 10, "sc_ind1": 24.3569, "sc_ind2": 48.8851, "sc_ind3": 37.6012, "sc_ind4": 98.5033, "sc_ind5": 94.641, "sc_ind6": 51.1728, "sc_ind7": 70.8669, "sc_ind8": 68.8849, "sc_ind9": 19.6297, "ind1": 6.18048, "ind2": 12.910993, "ind3": 126.371248, "ind4": 92.735735, "ind5": 13.289132, "ind6": 0.245459, "ind7": 53.461863, "ind8": 44.891836, "ind9": 5.982323}, "2025": {"score": 55.4289, "rank": 12, "sc_ind1": 9.6299, "sc_ind2": 60.3274, "sc_ind3": 34.5137, "sc_ind4": 68.2383, "sc_ind5": 95.4998, "sc_ind6": 83.2785, "sc_ind7": 72.0449, "sc_ind8": 58.9959, "sc_ind9": 16.3317, "ind1": 4.443633, "ind2": 13.860712, "ind3": 124.134013, "ind4": 90.296496, "ind5": 12.655408, "ind6": 0.060222, "ind7": 53.941993, "ind8": 56.864732, "ind9": 5.385087}}, "TO": {"2019": {"score": 33.807, "rank": 24, "sc_ind1": 20.67, "sc_ind2": 44.5994, "sc_ind3": 81.9954, "sc_ind4": 46.4507, "sc_ind5": 16.5933, "sc_ind6": 28.9514, "sc_ind7": 28.6433, "sc_ind8": 0.0, "sc_ind9": 36.3593, "ind1": 2.946399, "ind2": 6.308826, "ind3": 56.94585, "ind4": 84.470886, "ind5": 55.086774, "ind6": 0.476757, "ind7": 73.281297, "ind8": 575.081676, "ind9": 5.05744}, "2020": {"score": 41.3908, "rank": 22, "sc_ind1": 37.0039, "sc_ind2": 57.0969, "sc_ind3": 89.262, "sc_ind4": 61.3376, "sc_ind5": 21.8506, "sc_ind6": 27.2988, "sc_ind7": 46.7831, "sc_ind8": 0.0, "sc_ind9": 31.8844, "ind1": 4.065524, "ind2": 8.674361, "ind3": 36.201132, "ind4": 84.517674, "ind5": 57.148792, "ind6": 1.77887, "ind7": 66.208375, "ind8": 140.887072, "ind9": 8.704134}, "2021": {"score": 44.3169, "rank": 23, "sc_ind1": 28.6043, "sc_ind2": 23.8941, "sc_ind3": 81.6098, "sc_ind4": 63.5842, "sc_ind5": 22.5622, "sc_ind6": 29.2615, "sc_ind7": 46.0643, "sc_ind8": 71.1628, "sc_ind9": 32.1087, "ind1": 5.517896, "ind2": 8.806306, "ind3": 19.5959, "ind4": 84.278017, "ind5": 53.993926, "ind6": 0.79535, "ind7": 62.960725, "ind8": 58.421786, "ind9": 11.666417}, "2022": {"score": 53.5878, "rank": 18, "sc_ind1": 42.4082, "sc_ind2": 39.6456, "sc_ind3": 85.6628, "sc_ind4": 55.9896, "sc_ind5": 26.1228, "sc_ind6": 49.699, "sc_ind7": 56.8042, "sc_ind8": 79.1689, "sc_ind9": 46.7892, "ind1": 10.032853, "ind2": 13.793783, "ind3": 7.596671, "ind4": 86.364006, "ind5": 53.190481, "ind6": 0.063635, "ind7": 59.173156, "ind8": 41.17495, "ind9": 13.838367}, "2023": {"score": 47.4943, "rank": 18, "sc_ind1": 36.8754, "sc_ind2": 19.0277, "sc_ind3": 88.2899, "sc_ind4": 87.725, "sc_ind5": 30.7528, "sc_ind6": 31.6544, "sc_ind7": 43.0337, "sc_ind8": 67.4583, "sc_ind9": 22.6317, "ind1": 7.009323, "ind2": 8.402932, "ind3": 4.578612, "ind4": 90.112164, "ind5": 51.336359, "ind6": -0.224184, "ind7": 63.417738, "ind8": 41.240604, "ind9": 8.724291}, "2024": {"score": 42.3571, "rank": 20, "sc_ind1": 28.4317, "sc_ind2": 13.2186, "sc_ind3": 88.765, "sc_ind4": 82.2502, "sc_ind5": 27.9208, "sc_ind6": 26.6424, "sc_ind7": 43.8819, "sc_ind8": 55.4587, "sc_ind9": 14.6446, "ind1": 6.769388, "ind2": 7.149872, "ind3": 10.906545, "ind4": 90.535063, "ind5": 51.964845, "ind6": -0.838547, "ind7": 61.956484, "ind8": 61.891826, "ind9": 4.966831}, "2025": {"score": 33.3262, "rank": 26, "sc_ind1": 10.5372, "sc_ind2": 23.475, "sc_ind3": 74.545, "sc_ind4": 16.9989, "sc_ind5": 28.1818, "sc_ind6": 62.698, "sc_ind7": 44.9405, "sc_ind8": 29.6947, "sc_ind9": 8.8645, "ind1": 4.570101, "ind2": 5.962037, "ind3": 16.192992, "ind4": 82.0586, "ind5": 51.64976, "ind6": -0.390903, "ind7": 62.573649, "ind8": 94.695373, "ind9": 4.100074}}}, "rs_contas": {"2019": {"RCL": 39779435776.0, "RECEITAS_CORRENTES": 54210265538.0, "DESPESAS_CORRENTES": 54938047222.0, "TRANSFERENCIAS_CORRENTES": 8348480373.0, "RECEITA_OP_CREDITO": 191868025.3, "DESPESA_CAPITAL_EMPENHADA": 2540534717.0, "INVESTIMENTO_LIQUIDADO": 572804996.5, "DESPESA_LIQUIDADA_TOTAL": 72809039543.0, "DOTACAO_ATUALIZADA": 76787831191.0, "GASTO_PESSOAL_LIQ": 21472499560.51, "DCL": 89255394238.0, "RCL_DCL": 39779435776.47, "CAIXA_NV": -6988762085.35, "OBRIG_NV": 24068885655.57, "RECEITAS_INTRA": 15379195407.92, "DESPESAS_INTRA": 15611214830.36, "DESPESAS_CORRENTES_EMP": 55709885555.85, "PESSOAL_EMP_RREO": 31160327246.47, "RP_SEM_RPPS": 84687639.79000092}, "2020": {"RCL": 42073517609.0, "RECEITAS_CORRENTES": 46020565971.0, "DESPESAS_CORRENTES": 44052724346.0, "TRANSFERENCIAS_CORRENTES": 11169989874.0, "RECEITA_OP_CREDITO": 24870038.0, "DESPESA_CAPITAL_EMPENHADA": 2736034777.0, "INVESTIMENTO_LIQUIDADO": 430184489.0, "DESPESA_LIQUIDADA_TOTAL": 63026689275.0, "DOTACAO_ATUALIZADA": 68788057422.0, "GASTO_PESSOAL_LIQ": 21078012465.66, "DCL": 93262905408.12, "RCL_DCL": 42073517608.88, "CAIXA_NV": -3882045430.68, "OBRIG_NV": 25968506440.89, "RECEITAS_INTRA": 16884771940.87, "DESPESAS_INTRA": 16711409645.21, "DESPESAS_CORRENTES_EMP": 45110449341.26, "PESSOAL_EMP_RREO": 30486931175.84, "RP_SEM_RPPS": 3302414316.399994}, "2021": {"RCL": 53878109956.0, "RECEITAS_CORRENTES": 53915064960.0, "DESPESAS_CORRENTES": 45533054451.0, "TRANSFERENCIAS_CORRENTES": 10348575789.0, "RECEITA_OP_CREDITO": 41848000.0, "DESPESA_CAPITAL_EMPENHADA": 7474162761.0, "INVESTIMENTO_LIQUIDADO": 1149184566.0, "DESPESA_LIQUIDADA_TOTAL": 68169156577.0, "DOTACAO_ATUALIZADA": 75713365768.0, "GASTO_PESSOAL_LIQ": 26408254975.779995, "DCL": 98327576543.86, "RCL_DCL": 53878109956.44, "CAIXA_NV": 370711514.53, "OBRIG_NV": 28628755249.57, "RECEITAS_INTRA": 16643045788.06, "DESPESAS_INTRA": 16331395172.6, "DESPESAS_CORRENTES_EMP": 47164430252.87, "PESSOAL_EMP_RREO": 31124952487.13, "RP_SEM_RPPS": 3781748197.18}, "2022": {"RCL": 50634029850.0, "RECEITAS_CORRENTES": 54098338264.0, "DESPESAS_CORRENTES": 48190814762.0, "TRANSFERENCIAS_CORRENTES": 10862024898.0, "RECEITA_OP_CREDITO": 95595667.05, "DESPESA_CAPITAL_EMPENHADA": 4134908164.0, "INVESTIMENTO_LIQUIDADO": 2358730729.0, "DESPESA_LIQUIDADA_TOTAL": 67778236096.0, "DOTACAO_ATUALIZADA": 75202383013.0, "GASTO_PESSOAL_LIQ": 28681663997.83, "DCL": 100842876941.11, "RCL_DCL": 50634029849.59, "CAIXA_NV": 1878619563.25, "OBRIG_NV": 3425099320.49, "RECEITAS_INTRA": 16561707511.82, "DESPESAS_INTRA": 16546756877.4, "DESPESAS_CORRENTES_EMP": 49130922638.96, "PESSOAL_EMP_RREO": 33084918433.37, "RP_SEM_RPPS": 1429550846.2799988}, "2023": {"RCL": 56639116676.0, "RECEITAS_CORRENTES": 60574550434.0, "DESPESAS_CORRENTES": 53320893566.0, "TRANSFERENCIAS_CORRENTES": 12850986509.0, "RECEITA_OP_CREDITO": 78658880.0, "DESPESA_CAPITAL_EMPENHADA": 5933658130.0, "INVESTIMENTO_LIQUIDADO": 1326243759.0, "DESPESA_LIQUIDADA_TOTAL": 74772085534.0, "DOTACAO_ATUALIZADA": 83149468008.0, "GASTO_PESSOAL_LIQ": 30436472338.44, "DCL": 104898747726.42, "RCL_DCL": 56639116676.26, "CAIXA_NV": 3555430414.6, "OBRIG_NV": 3712037625.8, "RECEITAS_INTRA": 17070763695.07, "DESPESAS_INTRA": 17174222907.82, "DESPESAS_CORRENTES_EMP": 55244652435.12, "PESSOAL_EMP_RREO": 36001368913.81, "RP_SEM_RPPS": 676363123.2900009}, "2024": {"RCL": 60043883382.0, "RECEITAS_CORRENTES": 64089313279.0, "DESPESAS_CORRENTES": 55988211721.0, "TRANSFERENCIAS_CORRENTES": 13578144404.0, "RECEITA_OP_CREDITO": 1221374207.0, "DESPESA_CAPITAL_EMPENHADA": 6812798917.0, "INVESTIMENTO_LIQUIDADO": 1597344877.0, "DESPESA_LIQUIDADA_TOTAL": 76670306783.0, "DOTACAO_ATUALIZADA": 96564111774.0, "GASTO_PESSOAL_LIQ": 31774807489.72, "DCL": 110719293633.26, "RCL_DCL": 60043883382.48, "CAIXA_NV": 170817334.85, "OBRIG_NV": 1200810292.04, "RECEITAS_INTRA": 17059798246.84, "DESPESAS_INTRA": 17273046834.55, "DESPESAS_CORRENTES_EMP": 57926569897.87, "PESSOAL_EMP_RREO": 36977993384.71, "RP_SEM_RPPS": -1250646114.699997}, "2025": {"RCL": 65232845641.0, "RECEITAS_CORRENTES": 69588668830.0, "DESPESAS_CORRENTES": 61766322325.0, "TRANSFERENCIAS_CORRENTES": 12980922761.0, "RECEITA_OP_CREDITO": 2406757254.0, "DESPESA_CAPITAL_EMPENHADA": 5839976952.0, "INVESTIMENTO_LIQUIDADO": 2341594679.0, "DESPESA_LIQUIDADA_TOTAL": 82218287668.0, "DOTACAO_ATUALIZADA": 98005924512.0, "GASTO_PESSOAL_LIQ": 34722624258.68, "DCL": 113377582604.03, "RCL_DCL": 65232845641.12, "CAIXA_NV": 1113779052.71, "OBRIG_NV": 1061192302.08, "RECEITAS_INTRA": 17619445536.33, "DESPESAS_INTRA": 17639924656.94, "DESPESAS_CORRENTES_EMP": 63802542349.7, "PESSOAL_EMP_RREO": 41236148323.96, "RP_SEM_RPPS": -3816185080.169998}}, "proj26": {"AC": {"IND1_TAXA_INVEST": {"2026": 5.251937, "2027": 5.304622, "2028": 5.293723, "2029": 5.295978}, "IND2_REGRA_OURO": {"2026": 9.206406, "2027": 9.206566, "2028": 9.206539, "2029": 9.206544}, "IND3_SOLVENCIA": {"2026": 8.687136, "2027": 5.566518, "2028": 3.388955, "2029": 1.869455}, "IND4_EXEC_ORCAM": {"2026": 89.458159, "2027": 89.475974, "2028": 89.470522, "2029": 89.47219}, "IND5_DEPENDENCIA": {"2026": 68.095991, "2027": 68.011488, "2028": 68.070131, "2029": 68.029434}, "IND6_RES_PRIMARIO": {"2026": 0.882614, "2027": 0.644371, "2028": 0.741503, "2029": 0.701902}, "IND7_GASTO_PESSOAL": {"2026": 57.442659, "2027": 57.428539, "2028": 57.426959, "2029": 57.426783}, "IND8_LIQUIDEZ": {"2026": 133.51546, "2027": 133.766776, "2028": 133.898001, "2029": 133.966519}, "IND9_POUPANCA": {"2026": 6.508902, "2027": 6.486654, "2028": 6.490515, "2029": 6.489845}}, "AL": {"IND1_TAXA_INVEST": {"2026": 10.054031, "2027": 9.983264, "2028": 9.991289, "2029": 9.990379}, "IND2_REGRA_OURO": {"2026": 18.419468, "2027": 18.981807, "2028": 18.707083, "2029": 18.841296}, "IND3_SOLVENCIA": {"2026": 70.32885, "2027": 70.042324, "2028": 69.96827, "2029": 69.94913}, "IND4_EXEC_ORCAM": {"2026": 82.076609, "2027": 80.490907, "2028": 81.40493, "2029": 80.878074}, "IND5_DEPENDENCIA": {"2026": 52.933712, "2027": 53.036486, "2028": 52.989948, "2029": 53.011021}, "IND6_RES_PRIMARIO": {"2026": 0.423051, "2027": 0.423072, "2028": 0.423071, "2029": 0.423071}, "IND7_GASTO_PESSOAL": {"2026": 50.98852, "2027": 51.019166, "2028": 51.011415, "2029": 51.013375}, "IND8_LIQUIDEZ": {"2026": 74.540102, "2027": 73.623104, "2028": 73.354404, "2029": 73.275669}, "IND9_POUPANCA": {"2026": 12.48784, "2027": 12.435443, "2028": 12.442262, "2029": 12.441374}}, "AM": {"IND1_TAXA_INVEST": {"2026": 4.765749, "2027": 4.648914, "2028": 4.681362, "2029": 4.67235}, "IND2_REGRA_OURO": {"2026": 5.411286, "2027": 5.797335, "2028": 5.560519, "2029": 5.70579}, "IND3_SOLVENCIA": {"2026": 27.288027, "2027": 27.029699, "2028": 27.102856, "2029": 27.082138}, "IND4_EXEC_ORCAM": {"2026": 93.666884, "2027": 94.275631, "2028": 94.06217, "2029": 94.137022}, "IND5_DEPENDENCIA": {"2026": 31.163491, "2027": 30.698274, "2028": 31.027189, "2029": 30.794641}, "IND6_RES_PRIMARIO": {"2026": 0.132568, "2027": 0.138581, "2028": 0.139618, "2029": 0.139797}, "IND7_GASTO_PESSOAL": {"2026": 45.630758, "2027": 45.564337, "2028": 45.544497, "2029": 45.53857}, "IND8_LIQUIDEZ": {"2026": 28.258926, "2027": 28.265877, "2028": 28.266041, "2029": 28.266045}, "IND9_POUPANCA": {"2026": 5.653232, "2027": 5.64223, "2028": 5.647276, "2029": 5.644961}}, "AP": {"IND1_TAXA_INVEST": {"2026": 6.299375, "2027": 6.769036, "2028": 6.57887, "2029": 6.655869}, "IND2_REGRA_OURO": {"2026": 10.076825, "2027": 10.075758, "2028": 10.0758, "2029": 10.075798}, "IND3_SOLVENCIA": {"2026": -7.316172, "2027": -7.687434, "2028": -7.470189, "2029": -7.597311}, "IND4_EXEC_ORCAM": {"2026": 89.268448, "2027": 89.268404, "2028": 89.268403, "2029": 89.268403}, "IND5_DEPENDENCIA": {"2026": 64.498493, "2027": 64.482522, "2028": 64.48142, "2029": 64.481344}, "IND6_RES_PRIMARIO": {"2026": -2.57105, "2027": -3.525047, "2028": -4.125181, "2029": -4.502709}, "IND7_GASTO_PESSOAL": {"2026": 61.241514, "2027": 61.09413, "2028": 61.051362, "2029": 61.038952}, "IND8_LIQUIDEZ": {"2026": 115.424921, "2027": 355.253161, "2028": 148.703506, "2029": 326.592315}, "IND9_POUPANCA": {"2026": 11.896672, "2027": 10.713163, "2028": 9.924108, "2029": 9.398037}}, "BA": {"IND1_TAXA_INVEST": {"2026": 10.718342, "2027": 10.714672, "2028": 10.715028, "2029": 10.714993}, "IND2_REGRA_OURO": {"2026": 9.817536, "2027": 9.710747, "2028": 9.688463, "2029": 9.683813}, "IND3_SOLVENCIA": {"2026": 35.011181, "2027": 34.757633, "2028": 34.650275, "2029": 34.604817}, "IND4_EXEC_ORCAM": {"2026": 87.744598, "2027": 86.185806, "2028": 87.118024, "2029": 86.560521}, "IND5_DEPENDENCIA": {"2026": 39.261744, "2027": 38.838291, "2028": 39.087651, "2029": 38.94081}, "IND6_RES_PRIMARIO": {"2026": -0.443152, "2027": -0.443152, "2028": -0.443152, "2029": -0.443152}, "IND7_GASTO_PESSOAL": {"2026": 54.005778, "2027": 54.074662, "2028": 54.091446, "2029": 54.095535}, "IND8_LIQUIDEZ": {"2026": 59.47797, "2027": 60.488152, "2028": 61.027143, "2029": 61.314726}, "IND9_POUPANCA": {"2026": 7.871919, "2027": 7.846461, "2028": 7.843679, "2029": 7.843375}}, "CE": {"IND1_TAXA_INVEST": {"2026": 9.912091, "2027": 10.207033, "2028": 10.055997, "2029": 10.133341}, "IND2_REGRA_OURO": {"2026": 11.345302, "2027": 8.636516, "2028": 10.42547, "2029": 9.243998}, "IND3_SOLVENCIA": {"2026": 28.959019, "2027": 28.400066, "2028": 28.150274, "2029": 28.038643}, "IND4_EXEC_ORCAM": {"2026": 87.090659, "2027": 87.816309, "2028": 87.523707, "2029": 87.641692}, "IND5_DEPENDENCIA": {"2026": 43.796914, "2027": 43.685076, "2028": 43.726429, "2029": 43.711138}, "IND6_RES_PRIMARIO": {"2026": -1.204961, "2027": -1.678297, "2028": -2.144474, "2029": -2.6036}, "IND7_GASTO_PESSOAL": {"2026": 52.975431, "2027": 52.998359, "2028": 52.992972, "2029": 52.994238}, "IND8_LIQUIDEZ": {"2026": 11.78547, "2027": 11.72859, "2028": 11.734853, "2029": 11.734163}, "IND9_POUPANCA": {"2026": 7.326681, "2027": 7.323919, "2028": 7.32407, "2029": 7.324062}}, "DF": {"IND1_TAXA_INVEST": {"2026": 4.766136, "2027": 4.78506, "2028": 4.789083, "2029": 4.789938}, "IND2_REGRA_OURO": {"2026": 6.914593, "2027": 6.908701, "2028": 6.909703, "2029": 6.909532}, "IND3_SOLVENCIA": {"2026": 15.46431, "2027": 15.522765, "2028": 15.514342, "2029": 15.515555}, "IND4_EXEC_ORCAM": {"2026": 84.126037, "2027": 85.664985, "2028": 84.767894, "2029": 85.290831}, "IND5_DEPENDENCIA": {"2026": 16.508902, "2027": 15.98688, "2028": 15.689257, "2029": 15.519572}, "IND6_RES_PRIMARIO": {"2026": -0.417722, "2027": -0.427895, "2028": -0.422866, "2029": -0.425352}, "IND7_GASTO_PESSOAL": {"2026": 49.759514, "2027": 49.583679, "2028": 49.679433, "2029": 49.627289}, "IND8_LIQUIDEZ": {"2026": 111.340336, "2027": 111.502281, "2028": 111.513571, "2029": 111.514359}, "IND9_POUPANCA": {"2026": 2.205888, "2027": 2.435933, "2028": 2.292409, "2029": 2.381952}}, "ES": {"IND1_TAXA_INVEST": {"2026": 15.110878, "2027": 15.161482, "2028": 15.170767, "2029": 15.17247}, "IND2_REGRA_OURO": {"2026": 22.950101, "2027": 23.237359, "2028": 23.378116, "2029": 23.447086}, "IND3_SOLVENCIA": {"2026": -118.506839, "2027": -220.679737, "2028": -378.701047, "2029": -623.097898}, "IND4_EXEC_ORCAM": {"2026": 83.796625, "2027": 83.685654, "2028": 83.661655, "2029": 83.656465}, "IND5_DEPENDENCIA": {"2026": 27.260909, "2027": 27.162163, "2028": 27.090945, "2029": 27.039581}, "IND6_RES_PRIMARIO": {"2026": -0.359279, "2027": -0.360563, "2028": -0.360433, "2029": -0.360446}, "IND7_GASTO_PESSOAL": {"2026": 44.804509, "2027": 45.081654, "2028": 44.939536, "2029": 45.012413}, "IND8_LIQUIDEZ": {"2026": 17.943253, "2027": 17.950823, "2028": 17.950486, "2029": 17.950501}, "IND9_POUPANCA": {"2026": 20.966902, "2027": 20.422056, "2028": 20.672871, "2029": 20.55741}}, "GO": {"IND1_TAXA_INVEST": {"2026": 10.851041, "2027": 11.375609, "2028": 11.213984, "2029": 11.263782}, "IND2_REGRA_OURO": {"2026": 14.328966, "2027": 16.058244, "2028": 15.2409, "2029": 15.627218}, "IND3_SOLVENCIA": {"2026": 38.480837, "2027": 41.221701, "2028": 42.720068, "2029": 43.539189}, "IND4_EXEC_ORCAM": {"2026": 88.657162, "2027": 89.117067, "2028": 88.969219, "2029": 89.016748}, "IND5_DEPENDENCIA": {"2026": 22.226674, "2027": 22.223583, "2028": 22.225155, "2029": 22.224356}, "IND6_RES_PRIMARIO": {"2026": 0.170905, "2027": -1.227235, "2028": -0.080125, "2029": -1.021277}, "IND7_GASTO_PESSOAL": {"2026": 58.047746, "2027": 58.459605, "2028": 58.633023, "2029": 58.706043}, "IND8_LIQUIDEZ": {"2026": 11.930408, "2027": 12.134402, "2028": 12.174987, "2029": 12.183061}, "IND9_POUPANCA": {"2026": 1.130942, "2027": -1.216736, "2028": -2.429651, "2029": -3.056296}}, "MA": {"IND1_TAXA_INVEST": {"2026": 14.071018, "2027": 14.072045, "2028": 14.072061, "2029": 14.072061}, "IND2_REGRA_OURO": {"2026": 15.092649, "2027": 15.346594, "2028": 15.270715, "2029": 15.293388}, "IND3_SOLVENCIA": {"2026": 6.34325, "2027": 6.771328, "2028": 6.954975, "2029": 7.03376}, "IND4_EXEC_ORCAM": {"2026": 89.544178, "2027": 90.345759, "2028": 90.786627, "2029": 91.029103}, "IND5_DEPENDENCIA": {"2026": 55.909762, "2027": 55.567891, "2028": 55.681526, "2029": 55.643755}, "IND6_RES_PRIMARIO": {"2026": 2.219626, "2027": 0.007289, "2028": 2.255794, "2029": -0.02947}, "IND7_GASTO_PESSOAL": {"2026": 45.171181, "2027": 45.221843, "2028": 45.241324, "2029": 45.248814}, "IND8_LIQUIDEZ": {"2026": 24.91243, "2027": 25.753913, "2028": 25.308275, "2029": 25.544279}, "IND9_POUPANCA": {"2026": 17.720708, "2027": 17.362269, "2028": 17.488478, "2029": 17.444039}}, "MG": {"IND1_TAXA_INVEST": {"2026": 5.888007, "2027": 5.888297, "2028": 5.888303, "2029": 5.888303}, "IND2_REGRA_OURO": {"2026": 10.615547, "2027": 10.629858, "2028": 10.628652, "2029": 10.628754}, "IND3_SOLVENCIA": {"2026": 167.893678, "2027": 167.93503, "2028": 167.938836, "2029": 167.939186}, "IND4_EXEC_ORCAM": {"2026": 87.194798, "2027": 87.11088, "2028": 87.134964, "2029": 87.128052}, "IND5_DEPENDENCIA": {"2026": 21.474479, "2027": 21.007833, "2028": 21.335087, "2029": 21.105588}, "IND6_RES_PRIMARIO": {"2026": 0.248716, "2027": 0.248711, "2028": 0.248711, "2029": 0.248711}, "IND7_GASTO_PESSOAL": {"2026": 65.022869, "2027": 65.01327, "2028": 65.012336, "2029": 65.012245}, "IND8_LIQUIDEZ": {"2026": -375.499544, "2027": -374.227528, "2028": -374.137936, "2029": -374.131626}, "IND9_POUPANCA": {"2026": 8.355447, "2027": 8.321926, "2028": 8.312979, "2029": 8.310591}}, "MS": {"IND1_TAXA_INVEST": {"2026": 11.098514, "2027": 11.093434, "2028": 11.09311, "2029": 11.093089}, "IND2_REGRA_OURO": {"2026": 12.66547, "2027": 12.627764, "2028": 12.622548, "2029": 12.621827}, "IND3_SOLVENCIA": {"2026": 25.022128, "2027": 25.056217, "2028": 25.068275, "2029": 25.072541}, "IND4_EXEC_ORCAM": {"2026": 85.285751, "2027": 85.728304, "2028": 85.529965, "2029": 85.618855}, "IND5_DEPENDENCIA": {"2026": 26.537696, "2027": 26.631699, "2028": 26.60404, "2029": 26.612179}, "IND6_RES_PRIMARIO": {"2026": -0.232557, "2027": -0.232553, "2028": -0.232553, "2029": -0.232553}, "IND7_GASTO_PESSOAL": {"2026": 58.952032, "2027": 58.941662, "2028": 58.940361, "2029": 58.940198}, "IND8_LIQUIDEZ": {"2026": 48.409293, "2027": 48.376487, "2028": 48.365989, "2029": 48.36263}, "IND9_POUPANCA": {"2026": 9.749034, "2027": 9.765502, "2028": 9.767314, "2029": 9.767513}}, "MT": {"IND1_TAXA_INVEST": {"2026": 11.738412, "2027": 11.589958, "2028": 11.519749, "2029": 11.486543}, "IND2_REGRA_OURO": {"2026": 18.998639, "2027": 19.128889, "2028": 19.16976, "2029": 19.182584}, "IND3_SOLVENCIA": {"2026": -15.157007, "2027": -15.309401, "2028": -15.398319, "2029": -15.4502}, "IND4_EXEC_ORCAM": {"2026": 85.199134, "2027": 85.375807, "2028": 85.31948, "2029": 85.337438}, "IND5_DEPENDENCIA": {"2026": 22.080591, "2027": 21.989167, "2028": 22.041677, "2029": 22.011517}, "IND6_RES_PRIMARIO": {"2026": -0.368697, "2027": -0.35996, "2028": -0.358545, "2029": -0.358316}, "IND7_GASTO_PESSOAL": {"2026": 47.651158, "2027": 46.794735, "2028": 46.360248, "2029": 46.139821}, "IND8_LIQUIDEZ": {"2026": 16.675873, "2027": 16.676343, "2028": 16.676336, "2029": 16.676336}, "IND9_POUPANCA": {"2026": 16.28512, "2027": 16.298299, "2028": 16.299452, "2029": 16.299553}}, "PA": {"IND1_TAXA_INVEST": {"2026": 13.468673, "2027": 13.532589, "2028": 13.555763, "2029": 13.564165}, "IND2_REGRA_OURO": {"2026": 10.152406, "2027": 10.147402, "2028": 10.146996, "2029": 10.146962}, "IND3_SOLVENCIA": {"2026": 9.278066, "2027": 9.317619, "2028": 9.323415, "2029": 9.324264}, "IND4_EXEC_ORCAM": {"2026": 87.199917, "2027": 93.618068, "2028": 87.370094, "2029": 93.452403}, "IND5_DEPENDENCIA": {"2026": 39.447837, "2027": 40.110447, "2028": 39.683394, "2029": 39.958631}, "IND6_RES_PRIMARIO": {"2026": -0.316415, "2027": -0.315842, "2028": -0.315872, "2029": -0.31587}, "IND7_GASTO_PESSOAL": {"2026": 52.763014, "2027": 52.737143, "2028": 52.739496, "2029": 52.739282}, "IND8_LIQUIDEZ": {"2026": 28.296427, "2027": 29.984224, "2028": 29.114862, "2029": 29.562659}, "IND9_POUPANCA": {"2026": 8.885943, "2027": 9.13191, "2028": 9.019998, "2029": 9.070917}}, "PB": {"IND1_TAXA_INVEST": {"2026": 13.265624, "2027": 13.805543, "2028": 14.04793, "2029": 14.156745}, "IND2_REGRA_OURO": {"2026": 12.195435, "2027": 12.202544, "2028": 12.202026, "2029": 12.202064}, "IND3_SOLVENCIA": {"2026": 5.918462, "2027": 7.247707, "2028": 7.897154, "2029": 8.214463}, "IND4_EXEC_ORCAM": {"2026": 88.390871, "2027": 88.450238, "2028": 88.460282, "2029": 88.461981}, "IND5_DEPENDENCIA": {"2026": 48.444548, "2027": 48.246883, "2028": 48.343814, "2029": 48.296281}, "IND6_RES_PRIMARIO": {"2026": -2.138259, "2027": -2.219661, "2028": -2.237425, "2029": -2.241302}, "IND7_GASTO_PESSOAL": {"2026": 60.808863, "2027": 60.809051, "2028": 60.809043, "2029": 60.809044}, "IND8_LIQUIDEZ": {"2026": 1.228133, "2027": -0.013178, "2028": -0.584639, "2029": -0.847722}, "IND9_POUPANCA": {"2026": 8.042073, "2027": 7.032688, "2028": 6.531625, "2029": 6.282894}}, "PE": {"IND1_TAXA_INVEST": {"2026": 8.121278, "2027": 8.570517, "2028": 8.377895, "2029": 8.460487}, "IND2_REGRA_OURO": {"2026": 7.461562, "2027": 7.484509, "2028": 7.473945, "2029": 7.478808}, "IND3_SOLVENCIA": {"2026": 32.37659, "2027": 32.619807, "2028": 32.712259, "2029": 32.747402}, "IND4_EXEC_ORCAM": {"2026": 91.697896, "2027": 92.02262, "2028": 91.875699, "2029": 91.942173}, "IND5_DEPENDENCIA": {"2026": 41.866165, "2027": 41.453214, "2028": 41.652832, "2029": 41.556338}, "IND6_RES_PRIMARIO": {"2026": -0.110249, "2027": -0.273224, "2028": -0.20508, "2029": -0.233573}, "IND7_GASTO_PESSOAL": {"2026": 54.833928, "2027": 54.834541, "2028": 54.834567, "2029": 54.834569}, "IND8_LIQUIDEZ": {"2026": 45.804225, "2027": 45.851866, "2028": 45.856244, "2029": 45.856646}, "IND9_POUPANCA": {"2026": 7.096255, "2027": 6.87601, "2028": 6.953434, "2029": 6.926217}}, "PI": {"IND1_TAXA_INVEST": {"2026": 17.050278, "2027": 17.048886, "2028": 17.049079, "2029": 17.049052}, "IND2_REGRA_OURO": {"2026": 12.925207, "2027": 13.020082, "2028": 12.970373, "2029": 12.996417}, "IND3_SOLVENCIA": {"2026": 70.321732, "2027": 70.42532, "2028": 70.414007, "2029": 70.415242}, "IND4_EXEC_ORCAM": {"2026": 92.474222, "2027": 92.448635, "2028": 92.453979, "2029": 92.452863}, "IND5_DEPENDENCIA": {"2026": 53.264258, "2027": 52.772161, "2028": 53.076459, "2029": 52.88829}, "IND6_RES_PRIMARIO": {"2026": -1.564189, "2027": -1.491799, "2028": -1.515553, "2029": -1.507758}, "IND7_GASTO_PESSOAL": {"2026": 51.097363, "2027": 51.094456, "2028": 51.09462, "2029": 51.09461}, "IND8_LIQUIDEZ": {"2026": 55.431794, "2027": 55.420043, "2028": 55.419328, "2029": 55.419285}, "IND9_POUPANCA": {"2026": 7.314836, "2027": 7.279084, "2028": 7.286371, "2029": 7.284886}}, "PR": {"IND1_TAXA_INVEST": {"2026": 10.218346, "2027": 11.263799, "2028": 11.853645, "2029": 12.186437}, "IND2_REGRA_OURO": {"2026": 11.691596, "2027": 11.780763, "2028": 11.747309, "2029": 11.75986}, "IND3_SOLVENCIA": {"2026": -4.805541, "2027": -4.728597, "2028": -4.673807, "2029": -4.634793}, "IND4_EXEC_ORCAM": {"2026": 104.054606, "2027": 115.849026, "2028": 128.616675, "2029": 142.437861}, "IND5_DEPENDENCIA": {"2026": 24.171634, "2027": 24.360119, "2028": 24.288154, "2029": 24.315631}, "IND6_RES_PRIMARIO": {"2026": -0.692652, "2027": -0.693456, "2028": -0.693436, "2029": -0.693437}, "IND7_GASTO_PESSOAL": {"2026": 55.14367, "2027": 55.113292, "2028": 55.106606, "2029": 55.105135}, "IND8_LIQUIDEZ": {"2026": 7.958589, "2027": 7.976429, "2028": 7.978843, "2029": 7.97917}, "IND9_POUPANCA": {"2026": 9.278019, "2027": 9.222596, "2028": 9.208879, "2029": 9.205484}}, "RJ": {"IND1_TAXA_INVEST": {"2026": 5.400525, "2027": 5.403096, "2028": 5.40341, "2029": 5.403449}, "IND2_REGRA_OURO": {"2026": 6.212084, "2027": 6.221433, "2028": 6.219541, "2029": 6.219924}, "IND3_SOLVENCIA": {"2026": 216.925764, "2027": 216.938098, "2028": 216.937537, "2029": 216.937563}, "IND4_EXEC_ORCAM": {"2026": 83.92297, "2027": 83.951112, "2028": 83.956579, "2029": 83.957641}, "IND5_DEPENDENCIA": {"2026": 10.109048, "2027": 10.081849, "2028": 10.094102, "2029": 10.088582}, "IND6_RES_PRIMARIO": {"2026": 1.147226, "2027": 0.498379, "2028": 0.874386, "2029": 0.65649}, "IND7_GASTO_PESSOAL": {"2026": 63.528865, "2027": 63.500148, "2028": 63.50327, "2029": 63.502931}, "IND8_LIQUIDEZ": {"2026": 60.554903, "2027": 66.093231, "2028": 68.795001, "2029": 70.113008}, "IND9_POUPANCA": {"2026": 5.572666, "2027": 5.578378, "2028": 5.578001, "2029": 5.578026}}, "RN": {"IND1_TAXA_INVEST": {"2026": 4.904705, "2027": 3.297033, "2028": 4.730244, "2029": 3.452562}, "IND2_REGRA_OURO": {"2026": 5.762864, "2027": 5.802069, "2028": 5.789622, "2029": 5.793574}, "IND3_SOLVENCIA": {"2026": 50.62852, "2027": 51.148612, "2028": 51.278209, "2029": 51.310502}, "IND4_EXEC_ORCAM": {"2026": 91.175681, "2027": 91.242809, "2028": 91.264456, "2029": 91.271436}, "IND5_DEPENDENCIA": {"2026": 48.90185, "2027": 48.816566, "2028": 48.88278, "2029": 48.831372}, "IND6_RES_PRIMARIO": {"2026": 0.058658, "2027": 0.104763, "2028": 0.087906, "2029": 0.094069}, "IND7_GASTO_PESSOAL": {"2026": 76.862985, "2027": 76.863434, "2028": 76.863425, "2029": 76.863425}, "IND8_LIQUIDEZ": {"2026": 1786.464463, "2027": 1788.851372, "2028": 1788.695531, "2029": 1788.705706}, "IND9_POUPANCA": {"2026": 2.409236, "2027": 2.354826, "2028": 2.339338, "2029": 2.334929}}, "RO": {"IND1_TAXA_INVEST": {"2026": 3.94014, "2027": 3.811715, "2028": 3.857296, "2029": 3.841118}, "IND2_REGRA_OURO": {"2026": 7.818284, "2027": 7.576002, "2028": 7.4749, "2029": 7.432711}, "IND3_SOLVENCIA": {"2026": -4.854797, "2027": -4.861979, "2028": -4.861661, "2029": -4.861675}, "IND4_EXEC_ORCAM": {"2026": 81.488275, "2027": 81.751949, "2028": 81.663906, "2029": 81.693304}, "IND5_DEPENDENCIA": {"2026": 43.906604, "2027": 43.750911, "2028": 43.817295, "2029": 43.78899}, "IND6_RES_PRIMARIO": {"2026": -1.345081, "2027": -1.607569, "2028": -1.753735, "2029": -1.835127}, "IND7_GASTO_PESSOAL": {"2026": 59.349942, "2027": 59.527502, "2028": 59.58517, "2029": 59.6039}, "IND8_LIQUIDEZ": {"2026": 8.85172, "2027": 8.778987, "2028": 8.801303, "2029": 8.794456}, "IND9_POUPANCA": {"2026": 7.414417, "2027": 7.35984, "2028": 7.353362, "2029": 7.352593}}, "RR": {"IND1_TAXA_INVEST": {"2026": 3.368399, "2027": 3.343293, "2028": 3.335079, "2029": 3.332392}, "IND2_REGRA_OURO": {"2026": -4.282207, "2027": -9.869852, "2028": -15.859325, "2029": -22.279523}, "IND3_SOLVENCIA": {"2026": 9.380064, "2027": 9.359143, "2028": 9.354904, "2029": 9.354045}, "IND4_EXEC_ORCAM": {"2026": 84.498599, "2027": 84.530908, "2028": 84.527797, "2029": 84.528096}, "IND5_DEPENDENCIA": {"2026": 67.61084, "2027": 67.39813, "2028": 67.525092, "2029": 67.449311}, "IND6_RES_PRIMARIO": {"2026": 0.493432, "2027": 0.72318, "2028": 0.866325, "2029": 0.955514}, "IND7_GASTO_PESSOAL": {"2026": 54.619391, "2027": 54.60471, "2028": 54.603345, "2029": 54.603218}, "IND8_LIQUIDEZ": {"2026": 26.4537, "2027": 27.053677, "2028": 26.930166, "2029": 26.955592}, "IND9_POUPANCA": {"2026": 12.662456, "2027": 12.771644, "2028": 12.788304, "2029": 12.790846}}, "SC": {"IND1_TAXA_INVEST": {"2026": 9.178637, "2027": 9.5564, "2028": 9.363888, "2029": 9.461994}, "IND2_REGRA_OURO": {"2026": 12.578058, "2027": 12.705763, "2028": 12.66806, "2029": 12.679191}, "IND3_SOLVENCIA": {"2026": 19.066387, "2027": 15.544798, "2028": 12.596938, "2029": 10.129336}, "IND4_EXEC_ORCAM": {"2026": 84.856978, "2027": 85.629978, "2028": 85.365501, "2029": 85.45599}, "IND5_DEPENDENCIA": {"2026": 21.623099, "2027": 21.778793, "2028": 21.716138, "2029": 21.741352}, "IND6_RES_PRIMARIO": {"2026": 0.077593, "2027": 0.019646, "2028": 0.039541, "2029": 0.032711}, "IND7_GASTO_PESSOAL": {"2026": 54.615309, "2027": 54.537323, "2028": 54.514813, "2029": 54.508316}, "IND8_LIQUIDEZ": {"2026": 8.694908, "2027": 8.702437, "2028": 8.702081, "2029": 8.702098}, "IND9_POUPANCA": {"2026": 11.652547, "2027": 11.608321, "2028": 11.615051, "2029": 11.614027}}, "SE": {"IND1_TAXA_INVEST": {"2026": 6.161868, "2027": 6.222269, "2028": 6.212216, "2029": 6.213889}, "IND2_REGRA_OURO": {"2026": 7.748251, "2027": 7.834291, "2028": 7.807233, "2029": 7.815742}, "IND3_SOLVENCIA": {"2026": 4.683019, "2027": 3.451205, "2028": 2.805918, "2029": 2.467885}, "IND4_EXEC_ORCAM": {"2026": 91.395272, "2027": 91.435109, "2028": 91.427565, "2029": 91.428993}, "IND5_DEPENDENCIA": {"2026": 52.906046, "2027": 54.067301, "2028": 53.244293, "2029": 53.827578}, "IND6_RES_PRIMARIO": {"2026": 1.034631, "2027": 0.595464, "2028": 0.783567, "2029": 0.702999}, "IND7_GASTO_PESSOAL": {"2026": 54.295518, "2027": 54.519104, "2028": 54.583648, "2029": 54.60228}, "IND8_LIQUIDEZ": {"2026": 20.332364, "2027": 20.303082, "2028": 20.306494, "2029": 20.306097}, "IND9_POUPANCA": {"2026": 8.641248, "2027": 8.605948, "2028": 8.608961, "2029": 8.608704}}, "SP": {"IND1_TAXA_INVEST": {"2026": 4.829177, "2027": 4.743594, "2028": 4.762592, "2029": 4.758375}, "IND2_REGRA_OURO": {"2026": 13.583163, "2027": 13.664275, "2028": 13.64057, "2029": 13.647498}, "IND3_SOLVENCIA": {"2026": 123.787741, "2027": 123.734147, "2028": 123.725851, "2029": 123.724567}, "IND4_EXEC_ORCAM": {"2026": 91.0491, "2027": 90.816891, "2028": 90.888537, "2029": 90.866431}, "IND5_DEPENDENCIA": {"2026": 12.812618, "2027": 12.773618, "2028": 12.783293, "2029": 12.780893}, "IND6_RES_PRIMARIO": {"2026": 0.062564, "2027": 0.062535, "2028": 0.062535, "2029": 0.062535}, "IND7_GASTO_PESSOAL": {"2026": 53.873465, "2027": 53.883246, "2028": 53.88185, "2029": 53.882049}, "IND8_LIQUIDEZ": {"2026": 52.839903, "2027": 54.192896, "2028": 53.738072, "2029": 53.890967}, "IND9_POUPANCA": {"2026": 5.161942, "2027": 5.078569, "2028": 5.047418, "2029": 5.035779}}, "TO": {"IND1_TAXA_INVEST": {"2026": 4.851483, "2027": 4.815483, "2028": 4.820089, "2029": 4.819499}, "IND2_REGRA_OURO": {"2026": 6.305507, "2027": 6.20619, "2028": 6.234908, "2029": 6.226604}, "IND3_SOLVENCIA": {"2026": 19.686813, "2027": 21.995885, "2028": 23.521954, "2029": 24.530535}, "IND4_EXEC_ORCAM": {"2026": 79.644667, "2027": 78.957225, "2028": 78.761455, "2029": 78.705703}, "IND5_DEPENDENCIA": {"2026": 51.714591, "2027": 51.701252, "2028": 51.703996, "2029": 51.703432}, "IND6_RES_PRIMARIO": {"2026": -0.445791, "2027": -0.439061, "2028": -0.439886, "2029": -0.439785}, "IND7_GASTO_PESSOAL": {"2026": 62.652134, "2027": 62.662115, "2028": 62.663384, "2029": 62.663546}, "IND8_LIQUIDEZ": {"2026": 101.037897, "2027": 102.264216, "2028": 102.501323, "2029": 102.547167}, "IND9_POUPANCA": {"2026": 3.730412, "2027": 3.572755, "2028": 3.505517, "2029": 3.47684}}}, "inds": ["IND1", "IND2", "IND3", "IND4", "IND5", "IND6", "IND7", "IND8", "IND9"], "invertidos": ["IND3", "IND8", "IND5", "IND7"], "validacao_clp_2024": {"AC": {"sc_clp_ind1": 11.176838459858732, "rk_clp_ind1": 24, "sc_clp_ind2": 25.922216748214254, "rk_clp_ind2": 18, "sc_clp_ind3": 84.92697346654815, "rk_clp_ind3": 13, "sc_clp_ind4": 73.32200186309532, "rk_clp_ind4": 10, "sc_clp_ind5": 0.0, "rk_clp_ind5": 27, "sc_clp_ind6": 86.0338073603378, "rk_clp_ind6": 4, "sc_clp_ind7": 54.2362488150913, "rk_clp_ind7": 19, "sc_clp_ind8": 0.0, "rk_clp_ind8": 24, "sc_clp_ind9": 25.211969887824313, "rk_clp_ind9": 21}, "AL": {"sc_clp_ind1": 84.91430596542054, "rk_clp_ind1": 2, "sc_clp_ind2": 75.52701960224385, "rk_clp_ind2": 3, "sc_clp_ind3": 60.04237664954503, "rk_clp_ind3": 23, "sc_clp_ind4": 34.710702069107654, "rk_clp_ind4": 18, "sc_clp_ind5": 26.722509179448934, "rk_clp_ind5": 22, "sc_clp_ind6": 40.97954350858136, "rk_clp_ind6": 19, "sc_clp_ind7": 79.8608137873997, "rk_clp_ind7": 5, "sc_clp_ind8": 34.562987214610146, "rk_clp_ind8": 23, "sc_clp_ind9": 64.7773799323384, "rk_clp_ind9": 4}, "AM": {"sc_clp_ind1": 22.13815413411848, "rk_clp_ind1": 16, "sc_clp_ind2": 0.0, "rk_clp_ind2": 27, "sc_clp_ind3": 80.48309438437988, "rk_clp_ind3": 17, "sc_clp_ind4": 81.63763816911349, "rk_clp_ind4": 6, "sc_clp_ind5": 63.33522275064923, "rk_clp_ind5": 12, "sc_clp_ind6": 44.36512681881438, "rk_clp_ind6": 14, "sc_clp_ind7": 92.67273753134901, "rk_clp_ind7": 3, "sc_clp_ind8": 92.16431156077715, "rk_clp_ind8": 9, "sc_clp_ind9": 18.153160396970314, "rk_clp_ind9": 23}, "AP": {"sc_clp_ind1": 13.383575893164073, "rk_clp_ind1": 22, "sc_clp_ind2": 35.407256554789015, "rk_clp_ind2": 14, "sc_clp_ind3": 96.64039915424324, "rk_clp_ind3": 3, "sc_clp_ind4": 76.18641157690456, "rk_clp_ind4": 8, "sc_clp_ind5": 0.1139654982589775, "rk_clp_ind5": 26, "sc_clp_ind6": 78.88446522185865, "rk_clp_ind6": 5, "sc_clp_ind7": 38.97942692491241, "rk_clp_ind7": 24, "sc_clp_ind8": 48.61355319395009, "rk_clp_ind8": 21, "sc_clp_ind9": 70.44777325357137, "rk_clp_ind9": 3}, "BA": {"sc_clp_ind1": 58.20118403416947, "rk_clp_ind1": 7, "sc_clp_ind2": 48.08447437672572, "rk_clp_ind2": 8, "sc_clp_ind3": 77.1919651111024, "rk_clp_ind3": 20, "sc_clp_ind4": 74.58002367317124, "rk_clp_ind4": 9, "sc_clp_ind5": 48.96908279384002, "rk_clp_ind5": 14, "sc_clp_ind6": 43.76776701635244, "rk_clp_ind6": 15, "sc_clp_ind7": 73.72335869314654, "rk_clp_ind7": 8, "sc_clp_ind8": 61.66287139568344, "rk_clp_ind8": 18, "sc_clp_ind9": 40.51587621127128, "rk_clp_ind9": 12}, "CE": {"sc_clp_ind1": 46.379602332096304, "rk_clp_ind1": 10, "sc_clp_ind2": 52.24819905787891, "rk_clp_ind2": 5, "sc_clp_ind3": 78.97133752200122, "rk_clp_ind3": 19, "sc_clp_ind4": 37.14110150477599, "rk_clp_ind4": 17, "sc_clp_ind5": 41.12206724370731, "rk_clp_ind5": 16, "sc_clp_ind6": 41.404850217448704, "rk_clp_ind6": 18, "sc_clp_ind7": 73.42154744028903, "rk_clp_ind7": 9, "sc_clp_ind8": 91.7340281160503, "rk_clp_ind8": 10, "sc_clp_ind9": 30.509806467695288, "rk_clp_ind9": 17}, "DF": {"sc_clp_ind1": 11.057091665235635, "rk_clp_ind1": 25, "sc_clp_ind2": 12.809700376785099, "rk_clp_ind2": 23, "sc_clp_ind3": 87.81311036818263, "rk_clp_ind3": 12, "sc_clp_ind4": 20.96576013899993, "rk_clp_ind4": 23, "sc_clp_ind5": 84.73654680395718, "rk_clp_ind5": 3, "sc_clp_ind6": 37.55742839142231, "rk_clp_ind6": 22, "sc_clp_ind7": 81.77032685738818, "rk_clp_ind7": 4, "sc_clp_ind8": 44.55234043018898, "rk_clp_ind8": 22, "sc_clp_ind9": 0.0, "rk_clp_ind9": 27}, "ES": {"sc_clp_ind1": 73.83732146829925, "rk_clp_ind1": 3, "sc_clp_ind2": 100.0, "rk_clp_ind2": 1, "sc_clp_ind3": 97.9091671994949, "rk_clp_ind3": 2, "sc_clp_ind4": 53.79720794280629, "rk_clp_ind4": 13, "sc_clp_ind5": 69.97435597311025, "rk_clp_ind5": 11, "sc_clp_ind6": 40.96265056947544, "rk_clp_ind6": 20, "sc_clp_ind7": 100.0, "rk_clp_ind7": 1, "sc_clp_ind8": 93.05621432169625, "rk_clp_ind8": 6, "sc_clp_ind9": 100.0, "rk_clp_ind9": 1}, "GO": {"sc_clp_ind1": 30.21992812466017, "rk_clp_ind1": 12, "sc_clp_ind2": 32.42105442680723, "rk_clp_ind2": 15, "sc_clp_ind3": 82.83200144038447, "rk_clp_ind3": 14, "sc_clp_ind4": 46.08035634196573, "rk_clp_ind4": 15, "sc_clp_ind5": 79.21256082940806, "rk_clp_ind5": 8, "sc_clp_ind6": 58.522877021942435, "rk_clp_ind6": 8, "sc_clp_ind7": 66.7857463022255, "rk_clp_ind7": 13, "sc_clp_ind8": 99.79719409471178, "rk_clp_ind8": 2, "sc_clp_ind9": 61.297662114300564, "rk_clp_ind9": 5}, "MA": {"sc_clp_ind1": 49.01880431307345, "rk_clp_ind1": 8, "sc_clp_ind2": 50.044269041132296, "rk_clp_ind2": 6, "sc_clp_ind3": 92.2598767867364, "rk_clp_ind3": 7, "sc_clp_ind4": 44.59757106143844, "rk_clp_ind4": 16, "sc_clp_ind5": 17.551584539555805, "rk_clp_ind5": 24, "sc_clp_ind6": 94.46425368549112, "rk_clp_ind6": 2, "sc_clp_ind7": 98.71093753646065, "rk_clp_ind7": 2, "sc_clp_ind8": 85.77895887899811, "rk_clp_ind8": 12, "sc_clp_ind9": 86.44842042690449, "rk_clp_ind9": 2}, "MG": {"sc_clp_ind1": 17.278996949534747, "rk_clp_ind1": 18, "sc_clp_ind2": 23.242304819025204, "rk_clp_ind2": 19, "sc_clp_ind3": 21.563926194255828, "rk_clp_ind3": 25, "sc_clp_ind4": 62.943443822904065, "rk_clp_ind4": 11, "sc_clp_ind5": 80.03151457036971, "rk_clp_ind5": 6, "sc_clp_ind6": 58.690611886468794, "rk_clp_ind6": 7, "sc_clp_ind7": 30.608469756185556, "rk_clp_ind7": 26, "sc_clp_ind8": 0.0, "rk_clp_ind8": 24, "sc_clp_ind9": 34.20566593710948, "rk_clp_ind9": 13}, "MS": {"sc_clp_ind1": 67.56241872058672, "rk_clp_ind1": 6, "sc_clp_ind2": 61.25213348408679, "rk_clp_ind2": 4, "sc_clp_ind3": 82.67364676162785, "rk_clp_ind3": 15, "sc_clp_ind4": 34.50171381807209, "rk_clp_ind4": 19, "sc_clp_ind5": 73.10766823679297, "rk_clp_ind5": 10, "sc_clp_ind6": 37.867810053882515, "rk_clp_ind6": 21, "sc_clp_ind7": 51.06964751752878, "rk_clp_ind7": 20, "sc_clp_ind8": 65.77294437714494, "rk_clp_ind8": 17, "sc_clp_ind9": 30.709242415523004, "rk_clp_ind9": 15}, "MT": {"sc_clp_ind1": 69.57758388468646, "rk_clp_ind1": 5, "sc_clp_ind2": 75.81377121109337, "rk_clp_ind2": 2, "sc_clp_ind3": 100.0, "rk_clp_ind3": 1, "sc_clp_ind4": 34.09746892200611, "rk_clp_ind4": 20, "sc_clp_ind5": 79.27121364378141, "rk_clp_ind5": 7, "sc_clp_ind6": 29.954015971159038, "rk_clp_ind6": 25, "sc_clp_ind7": 73.392822508199, "rk_clp_ind7": 10, "sc_clp_ind8": 92.59573687297767, "rk_clp_ind8": 7, "sc_clp_ind9": 61.00943184678334, "rk_clp_ind9": 6}, "PA": {"sc_clp_ind1": 70.20148931115106, "rk_clp_ind1": 4, "sc_clp_ind2": 36.87642945020445, "rk_clp_ind2": 12, "sc_clp_ind3": 90.4225021702934, "rk_clp_ind3": 8, "sc_clp_ind4": 56.2922681842954, "rk_clp_ind4": 12, "sc_clp_ind5": 50.49241724027025, "rk_clp_ind5": 13, "sc_clp_ind6": 35.341149226064005, "rk_clp_ind6": 23, "sc_clp_ind7": 64.05287726544655, "rk_clp_ind7": 14, "sc_clp_ind8": 84.42793780468364, "rk_clp_ind8": 13, "sc_clp_ind9": 30.704593653532562, "rk_clp_ind9": 16}, "PB": {"sc_clp_ind1": 46.52261957926806, "rk_clp_ind1": 9, "sc_clp_ind2": 36.76345052559537, "rk_clp_ind2": 13, "sc_clp_ind3": 94.64823472047304, "rk_clp_ind3": 5, "sc_clp_ind4": 48.50385044475652, "rk_clp_ind4": 14, "sc_clp_ind5": 33.271068591805346, "rk_clp_ind5": 18, "sc_clp_ind6": 45.44067272420335, "rk_clp_ind6": 13, "sc_clp_ind7": 47.85925472084928, "rk_clp_ind7": 21, "sc_clp_ind8": 96.6144565237425, "rk_clp_ind8": 5, "sc_clp_ind9": 59.831203446590834, "rk_clp_ind9": 7}, "PE": {"sc_clp_ind1": 28.12776307803225, "rk_clp_ind1": 14, "sc_clp_ind2": 14.786556825875582, "rk_clp_ind2": 20, "sc_clp_ind3": 80.28076260686166, "rk_clp_ind3": 18, "sc_clp_ind4": 84.4236444276548, "rk_clp_ind4": 3, "sc_clp_ind5": 43.76725444996899, "rk_clp_ind5": 15, "sc_clp_ind6": 56.57927986933879, "rk_clp_ind6": 9, "sc_clp_ind7": 67.56471600524628, "rk_clp_ind7": 12, "sc_clp_ind8": 73.03018632037355, "rk_clp_ind8": 15, "sc_clp_ind9": 30.771378608371432, "rk_clp_ind9": 14}, "PI": {"sc_clp_ind1": 100.0, "rk_clp_ind1": 1, "sc_clp_ind2": 47.95456234274367, "rk_clp_ind2": 9, "sc_clp_ind3": 65.86553819536475, "rk_clp_ind3": 22, "sc_clp_ind4": 100.0, "rk_clp_ind4": 1, "sc_clp_ind5": 24.831889830253147, "rk_clp_ind5": 23, "sc_clp_ind6": 0.0, "rk_clp_ind6": 27, "sc_clp_ind7": 75.63986302437608, "rk_clp_ind7": 7, "sc_clp_ind8": 57.89599320174926, "rk_clp_ind8": 19, "sc_clp_ind9": 29.534367736198856, "rk_clp_ind9": 18}, "PR": {"sc_clp_ind1": 16.75017076087181, "rk_clp_ind1": 20, "sc_clp_ind2": 38.88565036440913, "rk_clp_ind2": 11, "sc_clp_ind3": 95.84234899876596, "rk_clp_ind3": 4, "sc_clp_ind4": 27.296971880655963, "rk_clp_ind4": 21, "sc_clp_ind5": 77.24629470784109, "rk_clp_ind5": 9, "sc_clp_ind6": 61.85042060646547, "rk_clp_ind6": 6, "sc_clp_ind7": 63.092959526895676, "rk_clp_ind7": 16, "sc_clp_ind8": 98.92765635005256, "rk_clp_ind8": 3, "sc_clp_ind9": 41.34874932887962, "rk_clp_ind9": 11}, "RJ": {"sc_clp_ind1": 17.622793525257965, "rk_clp_ind1": 17, "sc_clp_ind2": 6.628671374228147, "rk_clp_ind2": 24, "sc_clp_ind3": 0.0, "rk_clp_ind3": 27, "sc_clp_ind4": 26.835853784251363, "rk_clp_ind4": 22, "sc_clp_ind5": 100.0, "rk_clp_ind5": 1, "sc_clp_ind6": 87.89860768111691, "rk_clp_ind6": 3, "sc_clp_ind7": 32.007805111202686, "rk_clp_ind7": 25, "sc_clp_ind8": 83.86089396932796, "rk_clp_ind8": 14, "sc_clp_ind9": 11.60403163236716, "rk_clp_ind9": 25}, "RN": {"sc_clp_ind1": 17.048426046489517, "rk_clp_ind1": 19, "sc_clp_ind2": 2.9881700951947145, "rk_clp_ind2": 26, "sc_clp_ind3": 75.80021340468218, "rk_clp_ind3": 21, "sc_clp_ind4": 80.67653975194902, "rk_clp_ind4": 7, "sc_clp_ind5": 33.15025004083246, "rk_clp_ind5": 19, "sc_clp_ind6": 43.15982948808334, "rk_clp_ind6": 16, "sc_clp_ind7": 0.0, "rk_clp_ind7": 27, "sc_clp_ind8": 0.0, "rk_clp_ind8": 24, "sc_clp_ind9": 6.32396916595877, "rk_clp_ind9": 26}, "RO": {"sc_clp_ind1": 13.406109487009354, "rk_clp_ind1": 21, "sc_clp_ind2": 29.56518105367071, "rk_clp_ind2": 16, "sc_clp_ind3": 94.19162098194928, "rk_clp_ind3": 6, "sc_clp_ind4": 3.8012329253104173, "rk_clp_ind4": 26, "sc_clp_ind5": 40.97473598083092, "rk_clp_ind5": 17, "sc_clp_ind6": 46.096199170490486, "rk_clp_ind6": 12, "sc_clp_ind7": 59.24609655595734, "rk_clp_ind7": 18, "sc_clp_ind8": 96.925713233517, "rk_clp_ind8": 4, "sc_clp_ind9": 47.93522076934557, "rk_clp_ind9": 10}, "RR": {"sc_clp_ind1": 7.05339476134752, "rk_clp_ind1": 26, "sc_clp_ind2": 4.822224465625173, "rk_clp_ind2": 25, "sc_clp_ind3": 89.1699059285159, "rk_clp_ind3": 9, "sc_clp_ind4": 14.406899859430276, "rk_clp_ind4": 24, "sc_clp_ind5": 0.5143676735514902, "rk_clp_ind5": 25, "sc_clp_ind6": 34.958681442730956, "rk_clp_ind6": 24, "sc_clp_ind7": 61.29329498777929, "rk_clp_ind7": 17, "sc_clp_ind8": 92.32408924831249, "rk_clp_ind8": 8, "sc_clp_ind9": 25.886545885475503, "rk_clp_ind9": 20}, "RS": {"sc_clp_ind1": 0.0, "rk_clp_ind1": 27, "sc_clp_ind2": 26.605557217077653, "rk_clp_ind2": 17, "sc_clp_ind3": 11.889146320845214, "rk_clp_ind3": 26, "sc_clp_ind4": 0.0, "rk_clp_ind4": 27, "sc_clp_ind5": 81.01749607203914, "rk_clp_ind5": 5, "sc_clp_ind6": 42.269495827675065, "rk_clp_ind6": 17, "sc_clp_ind7": 45.06214768962192, "rk_clp_ind7": 22, "sc_clp_ind8": 0.0, "rk_clp_ind8": 24, "sc_clp_ind9": 26.25303723806574, "rk_clp_ind9": 19}, "SC": {"sc_clp_ind1": 40.166176459067046, "rk_clp_ind1": 11, "sc_clp_ind2": 40.43167627153171, "rk_clp_ind2": 10, "sc_clp_ind3": 81.05813923923753, "rk_clp_ind3": 16, "sc_clp_ind4": 8.231715750233995, "rk_clp_ind4": 25, "sc_clp_ind5": 81.25504223658602, "rk_clp_ind5": 4, "sc_clp_ind6": 55.81300652119725, "rk_clp_ind6": 10, "sc_clp_ind7": 63.370685891074864, "rk_clp_ind7": 15, "sc_clp_ind8": 100.0, "rk_clp_ind8": 1, "sc_clp_ind9": 55.41352167133614, "rk_clp_ind9": 8}, "SE": {"sc_clp_ind1": 11.653003341710026, "rk_clp_ind1": 23, "sc_clp_ind2": 13.230897631744012, "rk_clp_ind2": 21, "sc_clp_ind3": 88.49171934652652, "rk_clp_ind3": 11, "sc_clp_ind4": 81.95395981795367, "rk_clp_ind4": 5, "sc_clp_ind5": 27.458831822500755, "rk_clp_ind5": 21, "sc_clp_ind6": 100.0, "rk_clp_ind6": 1, "sc_clp_ind7": 79.20223285800006, "rk_clp_ind7": 6, "sc_clp_ind8": 86.77660070271389, "rk_clp_ind8": 11, "sc_clp_ind9": 54.434820094832425, "rk_clp_ind9": 9}, "SP": {"sc_clp_ind1": 24.356884368322365, "rk_clp_ind1": 15, "sc_clp_ind2": 48.885157009134005, "rk_clp_ind2": 7, "sc_clp_ind3": 37.6011919260573, "rk_clp_ind3": 24, "sc_clp_ind4": 98.5042822337731, "rk_clp_ind4": 2, "sc_clp_ind5": 94.64106444169194, "rk_clp_ind5": 2, "sc_clp_ind6": 52.42396250277713, "rk_clp_ind6": 11, "sc_clp_ind7": 70.86683467061081, "rk_clp_ind7": 11, "sc_clp_ind8": 68.88494652055665, "rk_clp_ind8": 16, "sc_clp_ind9": 19.629653891627115, "rk_clp_ind9": 22}, "TO": {"sc_clp_ind1": 28.431656833267205, "rk_clp_ind1": 13, "sc_clp_ind2": 13.21860512620666, "rk_clp_ind2": 22, "sc_clp_ind3": 88.76500698328225, "rk_clp_ind3": 10, "sc_clp_ind4": 82.25023069188366, "rk_clp_ind4": 4, "sc_clp_ind5": 27.920794304577896, "rk_clp_ind5": 20, "sc_clp_ind6": 27.869015927204444, "rk_clp_ind6": 26, "sc_clp_ind7": 43.881878927953146, "rk_clp_ind7": 23, "sc_clp_ind8": 55.45870950293908, "rk_clp_ind8": 20, "sc_clp_ind9": 14.64461293797319, "rk_clp_ind9": 24}}, "clp_rank_publicado": {"2023": {"ES": 1, "MT": 2, "BA": 3, "AM": 4, "MS": 5, "PA": 6, "SC": 7, "PR": 8, "GO": 9, "PB": 10, "SE": 11, "DF": 12, "PI": 13, "SP": 14, "AP": 15, "CE": 16, "RO": 17, "PE": 18, "TO": 19, "MA": 20, "AL": 21, "RJ": 22, "RR": 23, "AC": 24, "RS": 25, "MG": 26, "RN": 27}, "2024": {"ES": 1, "MA": 2, "MT": 3, "SE": 4, "GO": 5, "PR": 6, "SC": 7, "AM": 8, "BA": 9, "PA": 10, "PB": 11, "CE": 12, "SP": 13, "PE": 14, "PI": 15, "MS": 16, "AL": 17, "AP": 18, "RO": 19, "DF": 20, "TO": 21, "RR": 22, "AC": 23, "RJ": 24, "MG": 25, "RN": 26, "RS": 27}}, "nota_ind6": "IND6 = Resultado Primário SEM RPPS (RREO Anexo 06, Receita Primária Total EXCETO RPPS menos Despesa Primária Total EXCETO RPPS) dividido pelo PIB estadual DO ANO ANTERIOR (defasagem de 1 ano, conforme inferido do padrão de divergência observado). PIB fonte: IBGE SCN Regional (2019-2023, oficial); 2024 projetado por crescimento nominal médio 2021-2023 apenas como apoio ao cálculo do ano seguinte. Mesmo com fórmula e defasagem corretas, resta uma divergência média de 0,02 a 0,1pp frente ao CLP — testamos PIB com e sem projeção, RP com e sem RPPS, e fator de escala constante; nenhum fecha exatamente. A causa mais provável é uma fonte de PIB estadual específica da Tendências Consultoria não disponível publicamente. Esta é a ÚNICA divergência residual conhecida do painel — os demais 8 indicadores têm score idêntico ao CLP (27/27 ou 26/27 estados, com diferenças de arredondamento desprezíveis)."};
+const ANOS_HIST = DADOS.anos;                       // [2019..2025]
+const ANOS_PROJ = [2026,2027,2028,2029];
+const ANOS_TODOS = [...ANOS_HIST,...ANOS_PROJ];
+const UFS  = DADOS.ufs;
+const HIST = DADOS.hist_scores;                     // {UF:{ano:{score,rank,ind1..}}}
+const PROJ26 = DADOS.proj26;                        // {UF:{IND_KEY:{ano:val}}}
+const RS_HIST_CONTAS = DADOS.rs_contas;             // {ano:{CONTA:val}}
+
+const LAST_HIST = Math.max(...ANOS_HIST);
+
+const INDS = ['ind1','ind2','ind3','ind4','ind5','ind6','ind7','ind8','ind9'];
+const INVERTIDOS = new Set(['ind3','ind5','ind7','ind8']);
+
+const LABELS_IND = {
+  ind1: 'Taxa de Investimentos',
+  ind2: 'Regra de Ouro',
+  ind3: 'Solvência Fiscal',
+  ind4: 'Sucesso no Planejamento',
+  ind5: 'Dependência Fiscal',
+  ind6: 'Resultado Primário',
+  ind7: 'Gasto com Pessoal',
+  ind8: 'Índice de Liquidez',
+  ind9: 'Poupança Corrente',
+};
+const LABELS_SHORT = {
+  ind1:'Taxa Invest.', ind2:'Regra de Ouro', ind4:'Exec. Orçam.',
+  ind5:'Dep. Fiscal ↓',ind6:'Res. Primário', ind9:'Poupança',
+};
+
+// Cores do design system
+const C = {
+  red:'#92302a', green:'#3a6b3e', gold:'#a37714', steel:'#2f4e74',
+  muted:'#857a68', rule:'#c4b8a1', ink:'#1c1814',
+  projLine:'#a37714', histLine:'#92302a', medianaLine:'#c4b8a1',
+  paper:'#f1ecdf',
+};
+
+/* ── CONTAS SICONFI para sidebar ── */
+const CONTAS_DEF = [
+  {key:'RCL',                       label:'Receita Corrente Líquida',       desc:'RREO Anx 03'},
+  {key:'RECEITAS_CORRENTES',        label:'Receitas Correntes',             desc:'RREO Anx 01'},
+  {key:'RECEITAS_INTRA',            label:'Receitas Intra-Orçamentárias',   desc:'RREO Anx 01 (II)'},
+  {key:'DESPESAS_CORRENTES',        label:'Despesas Correntes (liquidada)', desc:'RREO Anx 01'},
+  {key:'DESPESAS_CORRENTES_EMP',    label:'Despesas Correntes (empenhada)', desc:'RREO Anx 01 — usada no IND9'},
+  {key:'DESPESAS_INTRA',            label:'Despesas Intra-Orçamentárias',   desc:'RREO Anx 01 (IX)'},
+  {key:'TRANSFERENCIAS_CORRENTES',  label:'Transferências Correntes',       desc:'RREO Anx 01'},
+  {key:'RECEITA_OP_CREDITO',        label:'Receita Op. de Crédito',         desc:'RREO Anx 01'},
+  {key:'DESPESA_CAPITAL_EMPENHADA', label:'Despesa de Capital Empenhada',   desc:'RREO Anx 01'},
+  {key:'INVESTIMENTO_LIQUIDADO',    label:'Investimentos Liquidados',       desc:'RREO Anx 01'},
+  {key:'DESPESA_LIQUIDADA_TOTAL',   label:'Despesa Liquidada Total',        desc:'RREO Anx 01'},
+  {key:'DOTACAO_ATUALIZADA',        label:'Dotação Atualizada',             desc:'RREO Anx 01'},
+  {key:'PESSOAL_EMP_RREO',          label:'Pessoal e Encargos (empenhado)', desc:'RREO Anx 01'},
+  {key:'RP_SEM_RPPS',               label:'Resultado Primário (sem RPPS)',  desc:'RREO Anx 06'},
+  {key:'DCL',                       label:'Dívida Consolidada Líquida',     desc:'RGF Anx 02'},
+  {key:'RCL_DCL',                   label:'RCL base LRF',                   desc:'RGF Anx 02'},
+  {key:'CAIXA_NV',                  label:'Caixa Bruta (Não Vinculados)',   desc:'RGF Anx 05, Executivo'},
+  {key:'OBRIG_NV',                  label:'Obrigações (Não Vinculados)',    desc:'RGF Anx 05, Executivo'},
+];
+
+// inputs[ano][conta] = valor
+const STORAGE_KEY = 'solidez_fiscal_inputs_v1';
+const STORAGE_META = 'solidez_fiscal_meta_v1';
+
+function salvarInputs(){
+  try{
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(inputs));
+    const agora = new Date().toLocaleString('pt-BR',{
+      day:'2-digit',month:'2-digit',year:'numeric',
+      hour:'2-digit',minute:'2-digit'
+    });
+    localStorage.setItem(STORAGE_META, JSON.stringify({ultima_alteracao: agora}));
+    atualizarDataAlteracao(agora);
+  }catch(e){}
+}
+
+function atualizarDataAlteracao(data){
+  const el = document.getElementById('ultima-alteracao');
+  if(el) el.textContent = data ? 'Última alteração: ' + data : '';
+}
+
+const inputs = {};
+// Default: valores históricos 2025
+ANOS_PROJ.forEach(ano => {
+  inputs[ano] = {};
+  const ref = RS_HIST_CONTAS[LAST_HIST] || RS_HIST_CONTAS[String(LAST_HIST)] || {};
+  // Adicionar contas RGF do hist_scores
+  const rs_hist = HIST['RS'] && HIST['RS'][LAST_HIST] ? HIST['RS'][LAST_HIST] : {};
+  CONTAS_DEF.forEach(c => { inputs[ano][c.key] = ref[c.key] || 0; });
+});
+// Sobrescrever com localStorage se existir
+try{
+  const saved = localStorage.getItem(STORAGE_KEY);
+  if(saved){
+    const parsed = JSON.parse(saved);
+    ANOS_PROJ.forEach(ano => {
+      if(parsed[ano]) Object.assign(inputs[ano], parsed[ano]);
+    });
+  }
+}catch(e){}
+
+/* ── Calcular indicadores a partir das contas brutas ── */
+// PIB RS por ano (R$ milhões) — 2019-2023 oficial IBGE, 2024-2025 projetado (cresc. nominal médio)
+const PIB_RS_M = {2019:482460,2020:499024,2021:581033,2022:593630,2023:650107,2024:711034,2025:777672};
+// IND6 usa o PIB DO ANO ANTERIOR (defasagem de 1 ano) — descoberto via validação ponto-a-ponto
+// contra o CLP: o ano corrente nunca bate, mas o ano anterior reduz o erro em ordem de grandeza.
+function getPIB(ano){
+  const anoPib = (ano && ano > 2019) ? ano - 1 : 2019;
+  return (PIB_RS_M[anoPib] || PIB_RS_M[2025]) * 1e6;
+}
+
+function contasParaInds(contas, ano){
+  // Fórmulas CLP — dados SICONFI puros, replicadas e validadas ponto a ponto
+  const rcl     = +contas.RCL || 1;
+  const rc      = +contas.RECEITAS_CORRENTES || 0;
+  const ri      = +contas.RECEITAS_INTRA || 0;
+  const dcEmp   = +contas.DESPESAS_CORRENTES_EMP || +contas.DESPESAS_CORRENTES || 0;
+  const di      = +contas.DESPESAS_INTRA || 0;
+  const tr      = +contas.TRANSFERENCIAS_CORRENTES || 0;
+  const oc      = +contas.RECEITA_OP_CREDITO || 0;
+  const cap     = +contas.DESPESA_CAPITAL_EMPENHADA || 0;
+  const inv     = +contas.INVESTIMENTO_LIQUIDADO || 0;
+  const liq     = +contas.DESPESA_LIQUIDADA_TOTAL || 0;
+  const dot     = +contas.DOTACAO_ATUALIZADA || 1;
+  const pessoalEmp = +contas.PESSOAL_EMP_RREO || 0;
+  const dcl     = +contas.DCL || 0;
+  const rcl_dcl = +contas.RCL_DCL || rcl;
+  const caixaNV = +contas.CAIXA_NV || 1;
+  const obrigNV = +contas.OBRIG_NV || 0;
+  const rp      = +contas.RP_SEM_RPPS || 0;
+  const pib     = getPIB(ano || 2025);
+
+  const rcTot = rc + ri, dcTot = dcEmp + di;
+  return {
+    ind1: (inv / rcl) * 100,
+    ind2: ((cap - oc) / rcl) * 100,
+    ind3: (dcl / rcl_dcl) * 100,
+    ind4: (liq / dot) * 100,
+    ind5: (tr / rc) * 100,
+    ind6: (rp / pib) * 100,
+    ind7: (pessoalEmp / rcl) * 100,
+    ind8: (obrigNV / caixaNV) * 100,
+    ind9: rcTot ? ((rcTot - dcTot) / rcTot) * 100 : 0,
+  };
+}
+
+/* ── Normalização min-max cross-sectional ── */
+function normAnno(rows){
+  // rows = [{uf, ind1..ind9}]
+  const out = rows.map(r=>({...r}));
+  INDS.forEach(ind=>{
+    const vals = out.map(r=>r[ind]).filter(v=>v!=null&&!isNaN(v));
+    const mn=Math.min(...vals), mx=Math.max(...vals);
+    out.forEach(r=>{
+      const v=r[ind];
+      if(v==null||isNaN(v)){r['sc_'+ind]=0;return;}
+      if(mx===mn){r['sc_'+ind]=50;return;}
+      r['sc_'+ind]=INVERTIDOS.has(ind)?((mx-v)/(mx-mn))*100:((v-mn)/(mx-mn))*100;
+    });
+  });
+  out.forEach(r=>{ r.score=INDS.reduce((s,i)=>s+(r['sc_'+i]||0),0)/INDS.length; });
+  const sorted=[...out].sort((a,b)=>b.score-a.score);
+  sorted.forEach((r,i)=>{ out.find(x=>x.uf===r.uf).rank=i+1; });
+  return out;
+}
+
+/* ── Montar rankings completos ── */
+function calcRankings(){
+  const res={};
+  const IND_MAP={ind1:'IND1_TAXA_INVEST',ind2:'IND2_REGRA_OURO',ind4:'IND4_EXEC_ORCAMENTARIA',
+                 ind5:'IND5_DEPENDENCIA',ind6:'IND6_RESULTADO_PRIMARIO',ind9:'IND9_POUPANCA'};
+  ANOS_TODOS.forEach(ano=>{
+    const rows=[];
+    UFS.forEach(uf=>{
+      if(ANOS_HIST.includes(ano)){
+        const h=HIST[uf]&&HIST[uf][ano];
+        if(h) rows.push({uf,...Object.fromEntries(INDS.map(i=>[i,h[i]]))});
+      } else {
+        if(uf==='RS'){
+          rows.push({uf:'RS',...contasParaInds(inputs[ano])});
+        } else {
+          const p=PROJ26[uf];
+          const row={uf};
+          INDS.forEach(ind=>{
+            const pind=p&&p[IND_MAP[ind]];
+            row[ind]=pind&&pind[ano]!==undefined?pind[ano]:(HIST[uf]&&HIST[uf][LAST_HIST]?HIST[uf][LAST_HIST][ind]:0);
+          });
+          rows.push(row);
+        }
+      }
+    });
+    res[ano]=normAnno(rows);
+  });
+  return res;
+}
+
+let rankings = calcRankings();
+function getRSRow(ano){ const r=rankings[ano]; return r?r.find(x=>x.uf==='RS'):null; }
+
+/* ── Formatadores ── */
+function fmtPct(v){ return (v*100).toFixed(2).replace('.',',')+' %'; }
+function fmtN4(v){ return v.toFixed(4).replace('.',','); }
+function fmtBi(v){
+  const b=Math.abs(v)/1e9, s=v<0?'−':'';
+  return s+'R$ '+b.toFixed(2).replace('.',',')+ ' bi';
+}
+
+/* ══════════════════════════════════════════════
+   SIDEBAR — INPUTS
+══════════════════════════════════════════════ */
+function buildSidebar(){
+  const el = document.getElementById('sidebar-inputs');
+  el.innerHTML = CONTAS_DEF.map(c => {
+    const yearsHtml = ANOS_PROJ.map(ano => {
+      const val = inputs[ano][c.key] || 0;
+      // Se tem valor: mostrar resumo; se não: campo vazio para digitar
+      const isText = val > 0;
+      const displayVal = isText ? fmtBiInline(val) : '';
+      const inputType = isText ? 'text' : 'number';
+      const hasCls = isText ? ' has-value' : '';
+      return `
+        <div class="conta-year-wrap">
+          <label>${ano}</label>
+          <input type="${inputType}" id="inp_${c.key}_${ano}"
+            value="${displayVal}"
+            step="100000000" min="0"
+            class="${hasCls.trim()}"
+            onfocus="onFocus(this,'${c.key}',${ano})"
+            oninput="onInput('${c.key}',${ano},this.value)"
+            onblur="onBlur(this,'${c.key}',${ano})">
+        </div>`;
+    }).join('');
+    return `<div class="conta-block">
+      <div class="conta-label">${c.label}</div>
+      <div class="conta-years">${yearsHtml}</div>
+    </div>`;
+  }).join('');
+}
+
+function fmtBiInline(v){
+  if(!v || isNaN(v)) return '';
+  const b = Math.abs(v)/1e9;
+  const sign = v < 0 ? '−' : '';
+  return sign + 'R$ ' + b.toFixed(1).replace('.',',') + ' bi';
+}
+
+// Ao focar: mostrar número bruto para edição
+function onFocus(el, conta, ano){
+  el.type = 'number';
+  el.value = inputs[ano][conta] || '';
+  el.classList.remove('has-value');
+  el.select();
+}
+
+// Ao sair do campo: salvar e mostrar resumo formatado
+function onBlur(el, conta, ano){
+  const val = parseFloat(el.value) || 0;
+  inputs[ano][conta] = val;
+  if(val){
+    el.type = 'text';
+    el.value = fmtBiInline(val);
+    el.classList.add('has-value');
+  } else {
+    el.type = 'number';
+    el.value = '';
+    el.classList.remove('has-value');
+  }
+  salvarInputs();
+  rankings = calcRankings();
+  refreshAll();
+}
+
+function onInput(conta, ano, val){
+  // Atualiza o valor interno durante a digitação (sem reformatar ainda)
+  inputs[ano][conta] = parseFloat(val) || 0;
+}
+
+function refreshAll(){
+  const activeTab=document.querySelector('.tab-pane.active');
+  if(!activeTab) return;
+  const id=activeTab.id;
+  if(id==='t1'){ buildTab1(); }
+  if(id==='t2') buildTab2();
+  if(id==='t3') buildTab3();
+  if(id==='t4') buildTab4();
+}
+
+/* ══════════════════════════════════════════════
+   TAB 1 — RANKING RS: HISTÓRICO & PROJEÇÃO
+══════════════════════════════════════════════ */
+let _chartRank=null, _chartIndT1=null;
+
+const IND_FORMULAS = {
+  ind1: 'Taxa de Investimentos = Investimento Liquidado ÷ RCL × 100',
+  ind2: 'Regra de Ouro = (Desp. Capital Empenhada − Rec. Operações de Crédito) ÷ RCL × 100',
+  ind3: 'Solvência Fiscal = Dívida Consolidada Líquida ÷ RCL (base LRF) × 100  ↓ menor é melhor',
+  ind4: 'Sucesso no Planejamento = Desp. Liquidada Total ÷ Dotação Atualizada × 100',
+  ind5: 'Dependência Fiscal = Transferências Correntes ÷ Receitas Correntes × 100  ↓ menor é melhor',
+  ind6: 'Resultado Primário = Resultado Primário SEM RPPS (RREO Anx 06) ÷ PIB estadual × 100',
+  ind7: 'Gasto com Pessoal = Pessoal e Encargos Sociais Empenhados (RREO Anx 01) ÷ RCL × 100  ↓ menor é melhor',
+  ind8: 'Índice de Liquidez = Obrigações ÷ Caixa Bruta — apenas Recursos Não Vinculados do Executivo (RGF Anx 05)  ↓ menor é melhor',
+  ind9: 'Poupança Corrente = [(Rec.Corr+Intra) − (Desp.Corr EMPENHADA+Intra)] ÷ (Rec.Corr+Intra) × 100',
+};
+
+function buildTab1(){
+  const el=document.getElementById('t1');
+  if(!el.innerHTML){
+    el.innerHTML=`
+      <div class="section-head">
+        <h2 class="section-title serif">Posição Projetada do RS — 2026 a 2029</h2>
+      </div>
+      <div class="metric-grid" id="t1-metrics"></div>
+      <hr class="rule-sep">
+      <div class="col-layout">
+        <div>
+          <div class="chart-block">
+            <div class="chart-eyebrow">Evolução do ranking</div>
+            <div class="chart-title serif">Ranking RS — histórico &amp; projeção</div>
+            <div class="legend-row">
+              <div class="legend-item"><div class="sq" style="background:${C.histLine}"></div>Histórico RS</div>
+              <div class="legend-item"><div class="sq" style="background:${C.projLine};opacity:.7"></div>Projeção RS (inputs)</div>
+              <div class="legend-item"><div class="sq" style="background:${C.medianaLine}"></div>Média outros estados</div>
+            </div>
+            <div class="chart-canvas"><canvas id="chart-rank" height="260"></canvas></div>
+          </div>
+        </div>
+        <div>
+          <div class="score-list">
+            <div class="score-list-title">Score Parcial RS por Ano</div>
+            <div id="t1-score-list"></div>
+          </div>
+        </div>
+      </div>
+      <hr class="rule-sep">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:12px">
+        <h2 class="section-title serif" style="font-size:19px">Evolução por Indicador — RS vs. Brasil</h2>
+        <select class="ctrl-sel" id="sel-ind-t1" onchange="renderIndChartT1()">
+          ${INDS.map(i=>`<option value="${i}">${LABELS_IND[i]}</option>`).join('')}
+        </select>
+      </div>
+      <div id="ind-formula-t1" style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:10px;padding:7px 12px;background:var(--paper-2);border-left:3px solid var(--rule);letter-spacing:.02em"></div>
+      <div class="chart-block">
+        <div class="legend-row">
+          <div class="legend-item"><div class="sq" style="background:rgba(47,78,116,.15);border:1px solid ${C.steel}"></div>Intervalo outros estados</div>
+          <div class="legend-item"><div class="sq" style="background:${C.steel}"></div>Mediana Brasil</div>
+          <div class="legend-item"><div class="sq" style="background:${C.histLine}"></div>RS histórico</div>
+          <div class="legend-item"><div class="sq" style="background:${C.projLine};opacity:.8"></div>RS projeção</div>
+        </div>
+        <div class="chart-canvas"><canvas id="chart-ind-t1" height="240"></canvas></div>
+      </div>`;
+  }
+
+  // MÉTRICAS
+  const rank2025 = getRSRow(LAST_HIST)?.rank || 27;
+  document.getElementById('t1-metrics').innerHTML = ANOS_PROJ.map(ano=>{
+    const r=getRSRow(ano); if(!r) return '';
+    const delta=rank2025-r.rank;
+    const imp=r.rank<rank2025;
+    const dStr=delta>0
+      ?`<div class="metric-delta pos">▲ ${delta} pos. vs ${LAST_HIST}</div>`
+      :delta<0?`<div class="metric-delta neg">▼ ${Math.abs(delta)} pos. vs ${LAST_HIST}</div>`
+      :`<div class="metric-delta neu">= estável</div>`;
+    return `<div class="metric-card">
+      <div class="metric-year">${ano}<span class="proj-tag">PROJ.</span></div>
+      <div class="metric-value${imp?' melhor':''}">${r.rank}º<span style="font-size:16px;font-weight:400;color:var(--muted)">/27</span></div>
+      <div class="metric-score">${r.score.toFixed(1)} pts</div>
+      ${dStr}
+    </div>`;
+  }).join('');
+
+  // SCORE LIST
+  document.getElementById('t1-score-list').innerHTML = ANOS_TODOS.map(ano=>{
+    const isH=ANOS_HIST.includes(ano);
+    const d=isH?HIST['RS'][ano]:getRSRow(ano);
+    if(!d) return '';
+    const score=d.score, rank=d.rank;
+    const fill=isH?C.histLine:C.projLine;
+    const rankStr=`<span class="s-rank" style="color:${rank<=10?C.green:rank>=22?C.red:C.gold}">${rank}º</span>`;
+    return `<div class="score-item">
+      <span class="s-year" style="color:${isH?C.steel:C.gold}">${ano}</span>
+      <div class="s-bar"><div class="s-fill" style="width:${score}%;background:${fill}"></div></div>
+      <span class="s-val">${score.toFixed(1)} pts</span>
+      ${rankStr}
+    </div>`;
+  }).join('');
+
+  // CHART RANKING
+  const ranksH=ANOS_HIST.map(a=>HIST['RS'][a]?.rank||null);
+  const ranksP=ANOS_PROJ.map(a=>getRSRow(a)?.rank||null);
+  const projLine=[...ANOS_HIST.map((_,i)=>i===ANOS_HIST.length-1?ranksH[i]:null), ...ranksP];
+  const medianaAll=ANOS_TODOS.map(ano=>{
+    const r=rankings[ano]; if(!r) return null;
+    const rks=r.filter(x=>x.uf!=='RS').map(x=>x.rank).sort((a,b)=>a-b);
+    return rks[Math.floor(rks.length/2)]||null;
+  });
+
+  const ctx1=document.getElementById('chart-rank');
+  if(_chartRank) _chartRank.destroy();
+  _chartRank=new Chart(ctx1,{
+    type:'line',
+    data:{
+      labels:ANOS_TODOS.map(String),
+      datasets:[
+        {label:'Histórico RS',
+          data:[...ranksH,...ANOS_PROJ.map(()=>null)],
+          borderColor:C.histLine,backgroundColor:'rgba(146,48,42,.1)',
+          borderWidth:2.5,pointRadius:6,pointBackgroundColor:C.histLine,
+          tension:.1,fill:false},
+        {label:'Projeção RS (inputs manuais)',
+          data:projLine,
+          borderColor:C.projLine,borderDash:[6,4],borderWidth:2.5,
+          pointRadius:6,pointStyle:'rectRot',pointBackgroundColor:C.projLine,
+          tension:.1,fill:false},
+        {label:'Média outros estados',
+          data:medianaAll,
+          borderColor:C.medianaLine,borderDash:[3,4],borderWidth:1.5,
+          pointRadius:0,tension:.3,fill:false},
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      scales:{
+        y:{reverse:true,min:1,max:27,
+          ticks:{stepSize:2,font:{family:'JetBrains Mono',size:11},color:C.muted},
+          grid:{color:'rgba(28,24,20,.06)'},
+          title:{display:true,text:'Posição (1 = melhor)',
+            font:{family:'PT Sans',size:11},color:C.muted}},
+        x:{ticks:{font:{family:'JetBrains Mono',size:11},color:C.muted},
+          grid:{display:false}}
+      },
+      plugins:{
+        legend:{labels:{font:{family:'PT Sans',size:11},boxWidth:12,color:C.ink}},
+        annotation:{annotations:{
+          zona:{type:'box',yMin:20,yMax:27,
+            backgroundColor:'rgba(146,48,42,.06)',borderWidth:0,
+            label:{display:true,content:'Zona crítica (20º–27º)',
+              font:{family:'PT Sans',size:9},color:C.red,position:{x:'end',y:'start'}}},
+          div:{type:'line',xMin:6.5,xMax:6.5,
+            borderColor:'rgba(28,24,20,.25)',borderWidth:1,borderDash:[4,4],
+            label:{display:true,content:'← Hist. | Proj. →',
+              font:{family:'PT Sans',size:9},color:C.muted,position:'start'}}
+        }}
+      }
+    },
+    plugins:[{
+      afterDraw(chart){
+        const ctx=chart.ctx;
+        chart.data.datasets.slice(0,2).forEach((ds,di)=>{
+          const meta=chart.getDatasetMeta(di);
+          meta.data.forEach((pt,i)=>{
+            const v=ds.data[i]; if(v==null) return;
+            ctx.save();
+            ctx.font='700 11px "JetBrains Mono"';
+            ctx.fillStyle=di===0?C.histLine:C.projLine;
+            ctx.textAlign='center';
+            ctx.fillText(v+'º',pt.x,pt.y-10);
+            ctx.restore();
+          });
+        });
+      }
+    }]
+  });
+
+  // Renderizar gráfico de indicador
+  renderIndChartT1();
+}
+
+function renderIndChartT1(){
+  const sel=document.getElementById('sel-ind-t1');
+  const ind=sel?sel.value:'ind1';
+
+  // Mostrar fórmula
+  const fEl=document.getElementById('ind-formula-t1');
+  if(fEl) fEl.textContent = IND_FORMULAS[ind] || '';
+
+  const rsH=ANOS_HIST.map(a=>HIST['RS'][a]?HIST['RS'][a][ind]:null);
+  const rsP=ANOS_PROJ.map(ano=>contasParaInds(inputs[ano])[ind]);
+  const rsProjLine=[...ANOS_HIST.map((_,i)=>i===ANOS_HIST.length-1?rsH[i]:null),...rsP];
+
+  const medOt=ANOS_TODOS.map(ano=>{
+    const r=rankings[ano];if(!r) return null;
+    const vals=r.filter(x=>x.uf!=='RS').map(x=>x[ind]).filter(v=>v!=null).sort((a,b)=>a-b);
+    return vals[Math.floor(vals.length/2)]||null;
+  });
+  const minOt=ANOS_TODOS.map(ano=>{
+    const r=rankings[ano];if(!r) return null;
+    const vals=r.filter(x=>x.uf!=='RS').map(x=>x[ind]).filter(v=>v!=null);
+    return vals.length?Math.min(...vals):null;
+  });
+  const maxOt=ANOS_TODOS.map(ano=>{
+    const r=rankings[ano];if(!r) return null;
+    const vals=r.filter(x=>x.uf!=='RS').map(x=>x[ind]).filter(v=>v!=null);
+    return vals.length?Math.max(...vals):null;
+  });
+
+  const ctx=document.getElementById('chart-ind-t1');
+  if(!ctx) return;
+  if(_chartIndT1) _chartIndT1.destroy();
+  _chartIndT1=new Chart(ctx,{
+    type:'line',
+    data:{
+      labels:ANOS_TODOS.map(String),
+      datasets:[
+        {label:'Intervalo outros estados',
+          data:maxOt,fill:'+1',
+          backgroundColor:'rgba(47,78,116,.10)',
+          borderColor:'rgba(0,0,0,0)',borderWidth:0,
+          pointRadius:0,tension:.3},
+        {label:'_min',data:minOt,fill:false,
+          borderColor:'rgba(0,0,0,0)',borderWidth:0,
+          pointRadius:0,tension:.3,showLine:true},
+        {label:'Mediana Brasil',data:medOt,
+          borderColor:C.steel,borderDash:[4,3],borderWidth:1.5,
+          pointRadius:0,tension:.3,fill:false},
+        {label:'RS — Histórico',
+          data:[...rsH,...ANOS_PROJ.map(()=>null)],
+          borderColor:C.histLine,borderWidth:2.5,
+          pointRadius:5,pointBackgroundColor:C.histLine,tension:.1,fill:false},
+        {label:'RS — Projeção',
+          data:rsProjLine,
+          borderColor:C.projLine,borderDash:[6,4],borderWidth:2.5,
+          pointRadius:5,pointStyle:'rectRot',pointBackgroundColor:C.projLine,
+          tension:.1,fill:false},
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      scales:{
+        y:{ticks:{font:{family:'JetBrains Mono',size:11},color:C.muted},
+          grid:{color:'rgba(28,24,20,.06)'},
+          title:{display:true,text:LABELS_IND[ind],font:{family:'PT Sans',size:11},color:C.muted}},
+        x:{ticks:{font:{family:'JetBrains Mono',size:11},color:C.muted},grid:{display:false}}
+      },
+      plugins:{
+        legend:{labels:{
+          font:{family:'PT Sans',size:11},boxWidth:12,color:C.ink,
+          filter:item=>item.text!=='_min'
+        }},
+        annotation:{annotations:{
+          div:{type:'line',xMin:6.5,xMax:6.5,
+            borderColor:'rgba(28,24,20,.25)',borderWidth:1,borderDash:[4,4]}
+        }}
+      }
+    }
+  });
+}
+
+/* ══════════════════════════════════════════════
+   TAB 2 — EVOLUÇÃO POR INDICADOR
+══════════════════════════════════════════════ */
+let _chartInd=null;
+
+function buildTab2(){
+  const el=document.getElementById('t2');
+  if(!el.innerHTML){
+    el.innerHTML=`
+      <div class="section-head">
+        <div class="section-eyebrow">Seção II</div>
+        <h2 class="section-title serif">Evolução do Indicador Bruto — RS vs. Brasil</h2>
+      </div>
+      <div class="control-row">
+        <div class="ctrl-group">
+          <span class="ctrl-label">Indicador</span>
+          <select class="ctrl-sel" id="sel-ind" onchange="renderIndChart()">
+            ${INDS.map(i=>`<option value="${i}">${LABELS_IND[i]}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+      <div class="chart-block">
+        <div class="chart-eyebrow" id="ind-eyebrow"></div>
+        <div class="chart-title serif" id="ind-chart-title"></div>
+        <div class="chart-deck">Banda azul = intervalo min-max dos outros estados · Pontilhado = mediana Brasil</div>
+        <div class="legend-row">
+          <div class="legend-item"><div class="sq" style="background:rgba(47,78,116,.15);border:1px solid ${C.steel}"></div>Intervalo outros estados</div>
+          <div class="legend-item"><div class="sq" style="background:${C.steel}"></div>Mediana Brasil</div>
+          <div class="legend-item"><div class="sq" style="background:${C.histLine}"></div>RS — Histórico</div>
+          <div class="legend-item"><div class="sq" style="background:${C.projLine};opacity:.7"></div>RS — Projeção manual</div>
+        </div>
+        <div class="chart-canvas"><canvas id="chart-ind" height="260"></canvas></div>
+
+      </div>
+      <hr class="rule-sep" style="margin:16px 0">
+      <div class="section-head">
+        <h2 class="section-title serif" style="font-size:16px">Valores RS — Histórico &amp; Projeção</h2>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table" id="tab-ind-rs">
+          <thead><tr><th>Ano</th><th>Valor</th><th>Tipo</th></tr></thead>
+          <tbody id="tbody-ind-rs"></tbody>
+        </table>
+      </div>`;
+  }
+  renderIndChart();
+}
+
+function renderIndChart(){
+  const ind=document.getElementById('sel-ind')?.value||'ind1';
+  document.getElementById('ind-eyebrow').textContent=LABELS_IND[ind];
+  document.getElementById('ind-chart-title').textContent=LABELS_IND[ind]+' — RS vs. Brasil 2019–2029';
+
+  // Dados RS histórico
+  const rsH=ANOS_HIST.map(a=>HIST['RS'][a]?HIST['RS'][a][ind]:null);
+  // Dados RS projetado
+  const IND_MAP={ind1:'IND1_TAXA_INVEST',ind2:'IND2_REGRA_OURO',ind4:'IND4_EXEC_ORCAMENTARIA',
+                 ind5:'IND5_DEPENDENCIA',ind6:'IND6_RESULTADO_PRIMARIO',ind9:'IND9_POUPANCA'};
+  const rsP=ANOS_PROJ.map(ano=>contasParaInds(inputs[ano])[ind]);
+  const rsProjLine=[...ANOS_HIST.map((_,i)=>i===ANOS_HIST.length-1?rsH[i]:null),...rsP];
+
+  // Mediana e banda outros estados
+  const medOt=ANOS_TODOS.map(ano=>{
+    const r=rankings[ano];if(!r) return null;
+    const vals=r.filter(x=>x.uf!=='RS').map(x=>x[ind]).filter(v=>v!=null).sort((a,b)=>a-b);
+    return vals[Math.floor(vals.length/2)]||null;
+  });
+  const minOt=ANOS_TODOS.map(ano=>{
+    const r=rankings[ano];if(!r) return null;
+    const vals=r.filter(x=>x.uf!=='RS').map(x=>x[ind]).filter(v=>v!=null);
+    return Math.min(...vals);
+  });
+  const maxOt=ANOS_TODOS.map(ano=>{
+    const r=rankings[ano];if(!r) return null;
+    const vals=r.filter(x=>x.uf!=='RS').map(x=>x[ind]).filter(v=>v!=null);
+    return Math.max(...vals);
+  });
+
+  const ctx=document.getElementById('chart-ind');
+  if(_chartInd) _chartInd.destroy();
+  _chartInd=new Chart(ctx,{
+    type:'line',
+    data:{
+      labels:ANOS_TODOS.map(String),
+      datasets:[
+        // Banda min-max (área preenchida)
+        {label:'Intervalo outros estados',
+          data:maxOt,fill:'+1',
+          backgroundColor:'rgba(47,78,116,.10)',
+          borderColor:'rgba(47,78,116,.0)',borderWidth:0,
+          pointRadius:0,tension:.3},
+        {label:'_min',data:minOt,fill:false,
+          borderColor:'rgba(47,78,116,.0)',borderWidth:0,
+          pointRadius:0,tension:.3,showLine:true},
+        {label:'Mediana Brasil',data:medOt,
+          borderColor:C.steel,borderDash:[4,3],borderWidth:1.5,
+          pointRadius:0,tension:.3,fill:false},
+        {label:'RS — Histórico',
+          data:[...rsH,...ANOS_PROJ.map(()=>null)],
+          borderColor:C.histLine,borderWidth:2.5,
+          pointRadius:5,pointBackgroundColor:C.histLine,tension:.1,fill:false},
+        {label:'RS — Projeção manual',
+          data:rsProjLine,
+          borderColor:C.projLine,borderDash:[6,4],borderWidth:2.5,
+          pointRadius:5,pointStyle:'rectRot',pointBackgroundColor:C.projLine,
+          tension:.1,fill:false},
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      scales:{
+        y:{ticks:{font:{family:'JetBrains Mono',size:11},color:C.muted},
+          grid:{color:'rgba(28,24,20,.06)'},
+          title:{display:true,text:LABELS_IND[ind],font:{family:'PT Sans',size:11},color:C.muted}},
+        x:{ticks:{font:{family:'JetBrains Mono',size:11},color:C.muted},grid:{display:false}}
+      },
+      plugins:{
+        legend:{labels:{
+          font:{family:'PT Sans',size:11},boxWidth:12,color:C.ink,
+          filter:item=>item.text!=='_min'
+        }},
+        annotation:{annotations:{
+          div:{type:'line',xMin:6.5,xMax:6.5,
+            borderColor:'rgba(28,24,20,.25)',borderWidth:1,borderDash:[4,4]}
+        }}
+      }
+    }
+  });
+
+  // Tabela
+  const tbody=document.getElementById('tbody-ind-rs');
+  if(tbody){
+    tbody.innerHTML=ANOS_TODOS.map(ano=>{
+      const isH=ANOS_HIST.includes(ano);
+      const v=isH?(HIST['RS'][ano]?HIST['RS'][ano][ind]:null):contasParaInds(inputs[ano])[ind];
+      if(v==null) return '';
+      const fmt=Math.abs(v)<1?fmtPct(v):fmtN4(v);
+      const tipo=isH?'📌 Histórico':'📍 Projeção';
+      return `<tr${!isH?' style="color:var(--gold)"':''}>
+        <td>${ano}</td><td class="mono">${fmtN4(v)}</td><td>${tipo}</td>
+      </tr>`;
+    }).join('');
+  }
+}
+
+/* ══════════════════════════════════════════════
+   TAB 3 — MAPA DE CALOR
+══════════════════════════════════════════════ */
+function buildTab3(){
+  const el=document.getElementById('t3');
+  if(!el.innerHTML){
+    el.innerHTML=`
+      <div class="section-head">
+        <h2 class="section-title serif">Ranking de Solidez Fiscal — Todos os Estados</h2>
+      </div>
+      <div class="control-row">
+        <div class="ctrl-group">
+          <span class="ctrl-label">Exibir</span>
+          <div class="radio-group">
+            <button class="radio-btn active" id="rb-rank" onclick="switchHeat('rank',this)">Ranking</button>
+            <button class="radio-btn" id="rb-score" onclick="switchHeat('score',this)">Score</button>
+          </div>
+        </div>
+      </div>
+      <div id="mapa-table"></div>
+      <hr class="rule-sep">
+      <div class="section-head" style="margin-top:24px">
+        <h2 class="section-title serif" style="font-size:16px">Top 5 e Bottom 5 — Anos Projetados</h2>
+      </div>
+      <div class="grid-2" id="top-bot-grid"></div>`;
+  }
+  renderHeat('rank');
+  renderTopBot();
+}
+
+let _heatMode='rank';
+function switchHeat(mode,btn){
+  document.querySelectorAll('.radio-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  _heatMode=mode;
+  renderHeat(mode);
+}
+
+function rankColor(rank){
+  const p=(rank-1)/26;
+  return `rgb(${Math.round(58+(146-58)*p)},${Math.round(107+(48-107)*p)},${Math.round(62+(42-62)*p)})`;
+}
+function scoreColor(score){
+  const p=score/100;
+  return `rgb(${Math.round(146+(58-146)*p)},${Math.round(48+(107-48)*p)},${Math.round(42+(62-42)*p)})`;
+}
+
+function renderHeat(mode){
+  const el=document.getElementById('mapa-table');if(!el)return;
+  const ord=UFS.map(uf=>{
+    const rks=ANOS_HIST.map(a=>HIST[uf][a]?HIST[uf][a].rank:27);
+    return{uf,med:rks.reduce((s,v)=>s+v,0)/rks.length};
+  }).sort((a,b)=>a.med-b.med).map(x=>x.uf);
+
+  const thead=`<thead><tr><th>Estado</th>
+    ${ANOS_HIST.map(a=>`<th>${a}</th>`).join('')}
+    ${ANOS_PROJ.map(a=>`<th class="proj-col"><div style="font-size:8px;letter-spacing:.06em;color:var(--gold)">proj.</div>${a}</th>`).join('')}
+  </tr></thead>`;
+
+  const tbody=ord.map(uf=>{
+    const isRS=uf==='RS';
+    const cells=ANOS_TODOS.map(ano=>{
+      const isP=ANOS_PROJ.includes(ano);
+      const d=ANOS_HIST.includes(ano)?(HIST[uf]&&HIST[uf][ano]):
+        (rankings[ano]&&rankings[ano].find(x=>x.uf===uf));
+      if(!d) return `<td class="${isP?'proj-col':''}">—</td>`;
+      const val=mode==='rank'?d.rank:d.score;
+      const bg=mode==='rank'?rankColor(d.rank):scoreColor(d.score);
+      const fg=d.rank<=8||d.rank>=22?'#f1ecdf':'#1c1814';
+      const disp=mode==='rank'?`${d.rank}º`:`${d.score.toFixed(1)}`;
+      return `<td class="${isP?'proj-col':''}"
+        style="background:${bg};color:${fg};font-weight:${isRS?700:400}">${disp}</td>`;
+    }).join('');
+    return `<tr${isRS?' class="rs-row"':''} style="${isRS?'outline:2px solid var(--red);outline-offset:-2px':''}">
+      <td>${uf}</td>${cells}</tr>`;
+  }).join('');
+
+  el.innerHTML=`<div class="table-wrap"><table class="data-table"><${thead}<tbody>${tbody}</tbody></table></div>`;
+}
+
+function renderTopBot(){
+  const el=document.getElementById('top-bot-grid');if(!el)return;
+  el.innerHTML=[2026,2028].map(ano=>{
+    const r=rankings[ano];if(!r) return '<div></div>';
+    const s=[...r].sort((a,b)=>a.rank-b.rank);
+    const rows=[...s.slice(0,5),{uf:'⋯',rank:'',score:''},...s.slice(-5)];
+    const trs=rows.map(x=>{
+      const isRS=x.uf==='RS';
+      return `<tr${isRS?' class="rs-row"':''}>
+        <td>${x.uf}</td>
+        <td>${x.rank?x.rank+'º':''}</td>
+        <td>${typeof x.score==='number'?x.score.toFixed(1):''}</td>
+      </tr>`;
+    }).join('');
+    return `<div>
+      <div class="section-eyebrow" style="margin-bottom:8px">${ano} — Projeção</div>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead><tr><th>Estado</th><th>Ranking</th><th>Score</th></tr></thead>
+          <tbody>${trs}</tbody>
+        </table>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ══════════════════════════════════════════════
+   TAB 4 — ALERTAS & REFERÊNCIAS
+══════════════════════════════════════════════ */
+function buildTab4(){
+  const el=document.getElementById('t4');
+  if(!el.innerHTML){
+    el.innerHTML=`
+      <div class="section-head">
+        <h2 class="section-title serif">Alertas &amp; Referências</h2>
+      </div>
+      <div class="control-row">
+        <div class="ctrl-group">
+          <span class="ctrl-label">Ano projetado</span>
+          <div class="radio-group" id="ytabs">
+            ${ANOS_PROJ.map((a,i)=>`<button class="radio-btn${i===0?' active':''}" onclick="selectAnoAlerta(${a},this)">${a}</button>`).join('')}
+          </div>
+        </div>
+      </div>
+      <div id="alertas-block"></div>
+      <div class="context-block">
+        <div class="section-eyebrow" style="margin-bottom:12px">Contexto RS</div>
+        <div class="context-item">
+          <span class="ctx-year">2023</span>
+          <div class="ctx-dot" style="background:${C.steel}"></div>
+          <div class="ctx-text">Adesão ao <strong>PRFE</strong> — altera estrutura da dívida, melhora perspectiva de Solvência Fiscal</div>
+        </div>
+        <div class="context-item">
+          <span class="ctx-year">2024</span>
+          <div class="ctx-dot" style="background:${C.red}"></div>
+          <div class="ctx-text"><strong>Enchentes de maio/2024</strong> — impacto em receitas, despesas emergenciais e transferências extraordinárias</div>
+        </div>
+      </div>
+
+      <hr class="rule-sep">
+      <div class="section-head">
+        <h2 class="section-title serif">Validação Metodológica vs. Ranking CLP/Tendências</h2>
+      </div>
+      <div class="context-block">
+        <div class="section-eyebrow" style="margin-bottom:12px">8 de 9 indicadores com score idêntico ao CLP (27 estados, 2024)</div>
+        <div class="context-item">
+          <span class="ctx-year">✅</span>
+          <div class="ctx-dot" style="background:${C.green}"></div>
+          <div class="ctx-text"><strong>IND1, IND3, IND4, IND5, IND7, IND9</strong> — score normalizado idêntico ao CLP em 27/27 estados. <strong>IND2 e IND8</strong> — idênticos em 26/27 e 27/27 estados respectivamente, com diferenças residuais de arredondamento de origem (&lt;0,02 pontos), sem efeito prático no ranking. Validados ponto a ponto contra a fonte SICONFI (RREO/RGF) e contra a planilha oficial do CLP.</div>
+        </div>
+        <div class="context-item">
+          <span class="ctx-year">⚠️</span>
+          <div class="ctx-dot" style="background:${C.gold}"></div>
+          <div class="ctx-text"><strong>IND6 — Resultado Primário:</strong> única divergência residual conhecida. Fórmula confirmada como Receita Primária Total (exceto RPPS) menos Despesa Primária Total (exceto RPPS), ambas do RREO Anexo 06, dividida pelo PIB estadual do <strong>ano anterior</strong> (descoberta desta validação: o CLP usa o PIB defasado em 1 ano, não o do ano corrente). Com essa correção, o erro caiu de pontos percentuais inteiros para uma média de ~0,02 a 0,1pp — mas como o ranking tem um grupo de 10+ estados com scores totais muito próximos, mesmo essa fração ainda desloca algumas posições. Testamos PIB com e sem projeção, Receita/Despesa com e sem RPPS, e fator de escala constante; nenhuma variação fecha exatamente. A causa mais provável é uma fonte de PIB estadual específica da Tendências Consultoria, não disponível publicamente.</div>
+        </div>
+        <div class="context-item">
+          <span class="ctx-year">📊</span>
+          <div class="ctx-dot" style="background:${C.steel}"></div>
+          <div class="ctx-text"><strong>Ranking final 2024:</strong> 11 de 27 estados com posição idêntica à publicada pelo CLP, incluindo o <strong>Rio Grande do Sul (27º, último lugar)</strong>. As divergências restantes vêm quase inteiramente do IND6, ampliadas pela alta sensibilidade do ranking nas faixas de score mais disputadas.</div>
+        </div>
+      </div>
+  `;
+  }
+  renderAlertas(ANOS_PROJ[0]);
+}
+
+let _anoAlerta=ANOS_PROJ[0];
+function selectAnoAlerta(ano,btn){
+  document.querySelectorAll('#ytabs .radio-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  _anoAlerta=ano;
+  renderAlertas(ano);
+}
+
+const LIMS=[
+  {ind:'ind1',label:'Taxa de Investimentos',cap:'Mínimo: ≥ 5% da RCL',op:'>=',lim:0.05,fmt:fmtPct},
+  {ind:'ind2',label:'Regra de Ouro',cap:'Capital não financiado por crédito: ≥ 0',op:'>=',lim:0,fmt:fmtN4},
+  {ind:'ind4',label:'Sucesso no Planejamento',cap:'Execução ≥ 85% da dotação',op:'>=',lim:0.85,fmt:fmtN4},
+  {ind:'ind5',label:'Dependência Fiscal',cap:'Transferências ≤ 50% da receita corrente',op:'<=',lim:0.50,fmt:fmtPct},
+  {ind:'ind6',label:'Resultado Primário / PIB',cap:'Resultado primário ≥ 0',op:'>=',lim:0,fmt:fmtPct},
+  {ind:'ind9',label:'Poupança Corrente / RCL',cap:'Poupança corrente ≥ 0',op:'>=',lim:0,fmt:fmtPct},
+];
+
+function renderAlertas(ano){
+  const el=document.getElementById('alertas-block');if(!el)return;
+  const inds=contasParaInds(inputs[ano]);
+  el.innerHTML=`<div class="limits-block">
+    <div class="limits-block-title serif">Indicadores RS — ${ano}</div>
+    ${LIMS.map(L=>{
+      const v=inds[L.ind];
+      const ok=L.op==='>='?v>=L.lim:v<=L.lim;
+      const pct=Math.min(Math.max(
+        L.op==='>='?(L.lim===0?50+v*200:v/L.lim*100):(L.lim===0?50:(L.lim-v)/L.lim*100+50)
+      ,0),100);
+      const fill=ok?C.green:C.red;
+      return `<div class="limit-row">
+        <div class="limit-name">${L.label}<span class="lim-cap">${L.cap}</span></div>
+        <div class="limit-bar"><div class="limit-fill" style="width:${Math.min(pct,100)}%;background:${fill}"></div></div>
+        <div class="limit-val" style="color:${ok?C.green:C.red}">${L.fmt(v)}</div>
+        <div class="limit-status">${ok?'✅':'🚨'}</div>
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+
+/* ══════════════════════════════════════════════
+   NAVEGAÇÃO
+══════════════════════════════════════════════ */
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
+    btn.classList.add('active');
+    const pane=document.getElementById(btn.dataset.tab);
+    pane.classList.add('active');
+    if(btn.dataset.tab==='t1') buildTab1();
+    if(btn.dataset.tab==='t2') buildTab2();
+    if(btn.dataset.tab==='t3') buildTab3();
+    if(btn.dataset.tab==='t4') buildTab4();
+  });
+});
+
+/* ══════════════════════════════════════════════
+   INIT
+══════════════════════════════════════════════ */
+// Carregar data da última alteração salva
+try{
+  const meta = JSON.parse(localStorage.getItem(STORAGE_META)||'{}');
+  if(meta.ultima_alteracao) atualizarDataAlteracao(meta.ultima_alteracao);
+}catch(e){}
+
+function resetarInputs(){
+  if(!confirm('Restaurar todos os valores para o padrão de 2025?')) return;
+  const ref = RS_HIST_CONTAS[LAST_HIST] || RS_HIST_CONTAS[String(LAST_HIST)] || {};
+  // Adicionar contas RGF do hist_scores
+  const rs_hist = HIST['RS'] && HIST['RS'][LAST_HIST] ? HIST['RS'][LAST_HIST] : {};
+  ANOS_PROJ.forEach(ano => {
+    CONTAS_DEF.forEach(c => {
+      inputs[ano][c.key] = ref[c.key] || 0;
+      const inp = document.getElementById(`inp_${c.key}_${ano}`);
+      if(inp) inp.value = Math.round(inputs[ano][c.key]) || '';
+      const disp = document.getElementById(`disp_${c.key}_${ano}`);
+      if(disp) disp.textContent = fmtBiInline(inputs[ano][c.key]);
+    });
+  });
+  localStorage.removeItem(STORAGE_KEY);
+  localStorage.removeItem(STORAGE_META);
+  atualizarDataAlteracao(null);
+  rankings = calcRankings();
+  refreshAll();
+}
+
+buildSidebar();
+buildTab1();
+</script>
+</body>
+</html>
